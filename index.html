@@ -1,1 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
 
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AvalonFlow Plans</title>
+
+    <style>
+        /* ---------- Base ---------- */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            background: #0d0d0d;
+            color: #fff;
+            overflow-x: hidden;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        /* ---------- Floating Background ---------- */
+        #floating-bg {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            background: radial-gradient(circle at bottom, #1a0d3a, #0d0d0d);
+            overflow: hidden;
+        }
+
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0.6;
+            animation: floatParticles linear infinite;
+            box-shadow: 0 0 10px #6b2cd8, 0 0 20px #6b2cd8;
+        }
+
+        @keyframes floatParticles {
+            0% { transform: translateY(100vh) scale(0.3); opacity: 0; }
+            50% { opacity: 1; }
+            100% { transform: translateY(-10vh) scale(1); opacity: 0; }
+        }
+
+        /* ---------- Content ---------- */
+        #content {
+            position: relative;
+            z-index: 1;
+            padding: 40px;
+            max-width: 1100px;
+            margin: auto;
+            padding-bottom: 80px;
+        }
+
+        /* ---------- Glass Cards ---------- */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(12px);
+            border-radius: 18px;
+            padding: 28px;
+            margin-bottom: 28px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+        }
+
+        .plan-logo {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+        }
+
+        .plan-pay {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        /* ---------- Notification Bar ---------- */
+        .notification-bar {
+            position: fixed;
+            top: -80px;
+            right: 20px;
+            background: rgba(30, 144, 255, 0.25);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(30,144,255,0.4);
+            color: #fff;
+            padding: 12px 18px;
+            border-radius: 12px;
+            font-size: 14px;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+            transition: top 0.5s ease, opacity 0.5s ease;
+            z-index: 9999;
+            opacity: 0;
+            max-width: 350px;
+            white-space: normal;
+            overflow: hidden;
+        }
+
+        .notification-bar.show { top: 20px; opacity: 1; }
+
+        .notification-bar::before {
+            content: '';
+            position: absolute;
+            left: -50%;
+            top: 0;
+            width: 50%;
+            height: 100%;
+            background: rgba(255,255,255,0.3);
+            transform: skewX(-25deg);
+            animation: liquidWave 2s linear infinite;
+        }
+
+        @keyframes liquidWave { 0% { left: -50%; } 100% { left: 100%; } }
+
+        /* ---------- Mini TV Video ---------- */
+        .video-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin: 20px auto;
+            border-radius: 16px;
+            overflow: hidden;
+            background: rgba(0,0,0,0.3);
+            backdrop-filter: blur(8px);
+        }
+
+        .video-container video { width: 100%; display: block; }
+
+        .video-controls { display: flex; justify-content: flex-end; margin-top: 4px; }
+
+        .video-controls input[type=range] { width: 100px; }
+
+        /* ---------- Footer ---------- */
+        footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            padding: 18px 0;
+            font-size: 14px;
+            color: #aaa;
+            background: rgba(15, 15, 25, 0.95);
+            backdrop-filter: blur(12px);
+            box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.4);
+            z-index: 6;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="floating-bg"></div>
+
+    <!-- Notification Bar -->
+    <div id="planNotification" class="notification-bar"></div>
+
+    <div id="content">
+
+        <!-- Page Header -->
+        <h3>Plans</h3>
+        <p style="margin-bottom:20px; font-size:14px; opacity:0.85;">
+            About the AvalonFlow Plans
+        </p>
+
+        <!-- ACU Intro Glass Card -->
+        <div class="glass-card">
+            <div>
+                <strong>As you continue inside AvalonCare, you’ll see the term ACU referenced throughout the ecosystem.</strong>
+            </div>
+        </div>
+
+        <!-- ACU Explanation Glass Card -->
+        <div class="glass-card">
+            <div>
+                <strong>ACU stands for AvalonCare Units — Interests which are released and tracked on timed system cycles generated through the Logical Wing.</strong><br>
+                <em>Rather than instant or speculative activity, ACU Interests are designed to maintain balance, clarity, and sustainability.</em>
+            </div>
+        </div>
+
+<!-- AvalonCare Premium Glass Card -->
+<div class="glass-card">
+    <div>
+        <strong>🪽 AvalonCare Premium</strong><br>
+        <span style="font-size:14px; opacity:0.85;">
+            Supports progress, alignment, and financial growth.
+        </span>
+    </div>
+    <div class="plan-pay">
+        <img class="plan-logo"
+             src="https://i.postimg.cc/W3nB6L7j/6bf751e011e8ae86963744c079ec2a9b.jpg"
+             alt="AvalonCare Premium Logo">
+        <a href="https://app.paymento.io/payment-link/5e887f901356404788e989c5e2c4cb47" target="_blank">
+            Activate access with Tether USDT
+        </a>
+    </div>
+    <div style="margin-top:12px; font-size:14px;">
+        <strong>Reference rate:</strong> 1 USD = 1 ACU<br>
+        <strong>Cycle style:</strong> Complete 24-hour ACU cycles<br>
+        <strong>Cycle rate (per 12 hours):</strong> 14.15<br>
+        ~ Built for full continuity, stability, and system depth.
+    </div>
+</div>
+
+<!-- AvalonCare Basic Glass Card -->
+<div class="glass-card">
+    <div>
+        <strong>🪽 AvalonCare Basic</strong><br>
+        <span style="font-size:14px; opacity:0.85;">
+            Enables sustainable systems with minimal friction.
+        </span>
+    </div>
+    <div class="plan-pay">
+        <img class="plan-logo"
+             src="https://i.postimg.cc/W3nB6L7j/6bf751e011e8ae86963744c079ec2a9b.jpg"
+             alt="AvalonCare Basic Logo">
+        <a href="https://app.paymento.io/payment-link/aaf970b845624de0b5eea78726134e79" target="_blank">
+            Activate access with Tether USDT
+        </a>
+    </div>
+    <div style="margin-top:12px; font-size:14px;">
+        <strong>Reference rate:</strong> 1 USD = 5 ACU<br>
+        <strong>Cycle style:</strong> Structured ACU cycles<br>
+        <strong>Cycle rate (per 12 hours):</strong> 45.15<br>
+        ~ Offers more consistency and deeper engagement than Lite
+    </div>
+</div>
+
+<!-- AvalonCare Lite Glass Card -->
+<div class="glass-card">
+    <div>
+        <strong>🪽 AvalonCare Lite</strong><br>
+        <span style="font-size:14px; opacity:0.85;">
+            Focuses on stability, clarity, and easing daily pressure.
+        </span>
+    </div>
+    <div class="plan-pay">
+        <img class="plan-logo"
+             src="https://i.postimg.cc/W3nB6L7j/6bf751e011e8ae86963744c079ec2a9b.jpg"
+             alt="AvalonCare Lite Logo">
+        <a href="https://app.paymento.io/payment-link/a860137ccb2743df9135b45f5c5c3334" target="_blank">
+            Activate access with Tether USDT
+        </a>
+    </div>
+    <div style="margin-top:12px; font-size:14px;">
+        <strong>Reference rate:</strong> 1 USD = 10 ACU<br>
+        <strong>Cycle style:</strong> Limited exposure cycles<br>
+        <strong>Cycle rate (per 12 hours):</strong> 47.15<br>
+        ~ Designed for light entry and observation-level participation
+    </div>
+</div>
+
+<!-- ACU Mechanics Summary Glass Card (before Mini TV) -->
+<div class="glass-card">
+    <div>
+        <strong>Higher tiers prioritize structure, control, and continuity, while lower tiers offer broader unit exposure with reduced cycle depth within a 30-Day Duration.</strong><br>
+        <em>Further ACU mechanics and visibility unlock as your access activates.</em>
+    </div>
+</div>
+
+        <!-- Mini TV: Member Reflection -->
+        <p style="text-align:center; font-weight:bold; margin-top:20px;">View a Member Reflection</p>
+        <div class="video-container">
+            <video id="planVideo" controls controlsList="nodownload">
+                <source src="assets/videos/2025-12-15-201525736.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+            <div class="video-controls">
+                <label for="volumeControl" style="margin-right:6px;">Volume:</label>
+                <input type="range" id="volumeControl" min="0" max="1" step="0.05" value="1">
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        © 2026 AvalonFlow • Powered by Centrical™
+    </footer>
+
+    <script>
+        // Floating particles
+        const bg = document.getElementById('floating-bg');
+        const colors = ['#6b2cd8', '#9b59b6', '#8e44ad'];
+
+        function particle() {
+            const p = document.createElement('div');
+            p.className = 'particle';
+            const s = Math.random() * 20 + 10;
+            p.style.width = s + 'px';
+            p.style.height = s + 'px';
+            p.style.left = Math.random() * 100 + 'vw';
+            p.style.background = `radial-gradient(circle, ${colors[Math.floor(Math.random() * 3)]}, transparent)`;
+            p.style.animationDuration = (Math.random() * 20 + 10) + 's';
+            bg.appendChild(p);
+            setTimeout(() => p.remove(), 30000);
+        }
+        setInterval(particle, 800);
+
+        // Notification bar
+        window.addEventListener("load", () => {
+            const notification = document.getElementById("planNotification");
+            notification.textContent = "Select a plan to continue.";
+            setTimeout(()=>notification.classList.add("show"),300);
+            setTimeout(()=>notification.classList.remove("show"),3300);
+        });
+
+        // Video volume
+        const video = document.getElementById("planVideo");
+        const volumeControl = document.getElementById("volumeControl");
+        volumeControl.addEventListener("input", e => { video.volume = e.target.value; });
+    </script>
+</body>
+</html>

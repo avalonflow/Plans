@@ -68,12 +68,24 @@
             border-radius: 50%;
         }
 
-        .plan-pay {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-top: 12px;
-        }
+        .plan-pay a {
+    display: inline-block;
+    margin-top: 12px;
+    padding: 10px 18px;
+    color: #ffffff;
+    background: linear-gradient(135deg, #7b2ff7, #9b59b6);
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    box-shadow: 0 0 12px rgba(155, 89, 182, 0.4);
+}
+
+.plan-pay a:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 18px rgba(155, 89, 182, 0.7);
+}
 
         /* ---------- Notification Bar ---------- */
         .notification-bar {

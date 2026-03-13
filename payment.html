@@ -5,10 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Payment Gateway</title>
 
-        <!-- Favicon -->
-<link rel="icon" href="/favicon.png" type="image/png" sizes="48x48">
+    <!-- Favicon -->
+    <link rel="icon" href="/favicon.png" type="image/png" sizes="48x48">
 
-        <!-- Structured Data for Logo -->
+    <!-- Structured Data for Logo -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
@@ -17,21 +17,21 @@
       "url": "https://avalonflow.site",
       "logo": "https://avalonFlow.site/favicon.png"
     }
+    </script>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-</script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
     <style>
         /* ---------- Base ---------- */
-                body {
+        body {
             font-family: Georgia, serif;
             margin: 0;
             color: #fff;
-display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-background: linear-gradient(135deg, #0d0f1a, #050608);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(135deg, #0d0f1a, #050608);
             overflow-x: hidden;
         }
         button { cursor: pointer; }
@@ -71,155 +71,145 @@ background: linear-gradient(135deg, #0d0f1a, #050608);
             padding-bottom: 40px;
         }
 
-/* --- Container Glass Panel --- */
-#payment-container {
-  background: rgba(255,255,255,0.05);
-  backdrop-filter: blur(15px);
-  border-radius: 20px;
-  padding: 40px 50px;
-  box-shadow: 0 0 30px rgba(0,255,255,0.2), 0 0 60px rgba(255,0,255,0.1);
-  text-align: center;
-  max-width: 400px;
-  width: 90%;
-  animation: pulseGlow 3s infinite alternate;
-}
+        /* --- Container Glass Panel --- */
+        #payment-container {
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            padding: 40px 50px;
+            box-shadow: 0 0 30px rgba(0,255,255,0.2), 0 0 60px rgba(255,0,255,0.1);
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+            animation: pulseGlow 3s infinite alternate;
+        }
 
-/* --- Neon Glow Animation --- */
-@keyframes pulseGlow {
-  0% { box-shadow: 0 0 20px rgba(0,255,255,0.2), 0 0 40px rgba(255,0,255,0.1); }
-  50% { box-shadow: 0 0 30px rgba(0,255,255,0.4), 0 0 60px rgba(255,0,255,0.2); }
-  100% { box-shadow: 0 0 25px rgba(0,255,255,0.3), 0 0 50px rgba(255,0,255,0.15); }
-}
+        @keyframes pulseGlow {
+            0% { box-shadow: 0 0 20px rgba(0,255,255,0.2), 0 0 40px rgba(255,0,255,0.1); }
+            50% { box-shadow: 0 0 30px rgba(0,255,255,0.4), 0 0 60px rgba(255,0,255,0.2); }
+            100% { box-shadow: 0 0 25px rgba(0,255,255,0.3), 0 0 50px rgba(255,0,255,0.15); }
+        }
 
-/* --- Headings & Status --- */
-#status {
-  font-size: 1.2rem;
-  margin-bottom: 20px;
-  color: #0ff; /* neon cyan */
-  text-shadow: 0 0 8px #0ff, 0 0 12px #0ff;
-  transition: all 0.3s ease-in-out;
-}
+        /* --- Headings & Status --- */
+        #status {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            color: #0ff;
+            text-shadow: 0 0 8px #0ff, 0 0 12px #0ff;
+            transition: all 0.3s ease-in-out;
+        }
 
-#amount {
-  font-weight: bold;
-  font-size: 1.8rem;
-  color: #ff3fff;
-  text-shadow: 0 0 10px #ff3fff, 0 0 20px #ff3fff;
-}
+        .amount {
+            font-weight: bold;
+            font-size: 1.8rem;
+            color: #ff3fff;
+            text-shadow: 0 0 10px #ff3fff, 0 0 20px #ff3fff;
+        }
 
-p {
-  margin: 12px 0;
-  font-size: 1rem;
-  letter-spacing: 0.5px;
-}
+        p {
+            margin: 12px 0;
+            font-size: 1rem;
+            letter-spacing: 0.5px;
+        }
 
-/* --- Wallet Address Styling --- */
-p + p {
-  font-family: 'Courier New', monospace;
-  font-size: 0.9rem;
-  color: #0ff;
-  text-shadow: 0 0 6px #0ff;
-  word-break: break-all;
-}
+        p + p {
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            color: #0ff;
+            text-shadow: 0 0 6px #0ff;
+            word-break: break-all;
+        }
 
-/* --- Glowing Button (Optional) --- */
-#check-btn {
-  margin-top: 25px;
-  padding: 12px 25px;
-  font-size: 1rem;
-  font-weight: bold;
-  color: #fff;
-  background: linear-gradient(45deg, #0ff, #ff3fff);
-  border: none;
-  border-radius: 12px;
-  cursor: pointer;
-  text-transform: uppercase;
-  box-shadow: 0 0 8px #0ff, 0 0 16px #ff3fff;
-  transition: all 0.3s ease-in-out;
-}
+        #check-btn {
+            margin-top: 25px;
+            padding: 12px 25px;
+            font-size: 1rem;
+            font-weight: bold;
+            color: #fff;
+            background: linear-gradient(45deg, #0ff, #ff3fff);
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            text-transform: uppercase;
+            box-shadow: 0 0 8px #0ff, 0 0 16px #ff3fff;
+            transition: all 0.3s ease-in-out;
+        }
 
-#check-btn:hover {
-  transform: scale(1.05);
-  box-shadow: 0 0 12px #0ff, 0 0 24px #ff3fff;
-}
+        #check-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 12px #0ff, 0 0 24px #ff3fff;
+        }
 
-/* Timer Styling */
-#timer {
-  font-family: 'Orbitron', sans-serif;
-  font-size: 1rem;
-  font-weight: bold;
-  color: #ff3fff; /* neon pink */
-  text-shadow: 
-    0 0 5px #ff3fff,
-    0 0 10px #ff3fff,
-    0 0 20px #ff3fff,
-    0 0 40px #ff3fff;
-  margin-top: 15px;
-  text-align: center;
-  animation: glowPulse 2s infinite alternate;
-}
+        /* Timer Styling */
+        #timer {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1rem;
+            font-weight: bold;
+            color: #ff3fff;
+            text-shadow: 0 0 5px #ff3fff, 0 0 10px #ff3fff, 0 0 20px #ff3fff, 0 0 40px #ff3fff;
+            margin-top: 15px;
+            text-align: center;
+            animation: glowPulse 2s infinite alternate;
+        }
 
-/* Glow pulse animation */
-@keyframes glowPulse {
-  0% { text-shadow: 0 0 5px #ff3fff, 0 0 10px #ff3fff, 0 0 20px #ff3fff, 0 0 40px #ff3fff; }
-  50% { text-shadow: 0 0 10px #ff3fff, 0 0 20px #ff3fff, 0 0 40px #ff3fff, 0 0 60px #ff3fff; }
-  100% { text-shadow: 0 0 8px #ff3fff, 0 0 16px #ff3fff, 0 0 32px #ff3fff, 0 0 50px #ff3fff; }
-}
+        @keyframes glowPulse {
+            0% { text-shadow: 0 0 5px #ff3fff, 0 0 10px #ff3fff, 0 0 20px #ff3fff, 0 0 40px #ff3fff; }
+            50% { text-shadow: 0 0 10px #ff3fff, 0 0 20px #ff3fff, 0 0 40px #ff3fff, 0 0 60px #ff3fff; }
+            100% { text-shadow: 0 0 8px #ff3fff, 0 0 16px #ff3fff, 0 0 32px #ff3fff, 0 0 50px #ff3fff; }
+        }
 
-        /* ---------------- PROGRESS BAR ---------------- */
-.progress-bar {
-    width: 100%;
-    height: 18px;
-    background: rgba(255,255,255,0.06);
-    border-radius: 12px;
-    overflow: hidden;
-    margin: 18px 0;
-}
+        /* Progress Bar */
+        .progress-bar {
+            width: 100%;
+            height: 18px;
+            background: rgba(255,255,255,0.06);
+            border-radius: 12px;
+            overflow: hidden;
+            margin: 18px 0;
+        }
 
-.progress-fill {
-    height: 100%;
-    width: 0%;
-    border-radius: 12px;
-    position: relative;
-    transition: width 0.6s ease;
-        background: linear-gradient(90deg,#4facfe,#00f2fe);
-    box-shadow: 0 0 20px rgba(79,172,254,0.6);
-}
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            border-radius: 12px;
+            position: relative;
+            transition: width 0.6s ease;
+            background: linear-gradient(90deg,#4facfe,#00f2fe);
+            box-shadow: 0 0 20px rgba(79,172,254,0.6);
+        }
 
-/* Energy flow */
-.progress-fill::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
-    animation: energyFlow 2.5s linear infinite;
-}
+        .progress-fill::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            animation: energyFlow 2.5s linear infinite;
+        }
 
-@keyframes energyFlow {
-    0% { transform: translateX(-100%); }
-    100% { transform: translateX(100%); }
-}
+        @keyframes energyFlow {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
 
         .plan-pay a {
-    display: inline-block;
-    margin-top: 12px;
-    padding: 10px 18px;
-    color: #ffffff;
-    background: linear-gradient(135deg, #7b2ff7, #9b59b6);
-    border-radius: 8px;
-    text-decoration: none;
-    font-weight: 600;
-    font-size: 14px;
-    transition: all 0.3s ease;
-    box-shadow: 0 0 12px rgba(155, 89, 182, 0.4);
-}
+            display: inline-block;
+            margin-top: 12px;
+            padding: 10px 18px;
+            color: #ffffff;
+            background: linear-gradient(135deg, #7b2ff7, #9b59b6);
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 12px rgba(155, 89, 182, 0.4);
+        }
 
-.plan-pay a:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 0 18px rgba(155, 89, 182, 0.7);
-}
+        .plan-pay a:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 18px rgba(155, 89, 182, 0.7);
+        }
 
-        /* ---------- Footer ---------- */
         footer {
             position: fixed;
             bottom: 0;
@@ -235,15 +225,14 @@ p + p {
             z-index: 6;
         }
 
-.qr-section div {
-  margin: 0 auto;
-  border-radius: 12px;
-}
+        .qr-section div {
+            margin: 0 auto;
+            border-radius: 12px;
+        }
 
-/* Hide inactive token card */
-.token-card.inactive {
-  display: none;
-}
+        .token-card.inactive {
+            display: none;
+        }
     </style>
 </head>
 
@@ -255,13 +244,13 @@ p + p {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      width: 300px;                /* slightly bigger frame */
+      width: 300px;
       height: 180px;
       border-radius: 24px;
-      background: rgba(255, 255, 255, 0.12);  /* a little more visible */
+      background: rgba(255, 255, 255, 0.12);
       backdrop-filter: blur(15px);
-      border: 1px solid rgba(255, 255, 255, 0.3); /* stronger border */
-      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);  /* deeper shadow */
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
       margin: 0 auto;
     ">
     <img src="assets/pictures/imagitool-export (26).jpg" 
@@ -276,255 +265,165 @@ p + p {
 </div>
 
 <div id="payment-container">
-  <!-- Payment Section -->
+  <!-- USDT Card -->
   <div class="token-card" id="usdt-card">
-        <div class="plan-pay">
-        <img class="plan-logo"
-             src="https://i.postimg.cc/W3nB6L7j/6bf751e011e8ae86963744c079ec2a9b.jpg"
-             alt="AvalonCare Premium Logo">
+    <div class="plan-pay">
+      <img class="plan-logo"
+           src="https://i.postimg.cc/W3nB6L7j/6bf751e011e8ae86963744c079ec2a9b.jpg"
+           alt="AvalonCare Premium Logo">
       <span class="token-name">USDT</span>
       <span class="network">ERC-20</span>
     </div>
-
     <div class="amount-section">
       <p>Send exactly:</p>
       <p class="amount" id="usdt-amount">400.2037</p>
     </div>
-
     <div class="wallet-section">
       <p>Wallet Address:</p>
       <p class="wallet">0x63d93f4348b109492d75aaaf10ac374d448178cd</p>
     </div>
-
     <div class="qr-section">
-  <div id="usdt-qr"></div>
-</div>
-
-<!-- Timer for payment expiration -->
-<p id="timer">Address expires in 05:00</p>
-
-      <div class="progress-bar">
-        <div class="progress-fill" id="progressFill"></div>
-
-    <div class="status" id="usdt-status">Waiting for payment...</div>
+      <div id="usdt-qr"></div>
+    </div>
+    <p id="usdt-timer">Address expires in 05:00</p>
+    <div class="progress-bar">
+      <div class="progress-fill" id="usdt-progress"></div>
+      <div class="status" id="usdt-status">Waiting for payment...</div>
+    </div>
   </div>
 
-  <div class="token-card" id="usdc-card">
-        <div class="plan-pay">
-        <img class="plan-logo"
-             src="https://i.postimg.cc/W3nB6L7j/6bf751e011e8ae86963744c079ec2a9b.jpg"
-             alt="AvalonCare Premium Logo">
+  <!-- USDC Card -->
+  <div class="token-card inactive" id="usdc-card">
+    <div class="plan-pay">
+      <img class="plan-logo"
+           src="https://i.postimg.cc/W3nB6L7j/6bf751e011e8ae86963744c079ec2a9b.jpg"
+           alt="AvalonCare Premium Logo">
       <span class="token-name">USDC</span>
       <span class="network">ERC-20</span>
     </div>
-
     <div class="amount-section">
       <p>Send exactly:</p>
       <p class="amount" id="usdc-amount">400.2037</p>
     </div>
-
     <div class="wallet-section">
       <p>Wallet Address:</p>
       <p class="wallet">0x63d93f4348b109492d75aaaf10ac374d448178cd</p>
     </div>
-
     <div class="qr-section">
-  <div id="usdc-qr"></div>
-</div>
-
-<!-- Timer for payment expiration -->
-<p id="timer">Address expires in 05:00</p>
-
-      <div class="progress-bar">
-        <div class="progress-fill" id="progressFill"></div>
-
-    <div class="status" id="usdc-status">Waiting for payment...</div>
+      <div id="usdc-qr"></div>
+    </div>
+    <p id="usdc-timer">Address expires in 05:00</p>
+    <div class="progress-bar">
+      <div class="progress-fill" id="usdc-progress"></div>
+      <div class="status" id="usdc-status">Waiting for payment...</div>
+    </div>
   </div>
-
 </div>
 
-    <!-- Footer -->
-    <footer>
-        © 2026 AvalonFlow • Powered by Centrical™
-    </footer>
+<footer>
+  © 2026 AvalonFlow • Powered by Centrical™
+</footer>
 
-    <script>
-        // Floating particles
-        const bg = document.getElementById('floating-bg');
-        const colors = ['#6b2cd8', '#9b59b6', '#8e44ad'];
+<script>
+    // Floating particles
+    const bg = document.getElementById('floating-bg');
+    const colors = ['#6b2cd8', '#9b59b6', '#8e44ad'];
+    function particle() {
+        const p = document.createElement('div');
+        p.className = 'particle';
+        const s = Math.random() * 20 + 10;
+        p.style.width = s + 'px';
+        p.style.height = s + 'px';
+        p.style.left = Math.random() * 100 + 'vw';
+        p.style.background = `radial-gradient(circle, ${colors[Math.floor(Math.random() * 3)]}, transparent)`;
+        p.style.animationDuration = (Math.random() * 20 + 10) + 's';
+        bg.appendChild(p);
+        setTimeout(() => p.remove(), 30000);
+    }
+    setInterval(particle, 800);
 
-        function particle() {
-            const p = document.createElement('div');
-            p.className = 'particle';
-            const s = Math.random() * 20 + 10;
-            p.style.width = s + 'px';
-            p.style.height = s + 'px';
-            p.style.left = Math.random() * 100 + 'vw';
-            p.style.background = `radial-gradient(circle, ${colors[Math.floor(Math.random() * 3)]}, transparent)`;
-            p.style.animationDuration = (Math.random() * 20 + 10) + 's';
-            bg.appendChild(p);
-            setTimeout(() => p.remove(), 30000);
-        }
-        setInterval(particle, 800);
+    // Wallet & tokens
+    const wallet = "0x63d93f4348b109492d75aaaf10ac374d448178cd";
+    const apiKey = "R53TCHYDZ9W1GJ4N861427HN52APJ5DZNI";
+    const tokens = {
+      USDT: "0xdAC17F958D2ee523a2206206994597C13D831ec7",
+      USDC: "0xA0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
+    };
 
-const wallet = "0x63d93f4348b109492d75aaaf10ac374d448178cd";
-const apiKey = "R53TCHYDZ9W1GJ4N861427HN52APJ5DZNI"; // your Etherscan API key
+    // 1️⃣ Token switch
+    function showTokenCard(selectedToken){
+        const cards = document.querySelectorAll(".token-card");
+        cards.forEach(card => card.classList.add("inactive"));
+        const activeCard = document.getElementById(`${selectedToken}-card`);
+        if(activeCard) activeCard.classList.remove("inactive");
+    }
+    showTokenCard("usdt");
 
-// ERC20 contracts
-const tokens = {
-  USDT: "0xdAC17F958D2ee523a2206206994597C13D831ec7",
-  USDC: "0xA0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
-};
+    // Optional buttons
+    document.getElementById("payUSDTBtn")?.addEventListener("click", () => showTokenCard("usdt"));
+    document.getElementById("payUSDCBtn")?.addEventListener("click", () => showTokenCard("usdc"));
 
-// Create QR code for USDT
-const usdtQrCode = new QRCode(document.getElementById("usdt-qr"), {
-  text: `ethereum:${wallet}?value=${expectedAmount}000000`, // 6 decimals
-  width: 120,
-  height: 120,
-  colorDark:"#0ff",
-  colorLight:"rgba(0,0,0,0)",
-  correctLevel: QRCode.CorrectLevel.H
-});
-
-// Create QR code for USDC
-const usdcQrCode = new QRCode(document.getElementById("usdc-qr"), {
-  text: `ethereum:${wallet}?value=${expectedAmount}000000`,
-  width: 120,
-  height: 120,
-  colorDark:"#ff3fff",
-  colorLight:"rgba(0,0,0,0)",
-  correctLevel: QRCode.CorrectLevel.H
-});
-
-// Function to show only the selected token card
-function showTokenCard(selectedToken){
-    const cards = document.querySelectorAll(".token-card");
-    cards.forEach(card => card.classList.add("inactive")); // hide all cards
-    const activeCard = document.getElementById(`${selectedToken}-card`);
-    if(activeCard) activeCard.classList.remove("inactive"); // show selected
-}
-
-// Immediately activate USDT by default
-showTokenCard("usdt");
-
-// Optional: if you have buttons to switch tokens, attach event listeners
-document.getElementById("payUSDTBtn")?.addEventListener("click", () => showTokenCard("usdt"));
-document.getElementById("payUSDCBtn")?.addEventListener("click", () => showTokenCard("usdc"));
-
-// 1️⃣ Generate unique payment amount
-const baseAmount = 400.20;
-
-// Check if amount already exists in localStorage
-let expectedAmount = localStorage.getItem("avalonflowAmount");
-if (!expectedAmount) {
-    const randomDecimal = Math.floor(Math.random()*10000)/10000;
-    expectedAmount = (baseAmount + randomDecimal).toFixed(4);
-    localStorage.setItem("avalonflowAmount", expectedAmount);
-}
-
-document.getElementById("amount").innerText = expectedAmount;
-
-// 2️⃣ Save page load time to ignore old transactions
-const pageLoadTime = Math.floor(Date.now() / 1000); // unix timestamp in seconds
-
-const timerElement = document.createElement("p");
-timerElement.id = "timer";
-timerElement.style.color = "#ff3fff";
-timerElement.style.textShadow = "0 0 6px #ff3fff";
-document.getElementById("payment-container").appendChild(timerElement);
-
-let timeLeft = 300; // 5 minutes in seconds
-
-const timerInterval = setInterval(() => {
-    const minutes = String(Math.floor(timeLeft / 60)).padStart(2,"0");
-    const seconds = String(timeLeft % 60).padStart(2,"0");
-    timerElement.innerText = `Address expires in ${minutes}:${seconds}`;
-
-    if(timeLeft <= 0){
-        clearInterval(timerInterval);
-        timerElement.innerText = "Payment session expired!";
-        localStorage.removeItem("avalonflowAmount");
-        // Optional: reload page or disable payment UI
-        // location.reload();
+    // 2️⃣ Unique amount
+    const baseAmount = 400.20;
+    let expectedAmount = localStorage.getItem("avalonflowAmount");
+    if (!expectedAmount) {
+        const randomDecimal = Math.floor(Math.random()*10000)/10000;
+        expectedAmount = (baseAmount + randomDecimal).toFixed(4);
+        localStorage.setItem("avalonflowAmount", expectedAmount);
     }
 
-    timeLeft--;
-}, 1000);
+    document.getElementById("usdt-amount").innerText = expectedAmount;
+    document.getElementById("usdc-amount").innerText = expectedAmount;
 
-// Total duration for countdown: 5 minutes
-const totalDuration = 5 * 60 * 1000; // 5 minutes in milliseconds
+    // 3️⃣ QR Codes
+    new QRCode(document.getElementById("usdt-qr"), {
+        text: `ethereum:${wallet}?value=${expectedAmount}000000`,
+        width: 120,
+        height: 120,
+        colorDark:"#0ff",
+        colorLight:"rgba(0,0,0,0)",
+        correctLevel: QRCode.CorrectLevel.H
+    });
+    new QRCode(document.getElementById("usdc-qr"), {
+        text: `ethereum:${wallet}?value=${expectedAmount}000000`,
+        width: 120,
+        height: 120,
+        colorDark:"#ff3fff",
+        colorLight:"rgba(0,0,0,0)",
+        correctLevel: QRCode.CorrectLevel.H
+    });
+
+    // 4️⃣ Timer & Progress Bar per card
+    // Total duration: 5 minutes
+const totalDuration = 5 * 60 * 1000; // milliseconds
 const progressFill = document.getElementById("progressFill");
-const timerElement = document.getElementById("timer"); // optional, updates the text countdown
+const timerElement = document.getElementById("timer");
 
 const startTime = Date.now();
 
 const interval = setInterval(() => {
+
     const now = Date.now();
     const elapsed = now - startTime;
     const remaining = totalDuration - elapsed;
 
-    // Calculate % width for progress fill
+    // Update progress bar
     const percentage = Math.max(0, remaining / totalDuration) * 100;
     progressFill.style.width = percentage + "%";
 
     // Update timer text
-    if (timerElement) {
-        const minutes = String(Math.floor(remaining / 60000)).padStart(2,"0");
-        const seconds = String(Math.floor((remaining % 60000) / 1000)).padStart(2,"0");
-        timerElement.innerText = `Address expires in ${minutes}:${seconds}`;
-    }
+    const minutes = String(Math.floor(remaining / 60000)).padStart(2,"0");
+    const seconds = String(Math.floor((remaining % 60000) / 1000)).padStart(2,"0");
+    timerElement.innerText = `Address expires in ${minutes}:${seconds}`;
 
-    // Expired
-    if (remaining <= 0) {
+    // Expire session
+    if(remaining <= 0){
         clearInterval(interval);
         progressFill.style.width = "0%";
-        if (timerElement) timerElement.innerText = "Payment session expired!";
-        localStorage.removeItem("avalonflowAmount"); // reset the amount
-        // Optional: reload page or show a message
+        timerElement.innerText = "Payment session expired!";
+        localStorage.removeItem("avalonflowAmount");
+        // Optional:
         // location.reload();
     }
+
 }, 1000);
-
-// 3️⃣ Check blockchain for payment
-async function checkPayment(){
-  for (let token in tokens){
-    let contract = tokens[token];
-    let url = `https://api.etherscan.io/api?module=account&action=tokentx&address=${wallet}&contractaddress=${contract}&sort=desc&apikey=${apiKey}`;
-
-    try{
-      let res = await fetch(url);
-      let data = await res.json();
-      if(data.status !== "1") continue;
-
-      for(let tx of data.result){
-        let amount = tx.value / 1e6; // USDT/USDC use 6 decimals
-        let txTime = parseInt(tx.timeStamp || 0); // tx timestamp
-        let confirmations = parseInt(tx.confirmations || 1);
-
-        if(
-          tx.to.toLowerCase() === wallet.toLowerCase() &&
-          parseFloat(amount).toFixed(4) === expectedAmount &&
-          txTime > pageLoadTime &&
-          confirmations >= 1
-        ){
-          // Payment detected → redirect
-          document.getElementById("status").innerText = "Payment detected. Redirecting...";
-          setTimeout(()=>{ window.location.href="/login.html"; }, 1000);
-          return;
-        }
-      }
-
-    }catch(err){
-      console.error("Error checking payment:", err);
-    }
-  }
-}
-
-// 4️⃣ Poll every 10 seconds
-setInterval(checkPayment, 10000);
-// Initial check immediately
-checkPayment();
-
-    </script>
-</body>
-</html>

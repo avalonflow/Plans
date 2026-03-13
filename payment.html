@@ -1,1 +1,87 @@
+<style>
+/* --- Global Reset & Font --- */
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Orbitron', sans-serif;
+  background: linear-gradient(135deg, #0d0f1a, #050608);
+  color: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  overflow: hidden;
+}
 
+/* --- Container Glass Panel --- */
+#payment-container {
+  background: rgba(255,255,255,0.05);
+  backdrop-filter: blur(15px);
+  border-radius: 20px;
+  padding: 40px 50px;
+  box-shadow: 0 0 30px rgba(0,255,255,0.2), 0 0 60px rgba(255,0,255,0.1);
+  text-align: center;
+  max-width: 400px;
+  width: 90%;
+  animation: pulseGlow 3s infinite alternate;
+}
+
+/* --- Neon Glow Animation --- */
+@keyframes pulseGlow {
+  0% { box-shadow: 0 0 20px rgba(0,255,255,0.2), 0 0 40px rgba(255,0,255,0.1); }
+  50% { box-shadow: 0 0 30px rgba(0,255,255,0.4), 0 0 60px rgba(255,0,255,0.2); }
+  100% { box-shadow: 0 0 25px rgba(0,255,255,0.3), 0 0 50px rgba(255,0,255,0.15); }
+}
+
+/* --- Headings & Status --- */
+#status {
+  font-size: 1.2rem;
+  margin-bottom: 20px;
+  color: #0ff; /* neon cyan */
+  text-shadow: 0 0 8px #0ff, 0 0 12px #0ff;
+  transition: all 0.3s ease-in-out;
+}
+
+#amount {
+  font-weight: bold;
+  font-size: 1.8rem;
+  color: #ff3fff;
+  text-shadow: 0 0 10px #ff3fff, 0 0 20px #ff3fff;
+}
+
+p {
+  margin: 12px 0;
+  font-size: 1rem;
+  letter-spacing: 0.5px;
+}
+
+/* --- Wallet Address Styling --- */
+p + p {
+  font-family: 'Courier New', monospace;
+  font-size: 0.9rem;
+  color: #0ff;
+  text-shadow: 0 0 6px #0ff;
+  word-break: break-all;
+}
+
+/* --- Glowing Button (Optional) --- */
+#check-btn {
+  margin-top: 25px;
+  padding: 12px 25px;
+  font-size: 1rem;
+  font-weight: bold;
+  color: #fff;
+  background: linear-gradient(45deg, #0ff, #ff3fff);
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  text-transform: uppercase;
+  box-shadow: 0 0 8px #0ff, 0 0 16px #ff3fff;
+  transition: all 0.3s ease-in-out;
+}
+
+#check-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 12px #0ff, 0 0 24px #ff3fff;
+}
+</style>

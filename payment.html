@@ -141,4 +141,112 @@ p + p {
   transform: scale(1.05);
   box-shadow: 0 0 12px #0ff, 0 0 24px #ff3fff;
 }
-</style>
+        /* ---------- Footer ---------- */
+        footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            padding: 18px 0;
+            font-size: 14px;
+            color: #aaa;
+            background: rgba(15, 15, 25, 0.95);
+            backdrop-filter: blur(12px);
+            box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.4);
+            z-index: 6;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="floating-bg"></div>
+
+<header style="text-align: center; padding: 40px 0;">
+  <div style="
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 300px;                /* slightly bigger frame */
+      height: 180px;
+      border-radius: 24px;
+      background: rgba(255, 255, 255, 0.12);  /* a little more visible */
+      backdrop-filter: blur(15px);
+      border: 1px solid rgba(255, 255, 255, 0.3); /* stronger border */
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);  /* deeper shadow */
+      margin: 0 auto;
+    ">
+    <img src="assets/pictures/imagitool-export (26).jpg" 
+         alt="AvalonFlow Logo" 
+         style="max-width: 90%; max-height: 90%; height: auto;">
+  </div>
+</header>
+
+<div id="payment-container">
+  <p id="status">Waiting for payment...</p>
+  <p>Send exactly: <span id="amount"></span> USDT or USDC</p>
+  <p>Wallet: 0x63d93f4348b109492d75aaaf10ac374d448178cd</p>
+  <!-- Optional manual check button -->
+  <button id="check-btn" onclick="checkPayment()">Check Payment</button>
+</div>
+
+<script>
+const wallet = "0x63d93f4348b109492d75aaaf10ac374d448178cd";
+const apiKey = "R53TCHYDZ9W1GJ4N861427HN52APJ5DZNI"; // your Etherscan API key
+
+// ERC20 contracts
+const tokens = {
+  USDT: "0xdAC17F958D2ee523a2206206994597C13D831ec7",
+  USDC: "0xA0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
+};
+
+// 1️⃣ Generate unique payment amount
+const baseAmount = 400.20;
+const randomDecimal = Math.floor(Math.random()*10000)/10000;
+const expectedAmount = (baseAmount + randomDecimal).toFixed(4);
+document.getElementById("amount").innerText = expectedAmount;
+
+// 2️⃣ Save page load time to ignore old transactions
+const pageLoadTime = Math.floor(Date.now() / 1000); // unix timestamp in seconds
+
+// 3️⃣ Check blockchain for payment
+async function checkPayment(){
+  for (let token in tokens){
+    let contract = tokens[token];
+    let url = `https://api.etherscan.io/api?module=account&action=tokentx&address=${wallet}&contractaddress=${contract}&sort=desc&apikey=${apiKey}`;
+
+    try{
+      let res = await fetch(url);
+      let data = await res.json();
+      if(data.status !== "1") continue;
+
+      for(let tx of data.result){
+        let amount = tx.value / 1e6; // USDT/USDC use 6 decimals
+        let txTime = parseInt(tx.timeStamp || 0); // tx timestamp
+        let confirmations = parseInt(tx.confirmations || 1);
+
+        if(
+          tx.to.toLowerCase() === wallet.toLowerCase() &&
+          parseFloat(amount).toFixed(4) === expectedAmount &&
+          txTime > pageLoadTime &&
+          confirmations >= 1
+        ){
+          // Payment detected → redirect
+          document.getElementById("status").innerText = "Payment detected. Redirecting...";
+          setTimeout(()=>{ window.location.href="/login.html"; }, 1000);
+          return;
+        }
+      }
+
+    }catch(err){
+      console.error("Error checking payment:", err);
+    }
+  }
+}
+
+// 4️⃣ Poll every 10 seconds
+setInterval(checkPayment, 10000);
+// Initial check immediately
+checkPayment();
+
+</script>

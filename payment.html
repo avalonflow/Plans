@@ -58,29 +58,28 @@ overflow-x:hidden;
         }
 
         /* ---------- Content ---------- */
-        #content {
-            position: relative;
-            z-index: 1;
-            padding: 30px;
-            max-width: 600px;
-            margin: auto;
-            padding-bottom: 40px;
-            text-align:center;
-            padding-top:40px;
-        }
+#content {
+    position: relative;
+    z-index: 1;
+    padding: 20px 15px;       /* smaller padding for mobile */
+    max-width: 600px;
+    margin: auto;
+    padding-bottom: 40px;
+    text-align: center;
+}
 
-        /* --- Container Glass Panel --- */
-        #payment-container {
-            background: rgba(255,255,255,0.05);
-            backdrop-filter: blur(15px);
-            border-radius: 20px;
-            padding: 40px 50px;
-            box-shadow: 0 0 30px rgba(0,255,255,0.2), 0 0 60px rgba(255,0,255,0.1);
-            text-align: center;
-            max-width: 400px;
-            width: 90%;
-            animation: pulseGlow 3s infinite alternate;
-        }
+/* --- Container Glass Panel --- */
+#payment-container {
+    background: rgba(255,255,255,0.05);
+    backdrop-filter: blur(15px);
+    border-radius: 20px;
+    padding: 25px 20px;       /* smaller padding for mobile */
+    box-shadow: 0 0 20px rgba(0,255,255,0.2), 0 0 40px rgba(255,0,255,0.1);
+    text-align: center;
+    max-width: 350px;          /* narrower to show edges on mobile */
+    width: 95%;                /* almost full width on small screens */
+    animation: pulseGlow 3s infinite alternate;
+}
 
         @keyframes pulseGlow {
             0% { box-shadow: 0 0 20px rgba(0,255,255,0.2), 0 0 40px rgba(255,0,255,0.1); }
@@ -90,7 +89,7 @@ overflow-x:hidden;
 
         /* --- Headings & Status --- */
         #status {
-            font-size: 2.8rem;
+            font-size: 1.8rem;
             margin-bottom: 29px;
             color: #0ff;
             text-shadow: 0 0 8px #0ff, 0 0 12px #0ff;
@@ -99,20 +98,20 @@ overflow-x:hidden;
 
         .amount {
             font-weight: bold;
-            font-size: 2.8rem;
+            font-size: 1.6rem;
             color: #ff3fff;
             text-shadow: 0 0 10px #ff3fff, 0 0 20px #ff3fff;
         }
 
         p {
             margin: 12px 0;
-            font-size: 2rem;
+            font-size: 1.2rem;
             letter-spacing: 0.5px;
         }
 
         p + p {
             font-family: 'Courier New', monospace;
-            font-size: 2rem;
+            font-size: 1.8rem;
             color: #0ff;
             text-shadow: 0 0 6px #0ff;
             word-break: break-all;
@@ -121,7 +120,7 @@ overflow-x:hidden;
         #check-btn {
             margin-top: 25px;
             padding: 12px 25px;
-            font-size: 2.6rem;
+            font-size: 1rem;
             font-weight: bold;
             color: #fff;
             background: linear-gradient(45deg, #0ff, #ff3fff);
@@ -189,31 +188,75 @@ overflow-x:hidden;
             100% { transform: translateX(100%); }
         }
 
-                .plan-logo {
+                .plan-pay {
+    display: flex;
+    align-items: center;      /* vertically center logo & text */
+    justify-content: center;  /* horizontal center */
+    gap: 8px;                 /* spacing between logo and text */
+    flex-wrap: wrap;          /* wrap if screen too small */
+}
+
+.plan-logo {
     width: 40px;
     height: 40px;
     border-radius: 50%;
-    margin-right: 5px;  /* moves it right */
-    margin-top: 29px;    /* moves it down */
+    margin: 0;                /* remove previous margin */
 }
 
-        .plan-pay a {
+.token-name, .network {
     display: inline-block;
-    margin-top: 8px;
-    padding: 10px 18px;
-    color: #ffffff;
-    background: linear-gradient(135deg, #7b2ff7, #9b59b6);
-    border-radius: 8px;
-    text-decoration: none;
-    font-weight: 600;
-    font-size: 14px;
-    transition: all 0.3s ease;
-    box-shadow: 0 0 12px rgba(155, 89, 182, 0.4);
+    font-weight: bold;
+    color: #fff;
 }
 
 .plan-pay a:hover {
     transform: translateY(-2px);
     box-shadow: 0 0 18px rgba(155, 89, 182, 0.7);
+}
+
+#tokenSelector {
+    display: flex;
+    justify-content: center;
+    gap: 15px; /* space between buttons */
+    margin-bottom: 20px;
+}
+
+#tokenSelector button {
+    padding: 12px 25px;
+    font-size: 1rem;
+    font-weight: bold;
+    color: #fff;
+    background: linear-gradient(135deg, #0ff, #ff3fff);
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    text-transform: uppercase;
+    box-shadow: 0 0 10px #0ff, 0 0 20px #ff3fff;
+    transition: all 0.3s ease-in-out;
+    position: relative;
+    overflow: hidden;
+}
+
+#tokenSelector button::before {
+    content: "";
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg, rgba(0,255,255,0.2), rgba(255,0,255,0.2), rgba(0,255,255,0.2));
+    transform: rotate(45deg);
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+}
+
+#tokenSelector button:hover::before {
+    opacity: 1;
+}
+
+#tokenSelector button:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 15px #0ff, 0 0 30px #ff3fff, 0 0 50px #0ff;
 }
 
         footer {
@@ -239,6 +282,33 @@ overflow-x:hidden;
         .token-card.inactive {
             display: none;
         }
+
+@media (max-width: 400px) {
+    #payment-container {
+        padding: 20px 15px;
+        max-width: 300px;
+    }
+    .amount {
+        font-size: 1.4rem;
+    }
+    p {
+        font-size: 0.9rem;
+    }
+    #status {
+        font-size: 1.4rem;
+    }
+
+    /* Token Selector Mobile Adjustment */
+    #tokenSelector {
+        flex-direction: column;
+        gap: 10px; /* smaller spacing vertically */
+    }
+    #tokenSelector button {
+        width: 100%; /* full width for mobile */
+        padding: 10px 0;
+        font-size: 0.9rem;
+    }
+}
     </style>
 </head>
 
@@ -437,8 +507,7 @@ const pageLoadTime = Math.floor(Date.now()/1000);
 
 
 // TIMER + PROGRESS SYSTEM
-
-const totalDuration = 5 * 60 * 1000;
+const totalDuration = 5 * 60 * 1000; // 5 minutes
 
 const usdtProgress = document.getElementById("usdt-progress");
 const usdcProgress = document.getElementById("usdc-progress");
@@ -446,9 +515,16 @@ const usdcProgress = document.getElementById("usdc-progress");
 const usdtTimer = document.getElementById("usdt-timer");
 const usdcTimer = document.getElementById("usdc-timer");
 
-const startTime = Date.now();
+// Use persisted start time or create a new one
+let startTime = localStorage.getItem("avalonflowStartTime");
+if (!startTime) {
+    startTime = Date.now();
+    localStorage.setItem("avalonflowStartTime", startTime);
+} else {
+    startTime = parseInt(startTime, 10);
+}
 
-const interval = setInterval(()=>{
+const interval = setInterval(() => {
 
     const now = Date.now();
     const elapsed = now - startTime;
@@ -459,27 +535,21 @@ const interval = setInterval(()=>{
     usdtProgress.style.width = percentage + "%";
     usdcProgress.style.width = percentage + "%";
 
-    const minutes = String(Math.floor(remaining / 60000)).padStart(2,"0");
-    const seconds = String(Math.floor((remaining % 60000) / 1000)).padStart(2,"0");
+    const minutes = String(Math.floor(remaining / 60000)).padStart(2, "0");
+    const seconds = String(Math.floor((remaining % 60000) / 1000)).padStart(2, "0");
 
-    usdtTimer.innerText = `Address expires in ${minutes}:${seconds}`;
-    usdcTimer.innerText = `Address expires in ${minutes}:${seconds}`;
+    usdtTimer.innerText = remaining > 0 ? `Address expires in ${minutes}:${seconds}` : "Payment session expired!";
+    usdcTimer.innerText = remaining > 0 ? `Address expires in ${minutes}:${seconds}` : "Payment session expired!";
 
-    if(remaining <= 0){
-
+    if (remaining <= 0) {
         clearInterval(interval);
-
-        usdtProgress.style.width="0%";
-        usdcProgress.style.width="0%";
-
-        usdtTimer.innerText="Payment session expired!";
-        usdcTimer.innerText="Payment session expired!";
-
+        usdtProgress.style.width = "0%";
+        usdcProgress.style.width = "0%";
         localStorage.removeItem("avalonflowAmount");
-
+        localStorage.removeItem("avalonflowStartTime");
     }
 
-},1000);
+}, 1000);
 
 
 // BLOCKCHAIN PAYMENT DETECTION
@@ -521,7 +591,7 @@ for(let token in tokens){
 
                 setTimeout(()=>{
 
-                    window.location.href="/login.html";
+                    window.location.href="/https://profile-login.avalonflow.site";
 
                 },1000);
 
@@ -542,7 +612,18 @@ for(let token in tokens){
 
 
 // Poll blockchain every 10 seconds
-setInterval(checkPayment,10000);
+let pollInterval = 15000;
+
+function poll() {
+    checkPayment().then(paymentDone => {
+        if (!paymentDone) {
+            pollInterval = Math.min(pollInterval * 2, 60000); // max 60s
+            setTimeout(poll, pollInterval);
+        }
+    });
+}
+
+poll();
 
 // Run first check immediately
 checkPayment();

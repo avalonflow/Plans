@@ -412,13 +412,13 @@ overflow-x:hidden;
 
         <div class="amount-section">
           <p>Send exactly:</p>
-          <p class="amount" id="usdc-amount">$400.2037</p>
+          <p class="amount" id="usdc-amount">400.2037</p>
         </div>
 
-        <div class="wallet-section">
+        <<div class="wallet-section">
   <p>Wallet Address:</p>
-  <p class="wallet" id="usdt-wallet">0x63d93f4348b109492d75aaaf10ac374d448178cd
-    <button class="copy-btn" onclick="copyWallet('usdc-wallet')">Copy</button>
+  <p class="wallet" id="usdc-wallet">0x63d93f4348b109492d75aaaf10ac374d448178cd
+    <button class="copy-btn" onclick="copyWallet('usdt-wallet')">Copy</button>
   </p>
 </div>
 
@@ -466,7 +466,13 @@ setInterval(particle,800);
 
 
 function copyWallet(id) {
-    const walletText = document.getElementById(id).innerText;
+    const walletP = document.getElementById(id);
+    // Select only the text node (the wallet address)
+    const walletText = Array.from(walletP.childNodes)
+        .filter(node => node.nodeType === Node.TEXT_NODE)
+        .map(node => node.textContent.trim())
+        .join('');
+    
     navigator.clipboard.writeText(walletText)
         .then(() => alert("Wallet copied!"))
         .catch(() => alert("Failed to copy wallet."));

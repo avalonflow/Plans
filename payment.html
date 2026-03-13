@@ -184,11 +184,55 @@ p + p {
 </header>
 
 <div id="payment-container">
-  <p id="status">Waiting for payment...</p>
-  <p>Send exactly: <span id="amount"></span> USDT or USDC</p>
-  <p>Wallet: 0x63d93f4348b109492d75aaaf10ac374d448178cd</p>
-  <!-- Optional manual check button -->
-  <button id="check-btn" onclick="checkPayment()">Check Payment</button>
+  <!-- Payment Section -->
+  <div class="token-card" id="usdt-card">
+    <div class="token-header">
+      <img src="usdt-logo.png" alt="USDT Logo" class="token-logo">
+      <span class="token-name">USDT</span>
+      <span class="network">ERC-20</span>
+    </div>
+
+    <div class="amount-section">
+      <p>Send exactly:</p>
+      <p class="amount" id="usdt-amount">400.2037</p>
+    </div>
+
+    <div class="wallet-section">
+      <p>Wallet Address:</p>
+      <p class="wallet">0x63d93f4348b109492d75aaaf10ac374d448178cd</p>
+    </div>
+
+    <div class="qr-section">
+      <img id="usdt-qr" src="" alt="USDT QR Code">
+    </div>
+
+    <div class="status" id="usdt-status">Waiting for payment...</div>
+  </div>
+
+  <div class="token-card" id="usdc-card">
+    <div class="token-header">
+      <img src="usdc-logo.png" alt="USDC Logo" class="token-logo">
+      <span class="token-name">USDC</span>
+      <span class="network">ERC-20</span>
+    </div>
+
+    <div class="amount-section">
+      <p>Send exactly:</p>
+      <p class="amount" id="usdc-amount">400.2037</p>
+    </div>
+
+    <div class="wallet-section">
+      <p>Wallet Address:</p>
+      <p class="wallet">0x63d93f4348b109492d75aaaf10ac374d448178cd</p>
+    </div>
+
+    <div class="qr-section">
+      <img id="usdc-qr" src="" alt="USDC QR Code">
+    </div>
+
+    <div class="status" id="usdc-status">Waiting for payment...</div>
+  </div>
+
 </div>
 
     <!-- Footer -->

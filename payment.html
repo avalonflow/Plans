@@ -325,108 +325,203 @@
 </footer>
 
 <script>
-    // Floating particles
-    const bg = document.getElementById('floating-bg');
-    const colors = ['#6b2cd8', '#9b59b6', '#8e44ad'];
-    function particle() {
-        const p = document.createElement('div');
-        p.className = 'particle';
-        const s = Math.random() * 20 + 10;
-        p.style.width = s + 'px';
-        p.style.height = s + 'px';
-        p.style.left = Math.random() * 100 + 'vw';
-        p.style.background = `radial-gradient(circle, ${colors[Math.floor(Math.random() * 3)]}, transparent)`;
-        p.style.animationDuration = (Math.random() * 20 + 10) + 's';
-        bg.appendChild(p);
-        setTimeout(() => p.remove(), 30000);
-    }
-    setInterval(particle, 800);
 
-    // Wallet & tokens
-    const wallet = "0x63d93f4348b109492d75aaaf10ac374d448178cd";
-    const apiKey = "R53TCHYDZ9W1GJ4N861427HN52APJ5DZNI";
-    const tokens = {
-      USDT: "0xdAC17F958D2ee523a2206206994597C13D831ec7",
-      USDC: "0xA0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
-    };
+// Floating particles
+const bg = document.getElementById('floating-bg');
+const colors = ['#6b2cd8', '#9b59b6', '#8e44ad'];
 
-    // 1️⃣ Token switch
-    function showTokenCard(selectedToken){
-        const cards = document.querySelectorAll(".token-card");
-        cards.forEach(card => card.classList.add("inactive"));
-        const activeCard = document.getElementById(`${selectedToken}-card`);
-        if(activeCard) activeCard.classList.remove("inactive");
-    }
-    showTokenCard("usdt");
+function particle(){
+    const p = document.createElement('div');
+    p.className = 'particle';
+    const s = Math.random() * 20 + 10;
+    p.style.width = s + 'px';
+    p.style.height = s + 'px';
+    p.style.left = Math.random() * 100 + 'vw';
+    p.style.background = `radial-gradient(circle, ${colors[Math.floor(Math.random()*3)]}, transparent)`;
+    p.style.animationDuration = (Math.random()*20 + 10) + 's';
 
-    // Optional buttons
-    document.getElementById("payUSDTBtn")?.addEventListener("click", () => showTokenCard("usdt"));
-    document.getElementById("payUSDCBtn")?.addEventListener("click", () => showTokenCard("usdc"));
+    bg.appendChild(p);
+    setTimeout(()=>p.remove(),30000);
+}
 
-    // 2️⃣ Unique amount
-    const baseAmount = 400.20;
-    let expectedAmount = localStorage.getItem("avalonflowAmount");
-    if (!expectedAmount) {
-        const randomDecimal = Math.floor(Math.random()*10000)/10000;
-        expectedAmount = (baseAmount + randomDecimal).toFixed(4);
-        localStorage.setItem("avalonflowAmount", expectedAmount);
-    }
+setInterval(particle,800);
 
-    document.getElementById("usdt-amount").innerText = expectedAmount;
-    document.getElementById("usdc-amount").innerText = expectedAmount;
 
-    // 3️⃣ QR Codes
-    new QRCode(document.getElementById("usdt-qr"), {
-        text: `ethereum:${wallet}?value=${expectedAmount}000000`,
-        width: 120,
-        height: 120,
-        colorDark:"#0ff",
-        colorLight:"rgba(0,0,0,0)",
-        correctLevel: QRCode.CorrectLevel.H
-    });
-    new QRCode(document.getElementById("usdc-qr"), {
-        text: `ethereum:${wallet}?value=${expectedAmount}000000`,
-        width: 120,
-        height: 120,
-        colorDark:"#ff3fff",
-        colorLight:"rgba(0,0,0,0)",
-        correctLevel: QRCode.CorrectLevel.H
-    });
+// Wallet & tokens
+const wallet = "0x63d93f4348b109492d75aaaf10ac374d448178cd";
+const apiKey = "R53TCHYDZ9W1GJ4N861427HN52APJ5DZNI";
 
-    // 4️⃣ Timer & Progress Bar per card
-    // Total duration: 5 minutes
-const totalDuration = 5 * 60 * 1000; // milliseconds
-const progressFill = document.getElementById("progressFill");
-const timerElement = document.getElementById("timer");
+const tokens = {
+    USDT:"0xdAC17F958D2ee523a2206206994597C13D831ec7",
+    USDC:"0xA0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
+};
+
+
+// Token switch
+function showTokenCard(selectedToken){
+    const cards = document.querySelectorAll(".token-card");
+    cards.forEach(card=>card.classList.add("inactive"));
+
+    const activeCard = document.getElementById(`${selectedToken}-card`);
+    if(activeCard) activeCard.classList.remove("inactive");
+}
+
+showTokenCard("usdt");
+
+
+// Unique amount generator
+const baseAmount = 400.20;
+
+let expectedAmount = localStorage.getItem("avalonflowAmount");
+
+if(!expectedAmount){
+
+    const randomDecimal = Math.floor(Math.random()*10000)/10000;
+
+    expectedAmount = (baseAmount + randomDecimal).toFixed(4);
+
+    localStorage.setItem("avalonflowAmount",expectedAmount);
+}
+
+document.getElementById("usdt-amount").innerText = expectedAmount;
+document.getElementById("usdc-amount").innerText = expectedAmount;
+
+
+// QR Codes
+new QRCode(document.getElementById("usdt-qr"),{
+    text:`ethereum:${wallet}?value=${expectedAmount}000000`,
+    width:120,
+    height:120,
+    colorDark:"#0ff",
+    colorLight:"rgba(0,0,0,0)",
+    correctLevel:QRCode.CorrectLevel.H
+});
+
+new QRCode(document.getElementById("usdc-qr"),{
+    text:`ethereum:${wallet}?value=${expectedAmount}000000`,
+    width:120,
+    height:120,
+    colorDark:"#ff3fff",
+    colorLight:"rgba(0,0,0,0)",
+    correctLevel:QRCode.CorrectLevel.H
+});
+
+
+// Payment session timestamp
+const pageLoadTime = Math.floor(Date.now()/1000);
+
+
+// TIMER + PROGRESS SYSTEM
+
+const totalDuration = 5 * 60 * 1000;
+
+const usdtProgress = document.getElementById("usdt-progress");
+const usdcProgress = document.getElementById("usdc-progress");
+
+const usdtTimer = document.getElementById("usdt-timer");
+const usdcTimer = document.getElementById("usdc-timer");
 
 const startTime = Date.now();
 
-const interval = setInterval(() => {
+const interval = setInterval(()=>{
 
     const now = Date.now();
     const elapsed = now - startTime;
     const remaining = totalDuration - elapsed;
 
-    // Update progress bar
     const percentage = Math.max(0, remaining / totalDuration) * 100;
-    progressFill.style.width = percentage + "%";
 
-    // Update timer text
+    usdtProgress.style.width = percentage + "%";
+    usdcProgress.style.width = percentage + "%";
+
     const minutes = String(Math.floor(remaining / 60000)).padStart(2,"0");
     const seconds = String(Math.floor((remaining % 60000) / 1000)).padStart(2,"0");
-    timerElement.innerText = `Address expires in ${minutes}:${seconds}`;
 
-    // Expire session
+    usdtTimer.innerText = `Address expires in ${minutes}:${seconds}`;
+    usdcTimer.innerText = `Address expires in ${minutes}:${seconds}`;
+
     if(remaining <= 0){
+
         clearInterval(interval);
-        progressFill.style.width = "0%";
-        timerElement.innerText = "Payment session expired!";
+
+        usdtProgress.style.width="0%";
+        usdcProgress.style.width="0%";
+
+        usdtTimer.innerText="Payment session expired!";
+        usdcTimer.innerText="Payment session expired!";
+
         localStorage.removeItem("avalonflowAmount");
-        // Optional:
-        // location.reload();
+
     }
 
-}, 1000);
-    </script>
+},1000);
+
+
+// BLOCKCHAIN PAYMENT DETECTION
+
+async function checkPayment(){
+
+for(let token in tokens){
+
+    let contract = tokens[token];
+
+    let url = `https://api.etherscan.io/api?module=account&action=tokentx&address=${wallet}&contractaddress=${contract}&sort=desc&apikey=${apiKey}`;
+
+    try{
+
+        let res = await fetch(url);
+        let data = await res.json();
+
+        if(data.status !== "1") continue;
+
+        for(let tx of data.result){
+
+            let amount = tx.value / 1e6;
+
+            let txTime = parseInt(tx.timeStamp || 0);
+
+            let confirmations = parseInt(tx.confirmations || 1);
+
+            if(
+
+                tx.to.toLowerCase() === wallet.toLowerCase() &&
+                parseFloat(amount).toFixed(4) === expectedAmount &&
+                txTime > pageLoadTime &&
+                confirmations >= 1
+
+            ){
+
+                document.getElementById("usdt-status").innerText = "Payment detected. Redirecting...";
+                document.getElementById("usdc-status").innerText = "Payment detected. Redirecting...";
+
+                setTimeout(()=>{
+
+                    window.location.href="/login.html";
+
+                },1000);
+
+                return;
+            }
+
+        }
+
+    }catch(err){
+
+        console.error("Payment check error:",err);
+
+    }
+
+}
+
+}
+
+
+// Poll blockchain every 10 seconds
+setInterval(checkPayment,10000);
+
+// Run first check immediately
+checkPayment();
+
+</script>
 </body>
 </html>

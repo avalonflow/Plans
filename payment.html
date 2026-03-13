@@ -382,10 +382,11 @@ overflow-x:hidden;
 
         <div class="wallet-section">
   <p>Wallet Address:</p>
-  <p class="wallet" id="usdt-wallet">0x63d93f4348b109492d75aaaf10ac374d448178cd
+  <div style="display:flex; justify-content:center; align-items:center; gap:8px;">
+    <span class="wallet" id="usdt-wallet">0x63d93f4348b109492d75aaaf10ac374d448178cd</span>
     <button class="copy-btn" onclick="copyWallet('usdt-wallet')">Copy</button>
-  </p>
-</div>
+  </div>
+
 
         <div class="qr-section">
           <div id="usdt-qr"></div>
@@ -416,10 +417,11 @@ overflow-x:hidden;
 
         <div class="wallet-section">
   <p>Wallet Address:</p>
-  <p class="wallet" id="usdt-wallet">0x63d93f4348b109492d75aaaf10ac374d448178cd
-    <button class="copy-btn" onclick="copyWallet('usdt-wallet')">Copy</button>
-  </p>
-</div>
+  <div style="display:flex; justify-content:center; align-items:center; gap:8px;">
+    <span class="wallet" id="usdt-wallet">0x63d93f4348b109492d75aaaf10ac374d448178cd</span>
+    <button class="copy-btn" onclick="copyWallet('usdc-wallet')">Copy</button>
+  </div>
+
 
         <div class="qr-section">
           <div id="usdc-qr"></div>
@@ -464,7 +466,7 @@ setInterval(particle,800);
 
 
 function copyWallet(id) {
-    const walletText = document.getElementById(id).innerText.split('\n')[0]; // exclude button text
+    const walletText = document.getElementById(id).innerText;
     navigator.clipboard.writeText(walletText)
         .then(() => alert("Wallet copied!"))
         .catch(() => alert("Failed to copy wallet."));

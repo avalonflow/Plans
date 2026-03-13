@@ -259,6 +259,23 @@ overflow-x:hidden;
     box-shadow: 0 0 15px #0ff, 0 0 30px #ff3fff, 0 0 50px #0ff;
 }
 
+.copy-btn {
+    margin-left: 8px;
+    padding: 2px 6px;
+    font-size: 0.8rem;
+    border: none;
+    border-radius: 4px;
+    background: linear-gradient(45deg, #0ff, #ff3fff);
+    color: #fff;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.copy-btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 6px #0ff, 0 0 12px #ff3fff;
+}
+
         footer {
             position: fixed;
             bottom: 0;
@@ -364,9 +381,11 @@ overflow-x:hidden;
         </div>
 
         <div class="wallet-section">
-          <p>Wallet Address:</p>
-          <p class="wallet">0x63d93f4348b109492d75aaaf10ac374d448178cd</p>
-        </div>
+  <p>Wallet Address:</p>
+  <p class="wallet" id="usdt-wallet">0x63d93f4348b109492d75aaaf10ac374d448178cd
+    <button class="copy-btn" onclick="copyWallet('usdt-wallet')">Copy</button>
+  </p>
+</div>
 
         <div class="qr-section">
           <div id="usdt-qr"></div>
@@ -392,13 +411,15 @@ overflow-x:hidden;
 
         <div class="amount-section">
           <p>Send exactly:</p>
-          <p class="amount" id="usdc-amount">400.2037</p>
+          <p class="amount" id="usdc-amount">$400.2037</p>
         </div>
 
         <div class="wallet-section">
-          <p>Wallet Address:</p>
-          <p class="wallet">0x63d93f4348b109492d75aaaf10ac374d448178cd</p>
-        </div>
+  <p>Wallet Address:</p>
+  <p class="wallet" id="usdt-wallet">0x63d93f4348b109492d75aaaf10ac374d448178cd
+    <button class="copy-btn" onclick="copyWallet('usdt-wallet')">Copy</button>
+  </p>
+</div>
 
         <div class="qr-section">
           <div id="usdc-qr"></div>
@@ -442,6 +463,13 @@ function particle(){
 setInterval(particle,800);
 
 
+function copyWallet(id) {
+    const walletText = document.getElementById(id).innerText.split('\n')[0]; // exclude button text
+    navigator.clipboard.writeText(walletText)
+        .then(() => alert("Wallet copied!"))
+        .catch(() => alert("Failed to copy wallet."));
+}
+
 // Wallet & tokens
 const wallet = "0x63d93f4348b109492d75aaaf10ac374d448178cd";
 const apiKey = "R53TCHYDZ9W1GJ4N861427HN52APJ5DZNI";
@@ -478,8 +506,8 @@ if(!expectedAmount){
     localStorage.setItem("avalonflowAmount",expectedAmount);
 }
 
-document.getElementById("usdt-amount").innerText = expectedAmount;
-document.getElementById("usdc-amount").innerText = expectedAmount;
+document.getElementById("usdt-amount").innerText = "$" + expectedAmount;
+document.getElementById("usdc-amount").innerText = "$" + expectedAmount;
 
 
 // QR Codes

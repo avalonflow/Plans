@@ -79,6 +79,9 @@ overflow-x:hidden;
     max-width: 350px;          /* narrower to show edges on mobile */
     width: 95%;                /* almost full width on small screens */
     animation: pulseGlow 3s infinite alternate;
+
+/* ADD margin bottom for scrolling */
+    margin-bottom: 50px;
 }
 
         @keyframes pulseGlow {
@@ -577,13 +580,21 @@ const interval = setInterval(() => {
     usdtTimer.innerText = remaining > 0 ? `Address expires in ${minutes}:${seconds}` : "Payment session expired!";
     usdcTimer.innerText = remaining > 0 ? `Address expires in ${minutes}:${seconds}` : "Payment session expired!";
 
-    if (remaining <= 0) {
-        clearInterval(interval);
-        usdtProgress.style.width = "0%";
-        usdcProgress.style.width = "0%";
-        localStorage.removeItem("avalonflowAmount");
-        localStorage.removeItem("avalonflowStartTime");
-    }
+    if(remaining <= 0){
+
+    clearInterval(interval);
+
+    usdtProgress.style.width="0%";
+    usdcProgress.style.width="0%";
+
+    usdtTimer.innerText="Payment session expired!";
+    usdcTimer.innerText="Payment session expired!";
+
+    localStorage.removeItem("avalonflowAmount");
+
+    // Redirect to access plans
+    window.location.href = "https://access-plans.avalonflow.site";
+}
 
 }, 1000);
 

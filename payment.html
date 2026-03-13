@@ -17,6 +17,8 @@
       "url": "https://avalonflow.site",
       "logo": "https://avalonFlow.site/favicon.png"
     }
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 </script>
 
     <style>
@@ -221,6 +223,26 @@ const tokens = {
   USDT: "0xdAC17F958D2ee523a2206206994597C13D831ec7",
   USDC: "0xA0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
 };
+
+// Create QR code for USDT
+const usdtQrCode = new QRCode(document.getElementById("usdt-qr"), {
+  text: `ethereum:${wallet}?value=${expectedAmount}000000`, // 6 decimals
+  width: 120,
+  height: 120,
+  colorDark:"#0ff",
+  colorLight:"rgba(0,0,0,0)",
+  correctLevel: QRCode.CorrectLevel.H
+});
+
+// Create QR code for USDC
+const usdcQrCode = new QRCode(document.getElementById("usdc-qr"), {
+  text: `ethereum:${wallet}?value=${expectedAmount}000000`,
+  width: 120,
+  height: 120,
+  colorDark:"#ff3fff",
+  colorLight:"rgba(0,0,0,0)",
+  correctLevel: QRCode.CorrectLevel.H
+});
 
 // 1️⃣ Generate unique payment amount
 const baseAmount = 400.20;

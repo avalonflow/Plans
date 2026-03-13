@@ -239,6 +239,11 @@ p + p {
   margin: 0 auto;
   border-radius: 12px;
 }
+
+/* Hide inactive token card */
+.token-card.inactive {
+  display: none;
+}
     </style>
 </head>
 
@@ -264,6 +269,11 @@ p + p {
          style="max-width: 90%; max-height: 90%; height: auto;">
   </div>
 </header>
+
+<div id="tokenSelector">
+  <button onclick="showTokenCard('usdt')">Pay with USDT</button>
+  <button onclick="showTokenCard('usdc')">Pay with USDC</button>
+</div>
 
 <div id="payment-container">
   <!-- Payment Section -->
@@ -379,6 +389,21 @@ const usdcQrCode = new QRCode(document.getElementById("usdc-qr"), {
   colorLight:"rgba(0,0,0,0)",
   correctLevel: QRCode.CorrectLevel.H
 });
+
+// Function to show only the selected token card
+function showTokenCard(selectedToken){
+    const cards = document.querySelectorAll(".token-card");
+    cards.forEach(card => card.classList.add("inactive")); // hide all cards
+    const activeCard = document.getElementById(`${selectedToken}-card`);
+    if(activeCard) activeCard.classList.remove("inactive"); // show selected
+}
+
+// Immediately activate USDT by default
+showTokenCard("usdt");
+
+// Optional: if you have buttons to switch tokens, attach event listeners
+document.getElementById("payUSDTBtn")?.addEventListener("click", () => showTokenCard("usdt"));
+document.getElementById("payUSDCBtn")?.addEventListener("click", () => showTokenCard("usdc"));
 
 // 1️⃣ Generate unique payment amount
 const baseAmount = 400.20;

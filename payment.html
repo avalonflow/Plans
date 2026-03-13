@@ -200,6 +200,25 @@ p + p {
     100% { transform: translateX(100%); }
 }
 
+        .plan-pay a {
+    display: inline-block;
+    margin-top: 12px;
+    padding: 10px 18px;
+    color: #ffffff;
+    background: linear-gradient(135deg, #7b2ff7, #9b59b6);
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    box-shadow: 0 0 12px rgba(155, 89, 182, 0.4);
+}
+
+.plan-pay a:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 18px rgba(155, 89, 182, 0.7);
+}
+
         /* ---------- Footer ---------- */
         footer {
             position: fixed;
@@ -249,8 +268,10 @@ p + p {
 <div id="payment-container">
   <!-- Payment Section -->
   <div class="token-card" id="usdt-card">
-    <div class="token-header">
-      <img src="usdt-logo.png" alt="USDT Logo" class="token-logo">
+        <div class="plan-pay">
+        <img class="plan-logo"
+             src="https://i.postimg.cc/W3nB6L7j/6bf751e011e8ae86963744c079ec2a9b.jpg"
+             alt="AvalonCare Premium Logo">
       <span class="token-name">USDT</span>
       <span class="network">ERC-20</span>
     </div>
@@ -273,8 +294,10 @@ p + p {
   </div>
 
   <div class="token-card" id="usdc-card">
-    <div class="token-header">
-      <img src="usdc-logo.png" alt="USDC Logo" class="token-logo">
+        <div class="plan-pay">
+        <img class="plan-logo"
+             src="https://i.postimg.cc/W3nB6L7j/6bf751e011e8ae86963744c079ec2a9b.jpg"
+             alt="AvalonCare Premium Logo">
       <span class="token-name">USDC</span>
       <span class="network">ERC-20</span>
     </div>

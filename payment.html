@@ -24,16 +24,12 @@
     <style>
         /* ---------- Base ---------- */
         body {
-            font-family: Georgia, serif;
-            margin: 0;
-            color: #fff;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background: linear-gradient(135deg, #0d0f1a, #050608);
-            overflow-x: hidden;
-        }
+font-family: Georgia, serif;
+margin: 0;
+color: #fff;
+background: linear-gradient(135deg,#0d0f1a,#050608);
+overflow-x:hidden;
+}
         button { cursor: pointer; }
         a { color: inherit; text-decoration: none; font-weight: bold; }
 
@@ -237,93 +233,112 @@
 </head>
 
 <body>
-    <div id="floating-bg"></div>
 
-<header style="text-align: center; padding: 40px 0;">
-  <div style="
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 300px;
-      height: 180px;
-      border-radius: 24px;
-      background: rgba(255, 255, 255, 0.12);
-      backdrop-filter: blur(15px);
-      border: 1px solid rgba(255, 255, 255, 0.3);
-      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
-      margin: 0 auto;
-    ">
-    <img src="assets/pictures/imagitool-export (26).jpg" 
-         alt="AvalonFlow Logo" 
-         style="max-width: 90%; max-height: 90%; height: auto;">
-  </div>
-</header>
+  <div id="floating-bg"></div>
 
-<div id="tokenSelector">
-  <button onclick="showTokenCard('usdt')">Pay with USDT</button>
-  <button onclick="showTokenCard('usdc')">Pay with USDC</button>
-</div>
+  <div id="content">
 
-<div id="payment-container">
-  <!-- USDT Card -->
-  <div class="token-card" id="usdt-card">
-    <div class="plan-pay">
-      <img class="plan-logo"
-           src="https://i.postimg.cc/W3nB6L7j/6bf751e011e8ae86963744c079ec2a9b.jpg"
-           alt="AvalonCare Premium Logo">
-      <span class="token-name">USDT</span>
-      <span class="network">ERC-20</span>
-    </div>
-    <div class="amount-section">
-      <p>Send exactly:</p>
-      <p class="amount" id="usdt-amount">400.2037</p>
-    </div>
-    <div class="wallet-section">
-      <p>Wallet Address:</p>
-      <p class="wallet">0x63d93f4348b109492d75aaaf10ac374d448178cd</p>
-    </div>
-    <div class="qr-section">
-      <div id="usdt-qr"></div>
-    </div>
-    <p id="usdt-timer">Address expires in 05:00</p>
-    <div class="progress-bar">
-      <div class="progress-fill" id="usdt-progress"></div>
-      <div class="status" id="usdt-status">Waiting for payment...</div>
-    </div>
-  </div>
+    <!-- Header -->
+    <header style="text-align:center;padding:40px 0;">
+      <div style="
+          display:inline-flex;
+          align-items:center;
+          justify-content:center;
+          width:300px;
+          height:180px;
+          border-radius:24px;
+          background:rgba(255,255,255,0.12);
+          backdrop-filter:blur(15px);
+          border:1px solid rgba(255,255,255,0.3);
+          box-shadow:0 8px 30px rgba(0,0,0,0.5);
+          margin:0 auto;
+      ">
+        <img src="assets/pictures/imagitool-export (26).jpg"
+             alt="AvalonFlow Logo"
+             style="max-width:90%;max-height:90%;height:auto;">
+      </div>
+    </header>
 
-  <!-- USDC Card -->
-  <div class="token-card inactive" id="usdc-card">
-    <div class="plan-pay">
-      <img class="plan-logo"
-           src="https://i.postimg.cc/W3nB6L7j/6bf751e011e8ae86963744c079ec2a9b.jpg"
-           alt="AvalonCare Premium Logo">
-      <span class="token-name">USDC</span>
-      <span class="network">ERC-20</span>
+    <!-- Token Selector -->
+    <div id="tokenSelector" style="margin-bottom:20px;">
+      <button onclick="showTokenCard('usdt')">Pay with USDT</button>
+      <button onclick="showTokenCard('usdc')">Pay with USDC</button>
     </div>
-    <div class="amount-section">
-      <p>Send exactly:</p>
-      <p class="amount" id="usdc-amount">400.2037</p>
+
+    <!-- Payment Container -->
+    <div id="payment-container">
+
+      <!-- USDT Card -->
+      <div class="token-card" id="usdt-card">
+        <div class="plan-pay">
+          <img class="plan-logo"
+               src="https://i.postimg.cc/W3nB6L7j/6bf751e011e8ae86963744c079ec2a9b.jpg"
+               alt="AvalonCare Premium Logo">
+          <span class="token-name">USDT</span>
+          <span class="network">ERC-20</span>
+        </div>
+
+        <div class="amount-section">
+          <p>Send exactly:</p>
+          <p class="amount" id="usdt-amount">400.2037</p>
+        </div>
+
+        <div class="wallet-section">
+          <p>Wallet Address:</p>
+          <p class="wallet">0x63d93f4348b109492d75aaaf10ac374d448178cd</p>
+        </div>
+
+        <div class="qr-section">
+          <div id="usdt-qr"></div>
+        </div>
+
+        <p id="usdt-timer">Address expires in 05:00</p>
+
+        <div class="progress-bar">
+          <div class="progress-fill" id="usdt-progress"></div>
+          <div class="status" id="usdt-status">Waiting for payment...</div>
+        </div>
+      </div>
+
+      <!-- USDC Card -->
+      <div class="token-card inactive" id="usdc-card">
+        <div class="plan-pay">
+          <img class="plan-logo"
+               src="https://i.postimg.cc/W3nB6L7j/6bf751e011e8ae86963744c079ec2a9b.jpg"
+               alt="AvalonCare Premium Logo">
+          <span class="token-name">USDC</span>
+          <span class="network">ERC-20</span>
+        </div>
+
+        <div class="amount-section">
+          <p>Send exactly:</p>
+          <p class="amount" id="usdc-amount">400.2037</p>
+        </div>
+
+        <div class="wallet-section">
+          <p>Wallet Address:</p>
+          <p class="wallet">0x63d93f4348b109492d75aaaf10ac374d448178cd</p>
+        </div>
+
+        <div class="qr-section">
+          <div id="usdc-qr"></div>
+        </div>
+
+        <p id="usdc-timer">Address expires in 05:00</p>
+
+        <div class="progress-bar">
+          <div class="progress-fill" id="usdc-progress"></div>
+          <div class="status" id="usdc-status">Waiting for payment...</div>
+        </div>
+      </div>
+
     </div>
-    <div class="wallet-section">
-      <p>Wallet Address:</p>
-      <p class="wallet">0x63d93f4348b109492d75aaaf10ac374d448178cd</p>
-    </div>
-    <div class="qr-section">
-      <div id="usdc-qr"></div>
-    </div>
-    <p id="usdc-timer">Address expires in 05:00</p>
-    <div class="progress-bar">
-      <div class="progress-fill" id="usdc-progress"></div>
-      <div class="status" id="usdc-status">Waiting for payment...</div>
-    </div>
-  </div>
-</div>
 
 <footer>
   © 2026 AvalonFlow • Powered by Centrical™
-</footer>
+  </footer>
 
+</body>
 <script>
 
 // Floating particles

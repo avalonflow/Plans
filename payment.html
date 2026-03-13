@@ -142,6 +142,30 @@ p + p {
   transform: scale(1.05);
   box-shadow: 0 0 12px #0ff, 0 0 24px #ff3fff;
 }
+
+/* Timer Styling */
+#timer {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 1rem;
+  font-weight: bold;
+  color: #ff3fff; /* neon pink */
+  text-shadow: 
+    0 0 5px #ff3fff,
+    0 0 10px #ff3fff,
+    0 0 20px #ff3fff,
+    0 0 40px #ff3fff;
+  margin-top: 15px;
+  text-align: center;
+  animation: glowPulse 2s infinite alternate;
+}
+
+/* Glow pulse animation */
+@keyframes glowPulse {
+  0% { text-shadow: 0 0 5px #ff3fff, 0 0 10px #ff3fff, 0 0 20px #ff3fff, 0 0 40px #ff3fff; }
+  50% { text-shadow: 0 0 10px #ff3fff, 0 0 20px #ff3fff, 0 0 40px #ff3fff, 0 0 60px #ff3fff; }
+  100% { text-shadow: 0 0 8px #ff3fff, 0 0 16px #ff3fff, 0 0 32px #ff3fff, 0 0 50px #ff3fff; }
+}
+
         /* ---------- Footer ---------- */
         footer {
             position: fixed;
@@ -235,6 +259,9 @@ p + p {
   <div id="usdc-qr"></div>
 </div>
 
+<!-- Timer for payment expiration -->
+<p id="timer">Address expires in 05:00</p>
+
     <div class="status" id="usdc-status">Waiting for payment...</div>
   </div>
 
@@ -295,12 +322,43 @@ const usdcQrCode = new QRCode(document.getElementById("usdc-qr"), {
 
 // 1️⃣ Generate unique payment amount
 const baseAmount = 400.20;
-const randomDecimal = Math.floor(Math.random()*10000)/10000;
-const expectedAmount = (baseAmount + randomDecimal).toFixed(4);
+
+// Check if amount already exists in localStorage
+let expectedAmount = localStorage.getItem("avalonflowAmount");
+if (!expectedAmount) {
+    const randomDecimal = Math.floor(Math.random()*10000)/10000;
+    expectedAmount = (baseAmount + randomDecimal).toFixed(4);
+    localStorage.setItem("avalonflowAmount", expectedAmount);
+}
+
 document.getElementById("amount").innerText = expectedAmount;
 
 // 2️⃣ Save page load time to ignore old transactions
 const pageLoadTime = Math.floor(Date.now() / 1000); // unix timestamp in seconds
+
+const timerElement = document.createElement("p");
+timerElement.id = "timer";
+timerElement.style.color = "#ff3fff";
+timerElement.style.textShadow = "0 0 6px #ff3fff";
+document.getElementById("payment-container").appendChild(timerElement);
+
+let timeLeft = 300; // 5 minutes in seconds
+
+const timerInterval = setInterval(() => {
+    const minutes = String(Math.floor(timeLeft / 60)).padStart(2,"0");
+    const seconds = String(timeLeft % 60).padStart(2,"0");
+    timerElement.innerText = `Address expires in ${minutes}:${seconds}`;
+
+    if(timeLeft <= 0){
+        clearInterval(timerInterval);
+        timerElement.innerText = "Payment session expired!";
+        localStorage.removeItem("avalonflowAmount");
+        // Optional: reload page or disable payment UI
+        // location.reload();
+    }
+
+    timeLeft--;
+}, 1000);
 
 // 3️⃣ Check blockchain for payment
 async function checkPayment(){

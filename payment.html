@@ -508,17 +508,26 @@ overflow-x:hidden;
 
 </body>
 <script>
+// ---------------- TIMER / SESSION INITIALIZATION ----------------
 const totalDuration = 5 * 60 * 1000; // 5 minutes
 
 let startTime = localStorage.getItem("avalonflowStartTime");
-if(startTime){
+if (startTime) {
     const elapsed = Date.now() - parseInt(startTime, 10);
-    if(elapsed > totalDuration){
+    if (elapsed > totalDuration) {
         // Clear expired session
         localStorage.removeItem("avalonflowAmount");
         localStorage.removeItem("avalonflowStartTime");
-        startTime = null; // so new startTime is generated below
+        localStorage.removeItem("avalonflowWallet"); // also clear old wallet
+        startTime = null; // force a new session
+    } else {
+        startTime = parseInt(startTime, 10); // convert to number
     }
+}
+
+if (!startTime) {
+    startTime = Date.now();
+    localStorage.setItem("avalonflowStartTime", startTime);
 }
 
 // ---------------- FLOATING PARTICLES ----------------
@@ -613,20 +622,7 @@ new QRCode(document.getElementById("usdc-qr"), {
 document.getElementById("usdt-address").innerText = activeWallet;
 document.getElementById("usdc-address").innerText = activeWallet;
 
-// ---------------- TIMER + PROGRESS ----------------
-const totalDuration = 5 * 60 * 1000; // 5 minutes
-const usdtProgress = document.getElementById("usdt-progress") || {style:{}};
-const usdcProgress = document.getElementById("usdc-progress") || {style:{}};
 
-const usdtTimer = document.getElementById("usdt-timer") || {innerText:""};
-const usdcTimer = document.getElementById("usdc-timer") || {innerText:""};
-
-// Use persisted start time or create a new one
-let startTime = localStorage.getItem("avalonflowStartTime");
-if (!startTime) {
-    startTime = Date.now();
-    localStorage.setItem("avalonflowStartTime", startTime);
-} else startTime = parseInt(startTime, 10);
 
 // ---------------- FLAG TO PREVENT DOUBLE REDIRECTS ----------------
 let paymentDone = false;  // <--- Add this right here
@@ -719,7 +715,7 @@ async function checkPayment() {
 
     const token = activeToken;
     const contract = tokens[token];
-    const url = `https://api.etherscan.io/api?module=account&action=tokentx&address=${wallet}&contractaddress=${contract}&sort=desc&apikey=${apiKey}`;
+    const url = `https://api.etherscan.io/api?module=account&action=tokentx&address=${activeWallet}&contractaddress=${contract}&sort=desc&apikey=${apiKey}`;
 
     try {
         const res = await fetch(url);
@@ -769,10 +765,10 @@ let pollTimeout;
 
 function poll() {
     pollTimeout = setTimeout(async () => {
-        const paymentDone = await checkPayment();
-        if (!paymentDone && Date.now() - startTime <= totalDuration) {
+        const done = await checkPayment();
+        if (!done && Date.now() - startTime <= totalDuration) {
             pollInterval = Math.min(pollInterval + 30000, 120000);
-            poll(); // continue polling
+            poll();
         }
     }, pollInterval);
 }

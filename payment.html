@@ -508,6 +508,19 @@ overflow-x:hidden;
 
 </body>
 <script>
+const totalDuration = 5 * 60 * 1000; // 5 minutes
+
+let startTime = localStorage.getItem("avalonflowStartTime");
+if(startTime){
+    const elapsed = Date.now() - parseInt(startTime, 10);
+    if(elapsed > totalDuration){
+        // Clear expired session
+        localStorage.removeItem("avalonflowAmount");
+        localStorage.removeItem("avalonflowStartTime");
+        startTime = null; // so new startTime is generated below
+    }
+}
+
 // ---------------- FLOATING PARTICLES ----------------
 const bg = document.getElementById('floating-bg');
 const colors = ['#6b2cd8', '#9b59b6', '#8e44ad'];
@@ -599,6 +612,9 @@ if (!startTime) {
     localStorage.setItem("avalonflowStartTime", startTime);
 } else startTime = parseInt(startTime, 10);
 
+// ---------------- FLAG TO PREVENT DOUBLE REDIRECTS ----------------
+let paymentDone = false;  // <--- Add this right here
+
 function animatePaymentLine(){
 
     const usdtStatus = document.getElementById("usdt-status");
@@ -627,7 +643,7 @@ function animatePaymentLine(){
                 if(usdtStatus) usdtStatus.innerText = "Sent __________ Received ✔️";
                 if(usdcStatus) usdcStatus.innerText = "Sent __________ Received ✔️";
 
-                showNotification("Payment Successful. Redirecting...");
+                triggerNotification("Payment Successful. Redirecting...");
 
             }
 
@@ -652,11 +668,14 @@ function updateTimer() {
     usdtTimer.innerText = remaining > 0 ? `Address expires in ${minutes}:${seconds}` : "Payment session expired!";
     usdcTimer.innerText = remaining > 0 ? `Address expires in ${minutes}:${seconds}` : "Payment session expired!";
 
-    if (remaining <= 0) {
+    // ---------------- PAYMENT FAILED ----------------
+    if (remaining <= 0 && !paymentDone) {
+        paymentDone = true; // prevent race with payment detection
         document.getElementById("usdt-status").innerText = "Payment session expired.";
         document.getElementById("usdc-status").innerText = "Payment session expired.";
 
-showNotification("Payment Failed. Redirecting...");
+        // Show notification for 3 seconds
+        triggerNotification("Payment Failed. Redirecting...", 3000);
 
         usdtProgress.style.width = "0%";
         usdcProgress.style.width = "0%";
@@ -664,12 +683,13 @@ showNotification("Payment Failed. Redirecting...");
         localStorage.removeItem("avalonflowAmount");
         localStorage.removeItem("avalonflowStartTime");
 
-        clearInterval(timerInterval); // stop timer updates
-        clearTimeout(pollTimeout);    // stop polling
+        clearInterval(timerInterval);
+        clearTimeout(pollTimeout);
 
+        // Redirect slightly after notification
         setTimeout(() => {
             window.location.href = "https://access-plans.avalonflow.site";
-        }, 1000);
+        }, 3200);
     }
 }
 const timerInterval = setInterval(updateTimer, 1000);
@@ -696,25 +716,27 @@ async function checkPayment() {
             const confirmations = parseInt(tx.confirmations || 1, 10);
 
             if (
-                tx.to.toLowerCase() === wallet.toLowerCase() &&
-                amount === expected &&
-                txTime > pageLoadTime &&
-                confirmations >= 1
-            ) {
-                animatePaymentLine();
+    tx.to.toLowerCase() === wallet.toLowerCase() &&
+    amount === expected &&
+    txTime > pageLoadTime &&
+    confirmations >= 1 &&
+    !paymentDone
+) {
+    paymentDone = true;  // prevent timer redirect conflict
+    animatePaymentLine();
 
-                localStorage.removeItem("avalonflowAmount");
-                localStorage.removeItem("avalonflowStartTime");
+    localStorage.removeItem("avalonflowAmount");
+    localStorage.removeItem("avalonflowStartTime");
 
-                clearInterval(timerInterval);
-                clearTimeout(pollTimeout);
+    clearInterval(timerInterval);
+    clearTimeout(pollTimeout);
 
-                setTimeout(() => {
-                    window.location.href = "https://profile-login.avalonflow.site";
-                }, 2200);
+    setTimeout(() => {
+        window.location.href = "https://profile-login.avalonflow.site";
+    }, 2200);
 
-                return true;
-            }
+    return true;
+}
         }
     } catch (err) {
         console.error("Payment check error:", err);
@@ -741,16 +763,14 @@ function poll() {
 poll();
 checkPayment();
 
-function triggerNotification(message){
-
+function triggerNotification(message, duration = 3000) {
     const notification = document.getElementById("planNotification");
-    if(!notification) return;
+    if (!notification) return;
 
     notification.textContent = message;
+    notification.classList.add("show");
 
-    setTimeout(()=>notification.classList.add("show"),300);
-    setTimeout(()=>notification.classList.remove("show"),3300);
-
+    setTimeout(() => notification.classList.remove("show"), duration);
 }
 </script>
 </body>

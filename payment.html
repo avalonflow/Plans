@@ -660,51 +660,66 @@ window.addEventListener("DOMContentLoaded", () => {
     const usdcProgress = document.getElementById("usdc-progress");
     const usdtTimer = document.getElementById("usdt-timer");
     const usdcTimer = document.getElementById("usdc-timer");
+    const usdtStatus = document.getElementById("usdt-status");
+    const usdcStatus = document.getElementById("usdc-status");
+    const checkBtn = document.getElementById("check-btn");
 
+    let paymentDone = false;
+
+    // ---------------- TIMER FUNCTION ----------------
     function updateTimer() {
-    const now = Date.now();
-    const elapsed = now - startTime;
-    const remaining = totalDuration - elapsed;
+        const now = Date.now();
+        const elapsed = now - startTime;
+        const remaining = totalDuration - elapsed;
 
-    // Progress decreases as time goes down
-    const percentage = Math.max(0, (remaining / totalDuration) * 100);
-    usdtProgress.style.width = percentage + "%";
-    usdcProgress.style.width = percentage + "%";
+        const percentage = Math.max(0, (remaining / totalDuration) * 100);
+        usdtProgress.style.width = percentage + "%";
+        usdcProgress.style.width = percentage + "%";
 
-    const minutes = String(Math.floor(remaining / 60000)).padStart(2, "0");
-    const seconds = String(Math.floor((remaining % 60000) / 1000)).padStart(2, "0");
+        const minutes = String(Math.floor(remaining / 60000)).padStart(2, "0");
+        const seconds = String(Math.floor((remaining % 60000) / 1000)).padStart(2, "0");
 
-    usdtTimer.innerText = remaining > 0 ? `Address expires in ${minutes}:${seconds}` : "Payment session expired!";
-    usdcTimer.innerText = remaining > 0 ? `Address expires in ${minutes}:${seconds}` : "Payment session expired!";
+        usdtTimer.innerText = remaining > 0 ? `Address expires in ${minutes}:${seconds}` : "Payment session expired!";
+        usdcTimer.innerText = remaining > 0 ? `Address expires in ${minutes}:${seconds}` : "Payment session expired!";
 
-    if (remaining <= 0 && !paymentDone) {
-        paymentDone = true;
+        if (remaining <= 0 && !paymentDone) {
+            paymentDone = true;
 
-        usdtStatus.innerText = "Payment session expired.";
-        usdcStatus.innerText = "Payment session expired.";
+            // Update status and progress
+            usdtStatus.innerText = "Payment session expired.";
+            usdcStatus.innerText = "Payment session expired.";
+            usdtProgress.style.width = "0%";
+            usdcProgress.style.width = "0%";
 
-        usdtProgress.style.width = "0%";
-        usdcProgress.style.width = "0%";
+            if (checkBtn) checkBtn.disabled = true;
 
-        if (checkBtn) checkBtn.disabled = true;
+            // Clear localStorage
+            localStorage.removeItem("avalonflowAmount");
+            localStorage.removeItem("avalonflowStartTime");
+            localStorage.removeItem("avalonflowWallet");
 
-        localStorage.removeItem("avalonflowAmount");
-        localStorage.removeItem("avalonflowStartTime");
-        localStorage.removeItem("avalonflowWallet");
+            // Stop timer
+            clearInterval(timerInterval);
 
-        if (typeof pollTimeout !== "undefined") clearTimeout(pollTimeout);
-        clearInterval(timerInterval);
+            // Ensure pollTimeout cleared safely
+            if (typeof pollTimeout !== "undefined") clearTimeout(pollTimeout);
 
-        triggerNotification("Payment Failed. Redirecting...", 3000);
+            // Use try/catch in case triggerNotification isn’t loaded yet
+            try {
+                triggerNotification("Payment Failed. Redirecting...", 3000);
+            } catch (err) {
+                console.warn("triggerNotification not found, skipping notification");
+            }
 
-        setTimeout(() => {
-            window.location.href = "https://access-plans.avalonflow.site";
-        }, 3200);
+            // Force redirect after a short delay
+            setTimeout(() => {
+                window.location.href = "https://access-plans.avalonflow.site";
+            }, 3200);
+        }
     }
-}
 
     const timerInterval = setInterval(updateTimer, 1000);
-    updateTimer(); // Initial call
+    updateTimer(); // initial call
 });
 
 // ---------------- BLOCKCHAIN PAYMENT DETECTION ----------------

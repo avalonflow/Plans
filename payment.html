@@ -662,48 +662,46 @@ window.addEventListener("DOMContentLoaded", () => {
     const usdcTimer = document.getElementById("usdc-timer");
 
     function updateTimer() {
-        const now = Date.now();
-        const elapsed = now - startTime;
-        const remaining = totalDuration - elapsed;
+    const now = Date.now();
+    const elapsed = now - startTime;
+    const remaining = totalDuration - elapsed;
 
-        // Progress: fill up as time passes
-        const percentage = Math.min(100, ((totalDuration - remaining) / totalDuration) * 100);
-        usdtProgress.style.width = percentage + "%";
-        usdcProgress.style.width = percentage + "%";
+    // Progress decreases as time goes down
+    const percentage = Math.max(0, (remaining / totalDuration) * 100);
+    usdtProgress.style.width = percentage + "%";
+    usdcProgress.style.width = percentage + "%";
 
-        const minutes = String(Math.floor(remaining / 60000)).padStart(2, "0");
-        const seconds = String(Math.floor((remaining % 60000) / 1000)).padStart(2, "0");
+    const minutes = String(Math.floor(remaining / 60000)).padStart(2, "0");
+    const seconds = String(Math.floor((remaining % 60000) / 1000)).padStart(2, "0");
 
-        usdtTimer.innerText = remaining > 0 ? `Address expires in ${minutes}:${seconds}` : "Payment session expired!";
-        usdcTimer.innerText = remaining > 0 ? `Address expires in ${minutes}:${seconds}` : "Payment session expired!";
+    usdtTimer.innerText = remaining > 0 ? `Address expires in ${minutes}:${seconds}` : "Payment session expired!";
+    usdcTimer.innerText = remaining > 0 ? `Address expires in ${minutes}:${seconds}` : "Payment session expired!";
 
-        if (remaining <= 0 && !paymentDone) {
-            paymentDone = true;
+    if (remaining <= 0 && !paymentDone) {
+        paymentDone = true;
 
-            document.getElementById("usdt-status").innerText = "Payment session expired.";
-            document.getElementById("usdc-status").innerText = "Payment session expired.";
+        usdtStatus.innerText = "Payment session expired.";
+        usdcStatus.innerText = "Payment session expired.";
 
-            triggerNotification("Payment Failed. Redirecting...", 3000);
+        usdtProgress.style.width = "0%";
+        usdcProgress.style.width = "0%";
 
-            usdtProgress.style.width = "0%";
-            usdcProgress.style.width = "0%";
+        if (checkBtn) checkBtn.disabled = true;
 
-            localStorage.removeItem("avalonflowAmount");
-            localStorage.removeItem("avalonflowStartTime");
-            localStorage.removeItem("avalonflowWallet");
+        localStorage.removeItem("avalonflowAmount");
+        localStorage.removeItem("avalonflowStartTime");
+        localStorage.removeItem("avalonflowWallet");
 
-            if (typeof pollTimeout !== "undefined") clearTimeout(pollTimeout);
-            clearInterval(timerInterval);
+        if (typeof pollTimeout !== "undefined") clearTimeout(pollTimeout);
+        clearInterval(timerInterval);
 
-            // Optional: disable check button
-            const checkBtn = document.getElementById("check-btn");
-            if (checkBtn) checkBtn.disabled = true;
+        triggerNotification("Payment Failed. Redirecting...", 3000);
 
-            setTimeout(() => {
-                window.location.href = "https://access-plans.avalonflow.site";
-            }, 3200);
-        }
+        setTimeout(() => {
+            window.location.href = "https://access-plans.avalonflow.site";
+        }, 3200);
     }
+}
 
     const timerInterval = setInterval(updateTimer, 1000);
     updateTimer(); // Initial call

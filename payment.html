@@ -584,6 +584,9 @@ const interval = setInterval(() => {
 
     clearInterval(interval);
 
+document.getElementById("usdt-status").innerText = "Payment detected. Redirecting...";
+document.getElementById("usdc-status").innerText = "Payment detected. Redirecting...";
+
     usdtProgress.style.width="0%";
     usdcProgress.style.width="0%";
 
@@ -638,12 +641,13 @@ for(let token in tokens){
 
                 setTimeout(()=>{
 
-                    window.location.href="/https://profile-login.avalonflow.site";
+                    window.location.href="https://profile-login.avalonflow.site";
 
-                },1000);
+    },1000);
 
-                return;
-            }
+    return true;
+
+}
 
         }
 

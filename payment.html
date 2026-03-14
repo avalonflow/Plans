@@ -561,7 +561,6 @@ function copyWallet(id) {
 }
 
 // ---------------- WALLET & TOKENS ----------------
-// ---------------- WALLET & TOKENS ----------------
 const wallets = [
     "0x63d93f4348b109492d75aaaf10ac374d448178cd",
     "0x6bC7a3943D217D2f80437b61a4D8898138f2EE5B"
@@ -573,6 +572,13 @@ const tokens = {
     USDT:"0xdAC17F958D2ee523a2206206994597C13D831ec7",
     USDC:"0xA0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
 };
+
+// ---------------- ASSIGN WALLET PAIR PER SESSION ----------------
+let walletPair = JSON.parse(localStorage.getItem("avalonflowWalletPair"));
+if(!walletPair){
+    walletPair = { USDT: wallets[0], USDC: wallets[1] };
+    localStorage.setItem("avalonflowWalletPair", JSON.stringify(walletPair));
+}
 
 // ---------------- ACTIVE WALLET PER SESSION ----------------
 let activeWallet = localStorage.getItem("avalonflowWallet");
@@ -589,6 +595,10 @@ function showTokenCard(selectedToken){
     cards.forEach(card => card.classList.add("inactive"));
     const activeCard = document.getElementById(`${selectedToken}-card`);
     if(activeCard) activeCard.classList.remove("inactive");
+
+    // Show correct wallet per token
+    if(selectedToken === "usdt") document.getElementById("usdt-wallet").childNodes[0].nodeValue = walletPair.USDT;
+    if(selectedToken === "usdc") document.getElementById("usdc-wallet").childNodes[0].nodeValue = walletPair.USDC;
 }
 showTokenCard("usdt");
 
@@ -605,27 +615,32 @@ document.getElementById("usdc-amount").innerText = "$" + expectedAmount;
 
 // ---------------- QR CODES ----------------
 const tokenValue = Math.floor(parseFloat(expectedAmount) * 1e6);
-new QRCode(document.getElementById("usdt-qr"), {
-    text: `ethereum:${activeWallet}?value=${tokenValue}`,
-    width:120, height:120,
-    colorDark:"#0ff", colorLight:"rgba(0,0,0,0)",
-    correctLevel: QRCode.CorrectLevel.H
-});
-new QRCode(document.getElementById("usdc-qr"), {
-    text: `ethereum:${activeWallet}?value=${tokenValue}`,
-    width:120, height:120,
-    colorDark:"#ff3fff", colorLight:"rgba(0,0,0,0)",
-    correctLevel: QRCode.CorrectLevel.H
-});
+    // Clear existing QR codes
+    document.getElementById("usdt-qr").innerHTML = "";
+    document.getElementById("usdc-qr").innerHTML = "";
+
+    // Regenerate QR codes with new wallet addresses
+    new QRCode(document.getElementById("usdt-qr"), {
+        text: `ethereum:${walletPair.USDT}?value=${tokenValue}`,
+        width: 120, height: 120,
+        colorDark: "#0ff",
+        colorLight: "rgba(0,0,0,0)",
+        correctLevel: QRCode.CorrectLevel.H
+    });
+    new QRCode(document.getElementById("usdc-qr"), {
+        text: `ethereum:${walletPair.USDC}?value=${tokenValue}`,
+        width: 120, height: 120,
+        colorDark: "#ff3fff",
+        colorLight: "rgba(0,0,0,0)",
+        correctLevel: QRCode.CorrectLevel.H
+    });
 
 // Display the wallet text for copy
-document.getElementById("usdt-wallet").childNodes[0].textContent = activeWallet;
-document.getElementById("usdc-wallet").childNodes[0].textContent = activeWallet;
-
-
+document.getElementById("usdt-wallet").childNodes[0].textContent = walletPair.USDT;
+document.getElementById("usdc-wallet").childNodes[0].textContent = walletPair.USDC;
 
 // ---------------- FLAG TO PREVENT DOUBLE REDIRECTS ----------------
-let paymentDone = false;  // <--- Add this right here
+let paymentDone = false;
 
 function animatePaymentLine(){
     if(paymentDone) return;
@@ -664,8 +679,6 @@ window.addEventListener("DOMContentLoaded", () => {
     const usdcStatus = document.getElementById("usdc-status");
     const checkBtn = document.getElementById("check-btn");
 
-    let paymentDone = false;
-
     // ---------------- TIMER FUNCTION ----------------
     function updateTimer() {
         const now = Date.now();
@@ -685,6 +698,16 @@ window.addEventListener("DOMContentLoaded", () => {
         if (remaining <= 0 && !paymentDone) {
             paymentDone = true;
 
+            // Swap wallets on expiry
+            const temp = walletPair.USDT;
+            walletPair.USDT = walletPair.USDC;
+            walletPair.USDC = temp;
+            localStorage.setItem("avalonflowWalletPair", JSON.stringify(walletPair));
+
+            // Update wallet display immediately
+            document.getElementById("usdt-wallet").childNodes[0].nodeValue = walletPair.USDT;
+            document.getElementById("usdc-wallet").childNodes[0].nodeValue = walletPair.USDC;
+
             // Update status and progress
             usdtStatus.innerText = "Payment session expired.";
             usdcStatus.innerText = "Payment session expired.";
@@ -693,25 +716,16 @@ window.addEventListener("DOMContentLoaded", () => {
 
             if (checkBtn) checkBtn.disabled = true;
 
-            // Clear localStorage
+            // Clear session data
             localStorage.removeItem("avalonflowAmount");
             localStorage.removeItem("avalonflowStartTime");
             localStorage.removeItem("avalonflowWallet");
 
-            // Stop timer
             clearInterval(timerInterval);
-
-            // Ensure pollTimeout cleared safely
             if (typeof pollTimeout !== "undefined") clearTimeout(pollTimeout);
 
-            // Use try/catch in case triggerNotification isn’t loaded yet
-            try {
-                triggerNotification("Payment Failed. Redirecting...", 3000);
-            } catch (err) {
-                console.warn("triggerNotification not found, skipping notification");
-            }
+            try { triggerNotification("Payment Failed. Redirecting...", 3000); } catch(err){}
 
-            // Force redirect after a short delay
             setTimeout(() => {
                 window.location.href = "https://access-plans.avalonflow.site";
             }, 3200);
@@ -744,28 +758,28 @@ async function checkPayment() {
             const confirmations = parseInt(tx.confirmations || 1, 10);
 
             if (
-    tx.to.toLowerCase() === activeWallet.toLowerCase() &&
-    amount === expected &&
-    txTime > pageLoadTime &&
-    confirmations >= 1 &&
-    !paymentDone
-) {
-    paymentDone = true;  // prevent timer redirect conflict
-    animatePaymentLine();
+                tx.to.toLowerCase() === activeWallet.toLowerCase() &&
+                amount === expected &&
+                txTime > pageLoadTime &&
+                confirmations >= 1 &&
+                !paymentDone
+            ) {
+                paymentDone = true;
+                animatePaymentLine();
 
-    localStorage.removeItem("avalonflowAmount");
-localStorage.removeItem("avalonflowStartTime");
-localStorage.removeItem("avalonflowWallet"); // <--- remove old wallet
+                localStorage.removeItem("avalonflowAmount");
+                localStorage.removeItem("avalonflowStartTime");
+                localStorage.removeItem("avalonflowWallet");
 
-    clearInterval(timerInterval);
-    clearTimeout(pollTimeout);
+                clearInterval(timerInterval);
+                clearTimeout(pollTimeout);
 
-    setTimeout(() => {
-        window.location.href = "https://profile-login.avalonflow.site";
-    }, 2200);
+                setTimeout(() => {
+                    window.location.href = "https://profile-login.avalonflow.site";
+                }, 2200);
 
-    return true;
-}
+                return true;
+            }
         }
     } catch (err) {
         console.error("Payment check error:", err);

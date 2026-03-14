@@ -556,6 +556,7 @@ const pageLoadTime = Math.floor(Date.now()/1000);
 
 // TIMER + PROGRESS SYSTEM
 const totalDuration = 5 * 60 * 1000; // 5 minutes
+const pageLoadTime = Math.floor(Date.now() / 1000);
 
 const usdtProgress = document.getElementById("usdt-progress");
 const usdcProgress = document.getElementById("usdc-progress");
@@ -563,7 +564,6 @@ const usdcProgress = document.getElementById("usdc-progress");
 const usdtTimer = document.getElementById("usdt-timer");
 const usdcTimer = document.getElementById("usdc-timer");
 
-// Use persisted start time or create a new one
 let startTime = localStorage.getItem("avalonflowStartTime");
 if (!startTime) {
     startTime = Date.now();
@@ -572,45 +572,9 @@ if (!startTime) {
     startTime = parseInt(startTime, 10);
 }
 
-const interval = setInterval(() => {
-
-    const now = Date.now();
-    const elapsed = now - startTime;
-    const remaining = totalDuration - elapsed;
-
-    const percentage = Math.max(0, remaining / totalDuration) * 100;
-
-    usdtProgress.style.width = percentage + "%";
-    usdcProgress.style.width = percentage + "%";
-
-    const minutes = String(Math.floor(remaining / 60000)).padStart(2, "0");
-    const seconds = String(Math.floor((remaining % 60000) / 1000)).padStart(2, "0");
-
-    usdtTimer.innerText = remaining > 0 ? `Address expires in ${minutes}:${seconds}` : "Payment session expired!";
-    usdcTimer.innerText = remaining > 0 ? `Address expires in ${minutes}:${seconds}` : "Payment session expired!";
-
-    if(remaining <= 0){
-
-    clearInterval(interval);
-
-document.getElementById("usdt-status").innerText = "Payment session expired.";
-document.getElementById("usdc-status").innerText = "Payment session expired.";
-
-    usdtProgress.style.width="0%";
-    usdcProgress.style.width="0%";
-
-    usdtTimer.innerText="Payment session expired!";
-    usdcTimer.innerText="Payment session expired!";
-
-        // Clear localStorage
-    localStorage.removeItem("avalonflowAmount");
-    localStorage.removeItem("avalonflowStartTime");
-
-    // Redirect after 1 second
-    setTimeout(() => {
-        window.location.href = "https://access-plans.avalonflow.site";
-    }, 1000); // 1000 ms = 1 second
-}
+// Polling interval
+let pollInterval = 30000; // 30s
+let pollTimeout = null;
 
 
 // BLOCKCHAIN PAYMENT DETECTION
@@ -674,29 +638,54 @@ async function checkPayment() {
 }
 
 // Poll blockchain every 10 seconds
-let pollInterval = 30000; // start at 30 seconds
+function loop() {
+    const now = Date.now();
+    const elapsed = now - startTime;
+    const remaining = totalDuration - elapsed;
 
-function poll() {
-    checkPayment().then(paymentDone => {
+    // Update progress
+    const percentage = Math.max(0, (remaining / totalDuration) * 100);
+    usdtProgress.style.width = percentage + "%";
+    usdcProgress.style.width = percentage + "%";
 
-        // Stop polling if payment detected
-        if (paymentDone) return;
+    const minutes = String(Math.floor(remaining / 60000)).padStart(2, "0");
+    const seconds = String(Math.floor((remaining % 60000) / 1000)).padStart(2, "0");
+    usdtTimer.innerText = remaining > 0 ? `Address expires in ${minutes}:${seconds}` : "Payment session expired!";
+    usdcTimer.innerText = remaining > 0 ? `Address expires in ${minutes}:${seconds}` : "Payment session expired!";
 
-        // Stop polling if session expired
-        if (Date.now() - startTime > totalDuration) return;
+    // Session expired
+    if (remaining <= 0) {
+        usdtProgress.style.width = "0%";
+        usdcProgress.style.width = "0%";
+        document.getElementById("usdt-status").innerText = "Payment session expired.";
+        document.getElementById("usdc-status").innerText = "Payment session expired.";
 
-        // Increase interval gradually up to 2 minutes
-        pollInterval = Math.min(pollInterval + 30000, 120000);
+        localStorage.removeItem("avalonflowAmount");
+        localStorage.removeItem("avalonflowStartTime");
 
-        setTimeout(poll, pollInterval);
-    });
+        // Redirect after 1s
+        setTimeout(() => {
+            window.location.href = "https://access-plans.avalonflow.site";
+        }, 1000);
+
+        // Stop loop
+        if (pollTimeout) clearTimeout(pollTimeout);
+        return;
+    }
+
+    // Poll payment every pollInterval
+    if (elapsed % pollInterval < 1000) { // approximate polling timing
+        checkPayment().then(paymentDone => {
+            if (paymentDone) return; // stops redirect handled in checkPayment
+        });
+    }
+
+    // Repeat every 1s
+    pollTimeout = setTimeout(loop, 1000);
 }
 
-// Start polling
-poll();
-
-// Optional: run first check immediately
-checkPayment();
+// Start unified loop
+loop();
 
 </script>
 </body>

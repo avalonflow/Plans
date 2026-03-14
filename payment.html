@@ -665,64 +665,52 @@ function animatePaymentLine(){
 }
 
 // ---------------- UPDATE TIMER ----------------
-function updateTimer() {
-    if (!usdtProgress || !usdcProgress || !usdtTimer || !usdcTimer) return;
-
-    const now = Date.now();
-    const elapsed = now - startTime;
-    const remaining = totalDuration - elapsed;
-    const percentage = Math.max(0, remaining / totalDuration) * 100;
-
-    usdtProgress.style.width = percentage + "%";
-    usdcProgress.style.width = percentage + "%";
-
-    const minutes = String(Math.floor(remaining / 60000)).padStart(2, "0");
-    const seconds = String(Math.floor((remaining % 60000) / 1000)).padStart(2, "0");
-
-    usdtTimer.innerText = remaining > 0 ? `Address expires in ${minutes}:${seconds}` : "Payment session expired!";
-    usdcTimer.innerText = remaining > 0 ? `Address expires in ${minutes}:${seconds}` : "Payment session expired!";
-
-    // ---------------- PAYMENT FAILED ----------------
-    if (remaining <= 0 && !paymentDone) {
-        paymentDone = true; // prevent race with payment detection
-        document.getElementById("usdt-status").innerText = "Payment session expired.";
-        document.getElementById("usdc-status").innerText = "Payment session expired.";
-
-        // Show notification for 3 seconds
-        triggerNotification("Payment Failed. Redirecting...", 3000);
-
-        usdtProgress.style.width = "0%";
-        usdcProgress.style.width = "0%";
-
-        localStorage.removeItem("avalonflowAmount");
-localStorage.removeItem("avalonflowStartTime");
-localStorage.removeItem("avalonflowWallet"); // <--- remove old wallet
-
-        clearInterval(timerInterval);
-        clearTimeout(pollTimeout);
-
-        // Redirect slightly after notification
-        setTimeout(() => {
-            window.location.href = "https://access-plans.avalonflow.site";
-        }, 3200);
-    }
-}
-
-let usdtProgress, usdcProgress, usdtTimer, usdcTimer;
-let timerInterval;
-
 window.addEventListener("DOMContentLoaded", () => {
-    usdtProgress = document.getElementById("usdt-progress");
-    usdcProgress = document.getElementById("usdc-progress");
+    const usdtProgress = document.getElementById("usdt-progress");
+    const usdcProgress = document.getElementById("usdc-progress");
+    const usdtTimer = document.getElementById("usdt-timer");
+    const usdcTimer = document.getElementById("usdc-timer");
 
-    usdtTimer = document.getElementById("usdt-timer");
-    usdcTimer = document.getElementById("usdc-timer");
+    // updateTimer now closes over these correct elements
+    function updateTimer() {
+        const now = Date.now();
+        const elapsed = now - startTime;
+        const remaining = totalDuration - elapsed;
+        const percentage = Math.max(0, remaining / totalDuration) * 100;
 
-    // Start timer now that elements exist
-    timerInterval = setInterval(updateTimer, 1000);
+        usdtProgress.style.width = percentage + "%";
+        usdcProgress.style.width = percentage + "%";
 
-    // Update immediately so it shows from 5:00
-    updateTimer();
+        const minutes = String(Math.floor(remaining / 60000)).padStart(2, "0");
+        const seconds = String(Math.floor((remaining % 60000) / 1000)).padStart(2, "0");
+
+        usdtTimer.innerText = remaining > 0 ? `Address expires in ${minutes}:${seconds}` : "Payment session expired!";
+        usdcTimer.innerText = remaining > 0 ? `Address expires in ${minutes}:${seconds}` : "Payment session expired!";
+
+        if (remaining <= 0 && !paymentDone) {
+            paymentDone = true;
+            document.getElementById("usdt-status").innerText = "Payment session expired.";
+            document.getElementById("usdc-status").innerText = "Payment session expired.";
+
+            triggerNotification("Payment Failed. Redirecting...", 3000);
+
+            usdtProgress.style.width = "0%";
+            usdcProgress.style.width = "0%";
+
+            localStorage.removeItem("avalonflowAmount");
+            localStorage.removeItem("avalonflowStartTime");
+            localStorage.removeItem("avalonflowWallet");
+
+            clearInterval(timerInterval);
+            clearTimeout(pollTimeout);
+
+            setTimeout(() => {
+                window.location.href = "https://access-plans.avalonflow.site";
+            }, 3200);
+        }
+    }
+
+    const timerInterval = setInterval(updateTimer, 1000); // start timer
 });
 
 // ---------------- BLOCKCHAIN PAYMENT DETECTION ----------------

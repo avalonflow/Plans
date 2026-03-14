@@ -524,10 +524,11 @@ new QRCode(document.getElementById("usdc-qr"), {
 
 // ---------------- TIMER + PROGRESS ----------------
 const totalDuration = 5 * 60 * 1000; // 5 minutes
-const usdtProgress = document.getElementById("usdt-progress");
-const usdcProgress = document.getElementById("usdc-progress");
-const usdtTimer = document.getElementById("usdt-timer");
-const usdcTimer = document.getElementById("usdc-timer");
+const usdtProgress = document.getElementById("usdt-progress") || {style:{}};
+const usdcProgress = document.getElementById("usdc-progress") || {style:{}};
+
+const usdtTimer = document.getElementById("usdt-timer") || {innerText:""};
+const usdcTimer = document.getElementById("usdc-timer") || {innerText:""};
 
 // Use persisted start time or create a new one
 let startTime = localStorage.getItem("avalonflowStartTime");
@@ -598,8 +599,11 @@ async function checkPayment() {
                 txTime > pageLoadTime &&
                 confirmations >= 1
             ) {
-                document.getElementById("usdt-status").innerText = "Payment detected. Redirecting...";
-                document.getElementById("usdc-status").innerText = "Payment detected. Redirecting...";
+                const usdtStatus = document.getElementById("usdt-status");
+if(usdtStatus) usdtStatus.innerText = "Payment detected. Redirecting...";
+
+                const usdcStatus = document.getElementById("usdc-status");
+if(usdcStatus) usdcStatus.innerText = "Payment detected. Redirecting...";
 
                 localStorage.removeItem("avalonflowAmount");
                 localStorage.removeItem("avalonflowStartTime");

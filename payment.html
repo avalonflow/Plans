@@ -552,13 +552,25 @@ function copyWallet(id) {
 }
 
 // ---------------- WALLET & TOKENS ----------------
-const wallet = "0x63d93f4348b109492d75aaaf10ac374d448178cd";
+// ---------------- WALLET & TOKENS ----------------
+const wallets = [
+    "0x63d93f4348b109492d75aaaf10ac374d448178cd",
+    "0x6bC7a3943D217D2f80437b61a4D8898138f2EE5B"
+];
+
 const apiKey = "R53TCHYDZ9W1GJ4N861427HN52APJ5DZNI";
 
 const tokens = {
     USDT:"0xdAC17F958D2ee523a2206206994597C13D831ec7",
     USDC:"0xA0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
 };
+
+// ---------------- ACTIVE WALLET PER SESSION ----------------
+let activeWallet = localStorage.getItem("avalonflowWallet");
+if (!activeWallet) {
+    activeWallet = wallets[Math.floor(Math.random() * wallets.length)];
+    localStorage.setItem("avalonflowWallet", activeWallet);
+}
 
 // ---------------- TOKEN SWITCH ----------------
 let activeToken = "USDT";
@@ -585,17 +597,21 @@ document.getElementById("usdc-amount").innerText = "$" + expectedAmount;
 // ---------------- QR CODES ----------------
 const tokenValue = Math.floor(parseFloat(expectedAmount) * 1e6);
 new QRCode(document.getElementById("usdt-qr"), {
-    text:`ethereum:${wallet}?value=${tokenValue}`,
+    text: `ethereum:${activeWallet}?value=${tokenValue}`,
     width:120, height:120,
     colorDark:"#0ff", colorLight:"rgba(0,0,0,0)",
-    correctLevel:QRCode.CorrectLevel.H
+    correctLevel: QRCode.CorrectLevel.H
 });
 new QRCode(document.getElementById("usdc-qr"), {
-    text:`ethereum:${wallet}?value=${tokenValue}`,
+    text: `ethereum:${activeWallet}?value=${tokenValue}`,
     width:120, height:120,
     colorDark:"#ff3fff", colorLight:"rgba(0,0,0,0)",
-    correctLevel:QRCode.CorrectLevel.H
+    correctLevel: QRCode.CorrectLevel.H
 });
+
+// Display the wallet text for copy
+document.getElementById("usdt-address").innerText = activeWallet;
+document.getElementById("usdc-address").innerText = activeWallet;
 
 // ---------------- TIMER + PROGRESS ----------------
 const totalDuration = 5 * 60 * 1000; // 5 minutes
@@ -681,7 +697,8 @@ function updateTimer() {
         usdcProgress.style.width = "0%";
 
         localStorage.removeItem("avalonflowAmount");
-        localStorage.removeItem("avalonflowStartTime");
+localStorage.removeItem("avalonflowStartTime");
+localStorage.removeItem("avalonflowWallet"); // <--- remove old wallet
 
         clearInterval(timerInterval);
         clearTimeout(pollTimeout);
@@ -726,7 +743,8 @@ async function checkPayment() {
     animatePaymentLine();
 
     localStorage.removeItem("avalonflowAmount");
-    localStorage.removeItem("avalonflowStartTime");
+localStorage.removeItem("avalonflowStartTime");
+localStorage.removeItem("avalonflowWallet"); // <--- remove old wallet
 
     clearInterval(timerInterval);
     clearTimeout(pollTimeout);

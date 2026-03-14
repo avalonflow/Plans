@@ -593,8 +593,8 @@ const interval = setInterval(() => {
 
     clearInterval(interval);
 
-document.getElementById("usdt-status").innerText = "Payment detected. Redirecting...";
-document.getElementById("usdc-status").innerText = "Payment detected. Redirecting...";
+document.getElementById("usdt-status").innerText = "Payment session expired.";
+document.getElementById("usdc-status").innerText = "Payment session expired.";
 
     usdtProgress.style.width="0%";
     usdcProgress.style.width="0%";
@@ -602,13 +602,15 @@ document.getElementById("usdc-status").innerText = "Payment detected. Redirectin
     usdtTimer.innerText="Payment session expired!";
     usdcTimer.innerText="Payment session expired!";
 
+        // Clear localStorage
     localStorage.removeItem("avalonflowAmount");
+    localStorage.removeItem("avalonflowStartTime");
 
-    // Redirect to access plans
-    window.location.href = "https://access-plans.avalonflow.site";
+    // Redirect after 1 second
+    setTimeout(() => {
+        window.location.href = "https://access-plans.avalonflow.site";
+    }, 1000); // 1000 ms = 1 second
 }
-
-}, 1000);
 
 
 // BLOCKCHAIN PAYMENT DETECTION
@@ -630,36 +632,31 @@ let url = `https://api.etherscan.io/api?module=account&action=tokentx&address=${
         let res = await fetch(url);
         let data = await res.json();
 
-        if(data.status !== "1") continue;
+        if(data.status !== "1") return false;
 
         for(let tx of data.result){
 
-            let amount = tx.value / 1e6;
+            let amount = +(tx.value / 1e6).toFixed(4);  // convert to number
+let expected = +expectedAmount;             // convert expectedAmount string to number
 
-            let txTime = parseInt(tx.timeStamp || 0);
-
-            let confirmations = parseInt(tx.confirmations || 1);
-
-            if(
-
-                tx.to.toLowerCase() === wallet.toLowerCase() &&
-                parseFloat(amount).toFixed(4) === expectedAmount &&
-                txTime > pageLoadTime &&
-                confirmations >= 1
-
-            ){
-
-                document.getElementById("usdt-status").innerText = "Payment detected. Redirecting...";
+if (
+    tx.to.toLowerCase() === wallet.toLowerCase() &&
+    amount === expected &&
+    txTime > pageLoadTime &&
+    confirmations >= 1
+) {
+    document.getElementById("usdt-status").innerText = "Payment detected. Redirecting...";
                 document.getElementById("usdc-status").innerText = "Payment detected. Redirecting...";
 
-                setTimeout(()=>{
+                    // Clear localStorage
+    localStorage.removeItem("avalonflowAmount");
+    localStorage.removeItem("avalonflowStartTime");
 
-                    window.location.href="https://profile-login.avalonflow.site";
-
-    },1000);
+    setTimeout(() => {
+        window.location.href = "https://profile-login.avalonflow.site";
+    }, 1000);
 
     return true;
-
 }
 
         }

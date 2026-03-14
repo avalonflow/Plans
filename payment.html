@@ -747,7 +747,7 @@ async function checkPayment() {
             const confirmations = parseInt(tx.confirmations || 1, 10);
 
             if (
-    tx.to.toLowerCase() === wallet.toLowerCase() &&
+    tx.to.toLowerCase() === activeWallet.toLowerCase() &&
     amount === expected &&
     txTime > pageLoadTime &&
     confirmations >= 1 &&

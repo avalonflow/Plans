@@ -615,86 +615,87 @@ document.getElementById("usdc-status").innerText = "Payment session expired.";
 
 // BLOCKCHAIN PAYMENT DETECTION
 
-async function checkPayment(){
+async function checkPayment() {
 
-// Stop polling if session expired
-if(Date.now() - startTime > totalDuration){
-    return true;
-}
+    // Stop polling if session expired
+    if (Date.now() - startTime > totalDuration) {
+        return true;
+    }
 
-let token = activeToken;
-let contract = tokens[token];
+    const token = activeToken;
+    const contract = tokens[token];
 
-let url = `https://api.etherscan.io/api?module=account&action=tokentx&address=${wallet}&contractaddress=${contract}&sort=desc&apikey=${apiKey}`;
+    const url = `https://api.etherscan.io/api?module=account&action=tokentx&address=${wallet}&contractaddress=${contract}&sort=desc&apikey=${apiKey}`;
 
-    try{
+    try {
+        const res = await fetch(url);
+        const data = await res.json();
 
-        let res = await fetch(url);
-        let data = await res.json();
+        if (data.status !== "1") return false;
 
-        if(data.status !== "1") return false;
+        for (let tx of data.result) {
 
-        for(let tx of data.result){
+            // Convert token value to number with 4 decimals
+            const amount = +(tx.value / 1e6).toFixed(4);
+            const expected = +expectedAmount;
 
-            let amount = +(tx.value / 1e6).toFixed(4);  // convert to number
-let expected = +expectedAmount;             // convert expectedAmount string to number
+            // Get timestamp and confirmations
+            const txTime = parseInt(tx.timeStamp || 0, 10);
+            const confirmations = parseInt(tx.confirmations || 1, 10);
 
-if (
-    tx.to.toLowerCase() === wallet.toLowerCase() &&
-    amount === expected &&
-    txTime > pageLoadTime &&
-    confirmations >= 1
-) {
-    document.getElementById("usdt-status").innerText = "Payment detected. Redirecting...";
+            if (
+                tx.to.toLowerCase() === wallet.toLowerCase() &&
+                amount === expected &&
+                txTime > pageLoadTime &&
+                confirmations >= 1
+            ) {
+                // Update UI
+                document.getElementById("usdt-status").innerText = "Payment detected. Redirecting...";
                 document.getElementById("usdc-status").innerText = "Payment detected. Redirecting...";
 
-                    // Clear localStorage
-    localStorage.removeItem("avalonflowAmount");
-    localStorage.removeItem("avalonflowStartTime");
+                // Clear localStorage
+                localStorage.removeItem("avalonflowAmount");
+                localStorage.removeItem("avalonflowStartTime");
 
-    setTimeout(() => {
-        window.location.href = "https://profile-login.avalonflow.site";
-    }, 1000);
+                // Redirect after 1 second
+                setTimeout(() => {
+                    window.location.href = "https://profile-login.avalonflow.site";
+                }, 1000);
 
-    return true;
-}
-
+                return true;
+            }
         }
 
-    }catch(err){
+    } catch (err) {
+        console.error("Payment check error:", err);
+    }
 
-        console.error("Payment check error:",err);
-
+    return false;
 }
-
-return false;
-
-}
-
 
 // Poll blockchain every 10 seconds
-let pollInterval = 30000; // start at 30s
+let pollInterval = 30000; // start at 30 seconds
 
 function poll() {
-
     checkPayment().then(paymentDone => {
 
-        if (!paymentDone) {
+        // Stop polling if payment detected
+        if (paymentDone) return;
 
-            pollInterval = Math.min(pollInterval + 30000, 120000); 
-            // increase by 30s up to 2 minutes
+        // Stop polling if session expired
+        if (Date.now() - startTime > totalDuration) return;
 
-            setTimeout(poll, pollInterval);
+        // Increase interval gradually up to 2 minutes
+        pollInterval = Math.min(pollInterval + 30000, 120000);
 
-        }
-
+        setTimeout(poll, pollInterval);
     });
-
 }
 
+// Start polling
 poll();
 
-// Run first check immediately
+// Optional: run first check immediately
 checkPayment();
 
 </script>

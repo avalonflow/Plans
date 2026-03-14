@@ -619,8 +619,8 @@ new QRCode(document.getElementById("usdc-qr"), {
 });
 
 // Display the wallet text for copy
-document.getElementById("usdt-address").innerText = activeWallet;
-document.getElementById("usdc-address").innerText = activeWallet;
+document.getElementById("usdt-wallet").childNodes[0].textContent = activeWallet;
+document.getElementById("usdc-wallet").childNodes[0].textContent = activeWallet;
 
 
 
@@ -628,6 +628,8 @@ document.getElementById("usdc-address").innerText = activeWallet;
 let paymentDone = false;  // <--- Add this right here
 
 function animatePaymentLine(){
+    if(paymentDone) return;
+    paymentDone = true;
 
     const usdtStatus = document.getElementById("usdt-status");
     const usdcStatus = document.getElementById("usdc-status");
@@ -636,32 +638,20 @@ function animatePaymentLine(){
     if(usdcStatus) usdcStatus.innerText = "Blockchain confirmation detected...";
 
     setTimeout(()=>{
-
         let progress = 0;
-
         const anim = setInterval(()=>{
-
             progress++;
-
             const bar = "▬".repeat(progress);
-
             if(usdtStatus) usdtStatus.innerText = `Sent ${bar}`;
             if(usdcStatus) usdcStatus.innerText = `Sent ${bar}`;
-
             if(progress >= 18){
-
                 clearInterval(anim);
-
                 if(usdtStatus) usdtStatus.innerText = "Sent __________ Received ✔️";
                 if(usdcStatus) usdcStatus.innerText = "Sent __________ Received ✔️";
-
                 triggerNotification("Payment Successful. Redirecting...");
-
             }
-
-        },60);
-
-    },800);
+        }, 60);
+    }, 800);
 }
 
 // ---------------- UPDATE TIMER ----------------
@@ -671,13 +661,13 @@ window.addEventListener("DOMContentLoaded", () => {
     const usdtTimer = document.getElementById("usdt-timer");
     const usdcTimer = document.getElementById("usdc-timer");
 
-    // updateTimer now closes over these correct elements
     function updateTimer() {
         const now = Date.now();
         const elapsed = now - startTime;
         const remaining = totalDuration - elapsed;
-        const percentage = Math.max(0, remaining / totalDuration) * 100;
 
+        // Progress: fill up as time passes
+        const percentage = Math.min(100, ((totalDuration - remaining) / totalDuration) * 100);
         usdtProgress.style.width = percentage + "%";
         usdcProgress.style.width = percentage + "%";
 
@@ -689,6 +679,7 @@ window.addEventListener("DOMContentLoaded", () => {
 
         if (remaining <= 0 && !paymentDone) {
             paymentDone = true;
+
             document.getElementById("usdt-status").innerText = "Payment session expired.";
             document.getElementById("usdc-status").innerText = "Payment session expired.";
 
@@ -701,8 +692,12 @@ window.addEventListener("DOMContentLoaded", () => {
             localStorage.removeItem("avalonflowStartTime");
             localStorage.removeItem("avalonflowWallet");
 
+            if (typeof pollTimeout !== "undefined") clearTimeout(pollTimeout);
             clearInterval(timerInterval);
-            clearTimeout(pollTimeout);
+
+            // Optional: disable check button
+            const checkBtn = document.getElementById("check-btn");
+            if (checkBtn) checkBtn.disabled = true;
 
             setTimeout(() => {
                 window.location.href = "https://access-plans.avalonflow.site";
@@ -710,7 +705,8 @@ window.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    const timerInterval = setInterval(updateTimer, 1000); // start timer
+    const timerInterval = setInterval(updateTimer, 1000);
+    updateTimer(); // Initial call
 });
 
 // ---------------- BLOCKCHAIN PAYMENT DETECTION ----------------

@@ -537,6 +537,43 @@ if (!startTime) {
     localStorage.setItem("avalonflowStartTime", startTime);
 } else startTime = parseInt(startTime, 10);
 
+function animatePaymentLine(){
+
+    const usdtStatus = document.getElementById("usdt-status");
+    const usdcStatus = document.getElementById("usdc-status");
+
+    if(usdtStatus) usdtStatus.innerText = "Blockchain confirmation detected...";
+    if(usdcStatus) usdcStatus.innerText = "Blockchain confirmation detected...";
+
+    setTimeout(()=>{
+
+        let progress = 0;
+
+        const anim = setInterval(()=>{
+
+            progress++;
+
+            const bar = "▬".repeat(progress);
+
+            if(usdtStatus) usdtStatus.innerText = `Sent ${bar}`;
+            if(usdcStatus) usdcStatus.innerText = `Sent ${bar}`;
+
+            if(progress >= 18){
+
+                clearInterval(anim);
+
+                if(usdtStatus) usdtStatus.innerText = "Sent __________ Received ✔️";
+                if(usdcStatus) usdcStatus.innerText = "Sent __________ Received ✔️";
+
+                showNotification("Payment Successful. Redirecting...");
+
+            }
+
+        },60);
+
+    },800);
+}
+
 // ---------------- UPDATE TIMER ----------------
 function updateTimer() {
     const now = Date.now();
@@ -556,6 +593,9 @@ function updateTimer() {
     if (remaining <= 0) {
         document.getElementById("usdt-status").innerText = "Payment session expired.";
         document.getElementById("usdc-status").innerText = "Payment session expired.";
+
+showNotification("Payment Failed. Redirecting...");
+
         usdtProgress.style.width = "0%";
         usdcProgress.style.width = "0%";
 
@@ -599,11 +639,7 @@ async function checkPayment() {
                 txTime > pageLoadTime &&
                 confirmations >= 1
             ) {
-                const usdtStatus = document.getElementById("usdt-status");
-if(usdtStatus) usdtStatus.innerText = "Payment detected. Redirecting...";
-
-                const usdcStatus = document.getElementById("usdc-status");
-if(usdcStatus) usdcStatus.innerText = "Payment detected. Redirecting...";
+                animatePaymentLine();
 
                 localStorage.removeItem("avalonflowAmount");
                 localStorage.removeItem("avalonflowStartTime");
@@ -642,6 +678,18 @@ function poll() {
 // Start polling
 poll();
 checkPayment();
+
+function triggerNotification(message){
+
+    const notification = document.getElementById("planNotification");
+    if(!notification) return;
+
+    notification.textContent = message;
+
+    setTimeout(()=>notification.classList.add("show"),300);
+    setTimeout(()=>notification.classList.remove("show"),3300);
+
+}
 </script>
 </body>
 </html>

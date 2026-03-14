@@ -492,12 +492,18 @@ const tokens = {
 
 
 // Token switch
+let activeToken = "USDT";
+
 function showTokenCard(selectedToken){
+
+    activeToken = selectedToken.toUpperCase();
+
     const cards = document.querySelectorAll(".token-card");
     cards.forEach(card=>card.classList.add("inactive"));
 
     const activeCard = document.getElementById(`${selectedToken}-card`);
     if(activeCard) activeCard.classList.remove("inactive");
+
 }
 
 showTokenCard("usdt");
@@ -521,9 +527,12 @@ document.getElementById("usdt-amount").innerText = "$" + expectedAmount;
 document.getElementById("usdc-amount").innerText = "$" + expectedAmount;
 
 
+// Convert amount to token units (USDT/USDC = 6 decimals)
+const tokenValue = Math.floor(parseFloat(expectedAmount) * 1e6);
+
 // QR Codes
 new QRCode(document.getElementById("usdt-qr"),{
-    text:`ethereum:${wallet}?value=${expectedAmount}000000`,
+    text:`ethereum:${wallet}?value=${tokenValue}`,
     width:120,
     height:120,
     colorDark:"#0ff",
@@ -532,7 +541,7 @@ new QRCode(document.getElementById("usdt-qr"),{
 });
 
 new QRCode(document.getElementById("usdc-qr"),{
-    text:`ethereum:${wallet}?value=${expectedAmount}000000`,
+    text:`ethereum:${wallet}?value=${tokenValue}`,
     width:120,
     height:120,
     colorDark:"#ff3fff",
@@ -606,11 +615,15 @@ document.getElementById("usdc-status").innerText = "Payment detected. Redirectin
 
 async function checkPayment(){
 
-for(let token in tokens){
+// Stop polling if session expired
+if(Date.now() - startTime > totalDuration){
+    return true;
+}
 
-    let contract = tokens[token];
+let token = activeToken;
+let contract = tokens[token];
 
-    let url = `https://api.etherscan.io/api?module=account&action=tokentx&address=${wallet}&contractaddress=${contract}&sort=desc&apikey=${apiKey}`;
+let url = `https://api.etherscan.io/api?module=account&action=tokentx&address=${wallet}&contractaddress=${contract}&sort=desc&apikey=${apiKey}`;
 
     try{
 
@@ -655,23 +668,31 @@ for(let token in tokens){
 
         console.error("Payment check error:",err);
 
-    }
-
 }
+
+return false;
 
 }
 
 
 // Poll blockchain every 10 seconds
-let pollInterval = 15000;
+let pollInterval = 30000; // start at 30s
 
 function poll() {
+
     checkPayment().then(paymentDone => {
+
         if (!paymentDone) {
-            pollInterval = Math.min(pollInterval * 2, 60000); // max 60s
+
+            pollInterval = Math.min(pollInterval + 30000, 120000); 
+            // increase by 30s up to 2 minutes
+
             setTimeout(poll, pollInterval);
+
         }
+
     });
+
 }
 
 poll();

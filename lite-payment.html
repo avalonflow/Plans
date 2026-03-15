@@ -604,11 +604,14 @@ showTokenCard("usdt");
 
 // ---------------- UNIQUE AMOUNT ----------------
 const baseAmount = 130.20;
-let expectedAmount = localStorage.getItem("avalonflowAmount");
+const storageKey = "avalonflowAmount_basic";
+
+let expectedAmount = localStorage.getItem(storageKey);
+
 if(!expectedAmount){
     const randomDecimal = Math.floor(Math.random()*10000)/10000;
     expectedAmount = (baseAmount + randomDecimal).toFixed(4);
-    localStorage.setItem("avalonflowAmount", expectedAmount);
+    localStorage.setItem(storageKey, expectedAmount);
 }
 document.getElementById("usdt-amount").innerText = "$" + expectedAmount;
 document.getElementById("usdc-amount").innerText = "$" + expectedAmount;
@@ -717,7 +720,7 @@ window.addEventListener("DOMContentLoaded", () => {
             if (checkBtn) checkBtn.disabled = true;
 
             // Clear session data
-            localStorage.removeItem("avalonflowAmount");
+                            localStorage.removeItem(storageKey);
             localStorage.removeItem("avalonflowStartTime");
             localStorage.removeItem("avalonflowWallet");
 
@@ -767,7 +770,7 @@ async function checkPayment() {
                 paymentDone = true;
                 animatePaymentLine();
 
-                localStorage.removeItem("avalonflowAmount");
+                                localStorage.removeItem(storageKey);
                 localStorage.removeItem("avalonflowStartTime");
                 localStorage.removeItem("avalonflowWallet");
 

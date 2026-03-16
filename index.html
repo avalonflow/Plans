@@ -333,6 +333,37 @@ height: 180px;   /* reduce this value */
 
         .video-controls input[type=range] { width: 100px; }
 
+.gradient-text{
+  font-weight: bold;
+  font-size: 1.8rem;
+
+  background: linear-gradient(90deg,#6b2cd8,#b393ff,#6b2cd8);
+  background-size: 200% auto;
+  animation: gradientShift 6s linear infinite;
+
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+
+  text-shadow: 0 2px 6px rgba(0,0,0,0.35);
+}
+
+.gradient-text-sub{
+  font-size:14px;
+  opacity:0.85;
+
+  background: linear-gradient(90deg,#6b2cd8,#b393ff,#6b2cd8);
+  background-size: 200% auto;
+  animation: gradientShift 6s linear infinite;
+
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+@keyframes gradientShift{
+  0% { background-position: 0% center; }
+  100% { background-position: 200% center; }
+}
+
         /* ---------- Footer ---------- */
         footer {
             position: fixed;
@@ -366,8 +397,10 @@ height: 180px;   /* reduce this value */
     <div id="content">
 
         <!-- Page Header -->
-<h3 style="margin:0;">Plans</h3>
-<p style="margin:0 0 10px 0; font-size:14px; opacity:0.85;">About the AvalonFlow Plans</p>
+<h3 class="gradient-text" style="margin:0;">Plans</h3>
+<p class="gradient-text-sub" style="margin:0 0 10px 0;">
+  About the AvalonFlow Plans
+</p>
 
 <!-- ACU Explanation -->
 <p>

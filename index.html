@@ -151,33 +151,34 @@ opacity:0.35;
     0 0 40px rgba(241,196,15,0.6);
 }
 
+/* ---------- Swipe Layout Fix (cards smaller) ---------- */
 .plans-wrapper {
   display: flex;
   gap: 20px;
   overflow-x: auto;
   scroll-snap-type: x mandatory;
   scroll-behavior: smooth;
-  padding: 20px 20px; /* adjust padding to avoid card clipping */
-  position: relative;
+  padding: 20px 20px; /* smaller padding to avoid clipping */
 }
 
 .plans-wrapper::-webkit-scrollbar {
   display: none;
 }
 
+/* Glass card sizing fix */
 .glass-card {
-  min-width: 80%;  /* slightly smaller to allow spacing */
+  min-width: 280px;       /* ✅ smaller width */
+  max-width: 320px;       /* optional max */
   flex-shrink: 0;
   scroll-snap-align: center;
-  margin-bottom: 0; /* remove extra bottom margin */
-  transition: transform 0.35s, opacity 0.35s, filter 0.35s;
-}
+  margin-bottom: 20px;
 
-/* Scale inactive cards */
-.glass-card:not(.active) {
+  /* inactive by default */
   transform: scale(0.92);
   opacity: 0.6;
   filter: brightness(0.7);
+  will-change: transform;
+  transition: transform 0.35s, opacity 0.35s, filter 0.35s;
 }
 
 /* Active card */

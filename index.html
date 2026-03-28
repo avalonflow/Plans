@@ -151,18 +151,16 @@ opacity:0.35;
     0 0 40px rgba(241,196,15,0.6);
 }
 
-/* ---------- Plans Wrapper (Horizontal Scroll) ---------- */
+/* ---------- Plans Wrapper ---------- */
 .plans-wrapper {
   display: flex;
-  flex-wrap: nowrap;
   gap: 20px;
   overflow-x: auto;
   scroll-snap-type: x mandatory;
   scroll-behavior: smooth;
-  
-  padding: 0 20px;       /* simple padding, no huge scroll-padding */
-  justify-content: center; /* center cards in wrapper */
-  width: 100%;           /* wrapper fits container */
+  padding: 20px;               /* simple padding */
+  justify-content: center;
+  width: 100%;
   box-sizing: border-box;
 }
 
@@ -170,53 +168,58 @@ opacity:0.35;
   display: none;
 }
 
-/* ---------- Glass Card Base ---------- */
+/* ---------- Glass Card ---------- */
 .glass-card {
-  flex-shrink: 0;
-  scroll-snap-align: center;
-  width: 280px;            /* slightly smaller to fit nicely */
-  max-width: 90vw;          /* ensures responsiveness on mobile */
+  flex: 0 0 auto;              /* fix card width */
+  width: 300px;
   border-radius: 24px;
   padding: 16px 24px;
-  border: 1px solid rgba(255,255,255,0.05);
   background: rgba(255,255,255,0.04);
   backdrop-filter: blur(14px);
+  border: 1px solid rgba(255,255,255,0.05);
   position: relative;
-  overflow: visible; /* glow visible */
-  margin-bottom: 20px;
+  overflow: visible;
+  scroll-snap-align: center;
 
-  transform: scale(0.95);  /* inactive slightly smaller */
-  filter: brightness(0.85);
+  /* Inactive card look */
+  transform: scale(0.92);
   opacity: 1;
-  transition: transform 0.35s, filter 0.35s, box-shadow 0.35s;
-  will-change: transform;
-
-  box-shadow:
-    0 5px 15px rgba(0,0,0,0.2),
-    inset 0 0 15px rgba(255,255,255,0.03);
+  filter: brightness(0.85);
+  transition: transform 0.3s, box-shadow 0.3s, filter 0.3s;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.2), inset 0 0 15px rgba(255,255,255,0.03);
 }
 
-/* ---------- Hover effect ---------- */
+/* ---------- Hover ---------- */
 .glass-card:hover {
-  transform: translateY(-4px) scale(0.97);
-  box-shadow: 0 10px 25px rgba(107,44,216,0.25);
+  transform: scale(0.95) translateY(-4px);
+  box-shadow: 0 0 20px rgba(107,44,216,0.3); /* subtle, equal purple glow */
 }
 
 /* ---------- Active Card ---------- */
 .glass-card.active {
-  transform: scale(1); /* full size */
+  transform: scale(0.97);
   opacity: 1;
   filter: brightness(1);
   z-index: 2;
 
-  border: 1px solid rgba(107,44,216,0.35);
   box-shadow:
-    0 12px 35px rgba(107,44,216,0.45),
-    0 0 20px rgba(107,44,216,0.35),
-    0 0 50px rgba(107,44,216,0.2);
+    0 0 15px rgba(107,44,216,0.35),
+    0 0 30px rgba(107,44,216,0.2);
+  border: 1px solid rgba(107,44,216,0.3);
 }
-  
 
+/* ---------- Neon Border ---------- */
+.glass-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 24px;
+  background: linear-gradient(120deg,#6b2cd8,#00f2fe,#6b2cd8);
+  opacity: 0.15; /* subtle border, no veil */
+  z-index: -1;
+}
+
+/* ---------- Active Pulse ---------- */
 .glass-card.active::after {
   content: "";
   position: absolute;
@@ -228,28 +231,15 @@ opacity:0.35;
 }
 
 @keyframes activePulse {
-  0% { opacity: 0.4; transform: scale(1); }
-  50% { opacity: 0.8; transform: scale(1.05); }
-  100% { opacity: 0.4; transform: scale(1); }
-}
-
-/* ---------- Neon Border ---------- */
-.glass-card::before {
-  content: "";
-  position: absolute;
-  top: 0; left: 0; right: 0; bottom: 0;
-  border-radius: 24px;
-  background: linear-gradient(120deg,#6b2cd8,#00f2fe,#6b2cd8);
-  opacity: 0.15; /* lighter, so it doesn’t cover content */
-  z-index: -1;
+  0% { opacity: 0.3; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(1.02); }
+  100% { opacity: 0.3; transform: scale(1); }
 }
 
 /* ---------- Plan Pay Glow ---------- */
 .glass-card.active .plan-pay a {
-  transform: scale(1.06);
-  box-shadow:
-    0 0 20px rgba(241,196,15,0.9),
-    0 0 40px rgba(241,196,15,0.6);
+  transform: scale(1.04);
+  box-shadow: 0 0 15px rgba(241,196,15,0.7);
 }
 
 /* ---------- Navigation Buttons ---------- */

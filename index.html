@@ -861,18 +861,49 @@ wrapper.addEventListener('scroll', () => {
   window.requestAnimationFrame(updateActiveCard);
 });
 
+const dots = document.querySelectorAll('.dots span');
+
+function updateActiveCard() {
+  const wrapperCenter = wrapper.scrollLeft + wrapper.offsetWidth / 2;
+  let closestCard = null;
+  let minDistance = Infinity;
+
+  cards.forEach(card => {
+    const cardCenter = card.offsetLeft + card.offsetWidth / 2;
+    const distance = Math.abs(wrapperCenter - cardCenter);
+    if(distance < minDistance) {
+      minDistance = distance;
+      closestCard = card;
+    }
+  });
+
+  cards.forEach(card => card.classList.remove('active'));
+  if(closestCard) closestCard.classList.add('active');
+
+  // Update dots
+  if (closestCard) {
+    const index = Array.from(cards).indexOf(closestCard);
+    dots.forEach(dot => dot.classList.remove('active'));
+    if(dots[index]) dots[index].classList.add('active');
+  }
+}
+
 // Initial active card
 updateActiveCard();
 
 // Optional: arrow navigation
 document.querySelector('.nav-btn.left')?.addEventListener('click', () => {
   const active = document.querySelector('.glass-card.active');
-  if(active && active.previousElementSibling) active.previousElementSibling.scrollIntoView({ behavior: 'smooth', inline: 'center' });
+  if(active && active.previousElementSibling) {
+    active.previousElementSibling.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+  }
 });
 
 document.querySelector('.nav-btn.right')?.addEventListener('click', () => {
   const active = document.querySelector('.glass-card.active');
-  if(active && active.nextElementSibling) active.nextElementSibling.scrollIntoView({ behavior: 'smooth', inline: 'center' });
+  if(active && active.nextElementSibling) {
+    active.nextElementSibling.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+  }
 });
 
         // Video volume

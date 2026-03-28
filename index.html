@@ -218,21 +218,29 @@ opacity:0.35;
   z-index: -1;
 }
 
-/* Active pulse */
-.glass-card.active::after {
+/* Active flowing border */
+.glass-card.active::before {
   content: "";
   position: absolute;
   inset: 0;
   border-radius: 24px;
-  background: radial-gradient(circle, rgba(107,44,216,0.15), transparent 70%);
-  animation: activePulse 2s ease-in-out infinite;
+  padding: 2px; /* border thickness */
+  background: linear-gradient(90deg, #6b2cd8, #00f2fe, #6b2cd8, #00f2fe);
+  background-size: 300% 300%; /* larger than element for smooth flow */
   z-index: -1;
+  mask: 
+    linear-gradient(#fff 0 0) content-box, 
+    linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  -webkit-mask-composite: destination-out;
+  animation: flowBorder 3s linear infinite;
 }
 
-@keyframes activePulse {
-  0% { opacity: 0.3; transform: scale(1); }
-  50% { opacity: 0.5; transform: scale(1.02); }
-  100% { opacity: 0.3; transform: scale(1); }
+/* Animate the gradient to flow */
+@keyframes flowBorder {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }
 
 /* Plan pay glow */
@@ -656,13 +664,12 @@ height: 180px;   /* reduce this value */
     <div style="height:14px;"></div>
 </p>
 
-!-- Carousel Wrapper for swipe + dots -->
     <div class="plans-wrapper">
 
         <!-- AvalonCare Lite Glass Card -->
         <div class="glass-card plan-lite">
             <!-- Badge example -->
-            <div class="badge-popular">Popular</div>
+            <div class="badge-popular">Essential</div>
 
             <div>
                 <strong class="gradient-animation">🪽 AvalonCare Lite</strong><br>
@@ -734,7 +741,7 @@ height: 180px;   /* reduce this value */
         <!-- AvalonCare Premium Glass Card -->
         <div class="glass-card plan-premium">
             <!-- Badge example -->
-            <div class="badge-popular">Popular</div>
+            <div class="badge-popular">Elite</div>
 
             <div>
                 <strong class="gradient-animation">🪽 AvalonCare Premium</strong><br>

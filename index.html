@@ -240,10 +240,10 @@ opacity:0.35;
 .glass-card::before {
   content: "";
   position: absolute;
-  top:-1px; left:-1px; right:-1px; bottom:-1px;
+  top: 0; left: 0; right: 0; bottom: 0;
   border-radius: 24px;
   background: linear-gradient(120deg,#6b2cd8,#00f2fe,#6b2cd8);
-  opacity: 0.35;
+  opacity: 0.15; /* lighter, so it doesn’t cover content */
   z-index: -1;
 }
 
@@ -847,6 +847,65 @@ height: 180px;   /* reduce this value */
             setTimeout(()=>notification.classList.add("show"),300);
             setTimeout(()=>notification.classList.remove("show"),3300);
         });
+
+const wrapper = document.querySelector('.plans-wrapper');
+const cards = document.querySelectorAll('.glass-card');
+
+function centerActiveCard(card) {
+  const wrapperCenter = wrapper.offsetWidth / 2;
+  const cardCenter = card.offsetLeft + card.offsetWidth / 2;
+  const scrollPos = cardCenter - wrapperCenter;
+
+  wrapper.scrollTo({
+    left: scrollPos,
+    behavior: 'smooth'
+  });
+}
+
+// Detect active card on scroll and lock it
+function updateActiveCard() {
+  const wrapperCenter = wrapper.scrollLeft + wrapper.offsetWidth / 2;
+  let closestCard = null;
+  let minDistance = Infinity;
+
+  cards.forEach(card => {
+    const cardCenter = card.offsetLeft + card.offsetWidth / 2;
+    const distance = Math.abs(wrapperCenter - cardCenter);
+    if(distance < minDistance) {
+      minDistance = distance;
+      closestCard = card;
+    }
+  });
+
+  cards.forEach(card => card.classList.remove('active'));
+  if(closestCard) {
+    closestCard.classList.add('active');
+    // Lock the card in place
+    centerActiveCard(closestCard);
+  }
+}
+
+// Run on scroll end
+let isScrolling;
+wrapper.addEventListener('scroll', () => {
+  window.clearTimeout(isScrolling);
+  isScrolling = setTimeout(() => {
+    updateActiveCard();
+  }, 100); // triggers 100ms after scroll stops
+});
+
+// Set first card as active initially
+updateActiveCard();
+
+// Optional: arrow buttons
+document.querySelector('.nav-btn.left').addEventListener('click', () => {
+  const active = document.querySelector('.glass-card.active');
+  if(active && active.previousElementSibling) centerActiveCard(active.previousElementSibling);
+});
+document.querySelector('.nav-btn.right').addEventListener('click', () => {
+  const active = document.querySelector('.glass-card.active');
+  if(active && active.nextElementSibling) centerActiveCard(active.nextElementSibling);
+});
 
         // Video volume
         const video = document.getElementById("planVideo");

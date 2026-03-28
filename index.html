@@ -158,10 +158,10 @@ opacity:0.35;
   overflow-x: auto;
   scroll-snap-type: x mandatory;
   scroll-behavior: smooth;
-  padding: 20px;               /* simple padding */
-  justify-content: center;
+  padding: 20px;
   width: 100%;
   box-sizing: border-box;
+  justify-content: flex-start; /* natural scroll */
 }
 
 .plans-wrapper::-webkit-scrollbar {
@@ -170,7 +170,7 @@ opacity:0.35;
 
 /* ---------- Glass Card ---------- */
 .glass-card {
-  flex: 0 0 auto;              /* fix card width */
+  flex: 0 0 auto;
   width: 300px;
   border-radius: 24px;
   padding: 16px 24px;
@@ -181,45 +181,44 @@ opacity:0.35;
   overflow: visible;
   scroll-snap-align: center;
 
-  /* Inactive card look */
+  /* Fade-in / scale */
   transform: scale(0.92);
-  opacity: 1;
-  filter: brightness(0.85);
-  transition: transform 0.3s, box-shadow 0.3s, filter 0.3s;
+  opacity: 0.5;
+  transition: transform 0.4s ease, opacity 0.4s ease, box-shadow 0.3s ease, filter 0.3s ease;
   box-shadow: 0 5px 15px rgba(0,0,0,0.2), inset 0 0 15px rgba(255,255,255,0.03);
+  filter: brightness(0.85);
 }
 
-/* ---------- Hover ---------- */
+/* Hover effect */
 .glass-card:hover {
   transform: scale(0.95) translateY(-4px);
-  box-shadow: 0 0 20px rgba(107,44,216,0.3); /* subtle, equal purple glow */
+  box-shadow: 0 0 20px rgba(107,44,216,0.3); /* subtle equal purple glow */
 }
 
-/* ---------- Active Card ---------- */
+/* Active card */
 .glass-card.active {
-  transform: scale(0.97);
+  transform: scale(1);
   opacity: 1;
   filter: brightness(1);
   z-index: 2;
-
   box-shadow:
     0 0 15px rgba(107,44,216,0.35),
     0 0 30px rgba(107,44,216,0.2);
   border: 1px solid rgba(107,44,216,0.3);
 }
 
-/* ---------- Neon Border ---------- */
+/* Neon subtle border */
 .glass-card::before {
   content: "";
   position: absolute;
   inset: 0;
   border-radius: 24px;
   background: linear-gradient(120deg,#6b2cd8,#00f2fe,#6b2cd8);
-  opacity: 0.15; /* subtle border, no veil */
+  opacity: 0.15;
   z-index: -1;
 }
 
-/* ---------- Active Pulse ---------- */
+/* Active pulse */
 .glass-card.active::after {
   content: "";
   position: absolute;
@@ -236,7 +235,7 @@ opacity:0.35;
   100% { opacity: 0.3; transform: scale(1); }
 }
 
-/* ---------- Plan Pay Glow ---------- */
+/* Plan pay glow */
 .glass-card.active .plan-pay a {
   transform: scale(1.04);
   box-shadow: 0 0 15px rgba(241,196,15,0.7);
@@ -838,18 +837,7 @@ height: 180px;   /* reduce this value */
 const wrapper = document.querySelector('.plans-wrapper');
 const cards = document.querySelectorAll('.glass-card');
 
-function centerActiveCard(card) {
-  const wrapperCenter = wrapper.offsetWidth / 2;
-  const cardCenter = card.offsetLeft + card.offsetWidth / 2;
-  const scrollPos = cardCenter - wrapperCenter;
-
-  wrapper.scrollTo({
-    left: scrollPos,
-    behavior: 'smooth'
-  });
-}
-
-// Detect active card on scroll and lock it
+// Detect active card based on scroll position
 function updateActiveCard() {
   const wrapperCenter = wrapper.scrollLeft + wrapper.offsetWidth / 2;
   let closestCard = null;
@@ -865,33 +853,26 @@ function updateActiveCard() {
   });
 
   cards.forEach(card => card.classList.remove('active'));
-  if(closestCard) {
-    closestCard.classList.add('active');
-    // Lock the card in place
-    centerActiveCard(closestCard);
-  }
+  if(closestCard) closestCard.classList.add('active');
 }
 
-// Run on scroll end
-let isScrolling;
+// Run on scroll
 wrapper.addEventListener('scroll', () => {
-  window.clearTimeout(isScrolling);
-  isScrolling = setTimeout(() => {
-    updateActiveCard();
-  }, 100); // triggers 100ms after scroll stops
+  window.requestAnimationFrame(updateActiveCard);
 });
 
-// Set first card as active initially
+// Initial active card
 updateActiveCard();
 
-// Optional: arrow buttons
-document.querySelector('.nav-btn.left').addEventListener('click', () => {
+// Optional: arrow navigation
+document.querySelector('.nav-btn.left')?.addEventListener('click', () => {
   const active = document.querySelector('.glass-card.active');
-  if(active && active.previousElementSibling) centerActiveCard(active.previousElementSibling);
+  if(active && active.previousElementSibling) active.previousElementSibling.scrollIntoView({ behavior: 'smooth', inline: 'center' });
 });
-document.querySelector('.nav-btn.right').addEventListener('click', () => {
+
+document.querySelector('.nav-btn.right')?.addEventListener('click', () => {
   const active = document.querySelector('.glass-card.active');
-  if(active && active.nextElementSibling) centerActiveCard(active.nextElementSibling);
+  if(active && active.nextElementSibling) active.nextElementSibling.scrollIntoView({ behavior: 'smooth', inline: 'center' });
 });
 
         // Video volume

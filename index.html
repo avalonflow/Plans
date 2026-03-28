@@ -159,17 +159,21 @@ opacity:0.35;
   overflow-x: auto;
   scroll-snap-type: x mandatory;
   scroll-behavior: smooth;
-  padding: 20px 40px; /* extra padding to center first/last cards */
-scroll-padding-left: 50%;   /* helps first card center nicely */
-  scroll-padding-right: 50%;  /* helps last card center nicely */
+  padding: 20px 60px;           /* enough space for first/last card */
   justify-content: flex-start;
+
+  width: 100vw;                  /* full viewport width */
+  box-sizing: border-box;
+
+  scroll-padding-left: 50%;      /* help first card center */
+  scroll-padding-right: 50%;     /* help last card center */
 }
 
 .plans-wrapper::-webkit-scrollbar {
   display: none;
 }
 
-/* ---------- Glass Card Base ---------- */
+/* ---------- Glass Card ---------- */
 .glass-card {
   flex-shrink: 0;
   scroll-snap-align: center;
@@ -180,8 +184,11 @@ scroll-padding-left: 50%;   /* helps first card center nicely */
   background: rgba(255,255,255,0.04);
   backdrop-filter: blur(14px);
   position: relative;
-  overflow: hidden;
+
+  /* Important: allow glow/pseudo-elements to show outside card */
+  overflow: visible;
   margin-bottom: 20px;
+  z-index: 0;
 
   /* Inactive state */
   transform: scale(0.92);
@@ -189,12 +196,12 @@ scroll-padding-left: 50%;   /* helps first card center nicely */
   filter: brightness(0.7);
   transition: transform 0.35s, opacity 0.35s, filter 0.35s, box-shadow 0.35s;
   will-change: transform;
+
   box-shadow:
-    0 10px 30px rgba(0,0,0,0.6),
+    0 10px 30px rgba(0,0,0,0.3),
     inset 0 0 30px rgba(255,255,255,0.03);
 }
 
-/* ---------- Hover Effect ---------- */
 .glass-card:hover {
   transform: translateY(-6px) scale(0.95);
   box-shadow: 0 20px 60px rgba(107,44,216,0.45);

@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Payment Gateway</title>
+
+    <!-- Favicon -->
+    <link rel="icon" href="/favicon.png" type="image/png" sizes="48x48">
+
+    <!-- Structured Data for Logo -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "AvalonFlow",
+      "url": "https://avalonflow.site",
+      "logo": "https://avalonFlow.site/favicon.png"
+    }
+    </script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+    <style>
+        /* ---------- Base ---------- */
+        body {
+font-family: Georgia, serif;
+margin: 0;
+color: #fff;
+background: linear-gradient(135deg,#0d0f1a,#050608);
+overflow-x:hidden;
+}
+        button { cursor: pointer; }
+        a { color: inherit; text-decoration: none; font-weight: bold; }
+
+        /* ---------- Floating Background ---------- */
+        #floating-bg {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            background: radial-gradient(circle at bottom, #1a0d3a, #0d0d0d);
+            overflow: hidden;
+        }
+
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0.6;
+            animation: floatParticles linear infinite;
+            box-shadow: 0 0 10px #6b2cd8, 0 0 20px #6b2cd8;
+        }
+
+        @keyframes floatParticles {
+            0% { transform: translateY(100vh) scale(0.3); opacity: 0; }
+            50% { opacity: 1; }
+            100% { transform: translateY(-10vh) scale(1); opacity: 0; }
+        }
+
+        /* ---------- Content ---------- */
+#content {
+    position: relative;
+    z-index: 1;
+    padding: 20px 15px;       /* smaller padding for mobile */
+    max-width: 600px;
+    margin: auto;
+    padding-bottom: 40px;
+    text-align: center;
+}
+
+/* --- Container Glass Panel --- */
+#payment-container {
+    background: rgba(255,255,255,0.05);
+    backdrop-filter: blur(15px);
+    border-radius: 20px;
+    padding: 25px 20px;       /* smaller padding for mobile */
+    box-shadow: 0 0 20px rgba(0,255,255,0.2), 0 0 40px rgba(255,0,255,0.1);
+    text-align: center;
+    max-width: 350px;          /* narrower to show edges on mobile */
+    width: 95%;                /* almost full width on small screens */
+    animation: pulseGlow 3s infinite alternate;
+
+/* ADD margin bottom for scrolling */
+    margin-bottom: 50px;
+}
+
+        @keyframes pulseGlow {
+            0% { box-shadow: 0 0 20px rgba(0,255,255,0.2), 0 0 40px rgba(255,0,255,0.1); }
+            50% { box-shadow: 0 0 30px rgba(0,255,255,0.4), 0 0 60px rgba(255,0,255,0.2); }
+            100% { box-shadow: 0 0 25px rgba(0,255,255,0.3), 0 0 50px rgba(255,0,255,0.15); }
+        }
+
+        /* --- Headings & Status --- */
+        #status {
+            font-size: 1.8rem;
+            margin-bottom: 29px;
+            color: #0ff;
+            text-shadow: 0 0 8px #0ff, 0 0 12px #0ff;
+            transition: all 0.3s ease-in-out;
+        }
+
+        .amount {
+            font-weight: bold;
+            font-size: 1.6rem;
+            color: #ff3fff;
+            text-shadow: 0 0 10px #ff3fff, 0 0 20px #ff3fff;
+        }
+
+        p {
+            margin: 12px 0;
+            font-size: 1.2rem;
+            letter-spacing: 0.5px;
+        }
+
+        p + p {
+            font-family: 'Courier New', monospace;
+            font-size: clamp(1.6rem, 4vw, 1.8rem);
+            color: #0ff;
+            text-shadow: 0 0 6px #0ff;
+            word-break:  break-all;
+  overflow-wrap: normal !important;
+        }
+
+        #check-btn {
+            margin-top: 25px;
+            padding: 12px 25px;
+            font-size: 1rem;
+            font-weight: bold;
+            color: #fff;
+            background: linear-gradient(45deg, #0ff, #ff3fff);
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            text-transform: uppercase;
+            box-shadow: 0 0 8px #0ff, 0 0 16px #ff3fff;
+            transition: all 0.3s ease-in-out;
+        }
+
+        #check-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 12px #0ff, 0 0 24px #ff3fff;
+        }
+
+        /* Timer Styling */
+        #timer {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1rem;
+            font-weight: bold;
+            color: #ff3fff;
+            text-shadow: 0 0 5px #ff3fff, 0 0 10px #ff3fff, 0 0 20px #ff3fff, 0 0 40px #ff3fff;
+            margin-top: 15px;
+            text-align: center;
+            animation: glowPulse 2s infinite alternate;
+        }
+
+        @keyframes glowPulse {
+            0% { text-shadow: 0 0 5px #ff3fff, 0 0 10px #ff3fff, 0 0 20px #ff3fff, 0 0 40px #ff3fff; }
+            50% { text-shadow: 0 0 10px #ff3fff, 0 0 20px #ff3fff, 0 0 40px #ff3fff, 0 0 60px #ff3fff; }
+            100% { text-shadow: 0 0 8px #ff3fff, 0 0 16px #ff3fff, 0 0 32px #ff3fff, 0 0 50px #ff3fff; }
+        }
+
+/* ================= Header Logo Card Neon ================= */
+header .logo-card {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 90%;
+  max-width: 300px;
+  height: 180px;
+  border-radius: 24px;
+
+  /* Purple glass */
+  background: rgba(107,44,216,0.2);
+  backdrop-filter: blur(15px);
+  border: 1px solid rgba(107,44,216,0.4);
+
+  /* Outer neon glow */
+  box-shadow: 
+    0 0 10px rgba(107,44,216,0.5),
+    0 0 20px rgba(107,44,216,0.4),
+    0 0 40px rgba(107,44,216,0.3),
+    0 0 80px rgba(107,44,216,0.2);
+  position: relative;
+  margin: 0 auto;
+
+  /* Smooth pulsing */
+  animation: neonGlow 2.5s ease-in-out infinite alternate;
+  transition: box-shadow 0.3s ease;
+  overflow: hidden;
+}
+
+/* Inner border glow */
+header .logo-card::before {
+  content: '';
+  position: absolute;
+  inset: 2px; /* slightly smaller than card edges */
+  border-radius: 22px;
+  border: 2px solid rgba(107,44,216,0.6);
+  box-shadow:
+    0 0 10px rgba(107,44,216,0.8),
+    0 0 20px rgba(107,44,216,0.6),
+    0 0 30px rgba(107,44,216,0.4);
+  pointer-events: none;
+  z-index: 1;
+  animation: innerGlow 2.5s ease-in-out infinite alternate;
+}
+
+/* Animated halo behind logo */
+header .logo-card::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 120%;
+  height: 120%;
+  background: radial-gradient(circle, rgba(107,44,216,0.4) 0%, transparent 70%);
+  transform: translate(-50%, -50%) scale(1);
+  border-radius: 50%;
+  z-index: 0; /* behind logo image */
+  animation: haloPulse 2.5s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+
+/* Image inside card stays on top */
+header .logo-card img {
+  max-width: 90%;
+  max-height: 90%;
+  height: auto;
+  z-index: 2;
+  position: relative;
+}
+
+/* Outer glow pulse animation */
+@keyframes neonGlow {
+  0% {
+    box-shadow: 
+      0 0 15px rgba(107,44,216,0.4),
+      0 0 30px rgba(107,44,216,0.3),
+      0 0 50px rgba(107,44,216,0.2),
+      0 0 100px rgba(107,44,216,0.15);
+  }
+  50% {
+    box-shadow: 
+      0 0 25px rgba(107,44,216,0.8),
+      0 0 50px rgba(107,44,216,0.6),
+      0 0 80px rgba(107,44,216,0.4),
+      0 0 120px rgba(107,44,216,0.25);
+  }
+  100% {
+    box-shadow: 
+      0 0 15px rgba(107,44,216,0.4),
+      0 0 30px rgba(107,44,216,0.3),
+      0 0 50px rgba(107,44,216,0.2),
+      0 0 100px rgba(107,44,216,0.15);
+  }
+}
+
+/* Inner border glow pulse animation */
+@keyframes innerGlow {
+  0% {
+    box-shadow:
+      0 0 5px rgba(107,44,216,0.5),
+      0 0 10px rgba(107,44,216,0.4),
+      0 0 15px rgba(107,44,216,0.3);
+  }
+  50% {
+    box-shadow:
+      0 0 15px rgba(107,44,216,0.8),
+      0 0 25px rgba(107,44,216,0.6),
+      0 0 35px rgba(107,44,216,0.4);
+  }
+  100% {
+    box-shadow:
+      0 0 5px rgba(107,44,216,0.5),
+      0 0 10px rgba(107,44,216,0.4),
+      0 0 15px rgba(107,44,216,0.3);
+  }
+}
+
+/* Halo pulse animation behind logo */
+@keyframes haloPulse {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0.5;
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.15);
+    opacity: 0.7;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0.5;
+  }
+}
+
+        /* Progress Bar */
+        .progress-bar {
+            width: 100%;
+            height: 18px;
+            background: rgba(255,255,255,0.06);
+            border-radius: 12px;
+            overflow: hidden;
+            margin: 18px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            border-radius: 12px;
+            position: relative;
+            transition: width 0.6s ease;
+            background: linear-gradient(90deg,#4facfe,#00f2fe);
+            box-shadow: 0 0 20px rgba(79,172,254,0.6);
+        }
+
+        .progress-fill::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            animation: energyFlow 2.5s linear infinite;
+        }
+
+        @keyframes energyFlow {
+    0% { transform: translateX(100%); }
+    100% { transform: translateX(-100%); }
+}
+
+                .plan-pay {
+    display: flex;
+    align-items: center;      /* vertically center logo & text */
+    justify-content: center;  /* horizontal center */
+    gap: 8px;                 /* spacing between logo and text */
+    flex-wrap: wrap;          /* wrap if screen too small */
+}
+
+.plan-logo {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin: 0;                /* remove previous margin */
+}
+
+.token-name, .network {
+    display: inline-block;
+    font-weight: bold;
+    color: #fff;
+}
+
+.plan-pay a:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 18px rgba(155, 89, 182, 0.7);
+}
+
+#tokenSelector {
+    display: flex;
+    justify-content: center;
+    gap: 15px; /* space between buttons */
+    margin-bottom: 20px;
+}
+
+#tokenSelector button {
+    padding: 12px 25px;
+    font-size: 1rem;
+    font-weight: bold;
+    color: #fff;
+    background: linear-gradient(135deg, #0ff, #ff3fff);
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    text-transform: uppercase;
+    box-shadow: 0 0 10px #0ff, 0 0 20px #ff3fff;
+    transition: all 0.3s ease-in-out;
+    position: relative;
+    overflow: hidden;
+}
+
+#tokenSelector button::before {
+    content: "";
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg, rgba(0,255,255,0.2), rgba(255,0,255,0.2), rgba(0,255,255,0.2));
+    transform: rotate(45deg);
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+}
+
+#tokenSelector button:hover::before {
+    opacity: 1;
+}
+
+#tokenSelector button:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 15px #0ff, 0 0 30px #ff3fff, 0 0 50px #0ff;
+}
+
+.copy-btn {
+    margin-left: 8px;
+    padding: 2px 6px;
+    font-size: 0.8rem;
+    border: none;
+    border-radius: 4px;
+    background: linear-gradient(45deg, #0ff, #ff3fff);
+    color: #fff;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.copy-btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 6px #0ff, 0 0 12px #ff3fff;
+}
+
+        footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            padding: 18px 0;
+            font-size: 14px;
+            color: #aaa;
+            background: rgba(15, 15, 25, 0.95);
+            backdrop-filter: blur(12px);
+            box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.4);
+            z-index: 6;
+        }
+
+        .qr-section div {
+            margin: 0 auto;
+            border-radius: 12px;
+        }
+
+        .token-card.inactive {
+            display: none;
+        }
+
+@media (max-width: 400px) {
+    #payment-container {
+        padding: 20px 15px;
+        max-width: 300px;
+    }
+    .amount {
+        font-size: 1.4rem;
+    }
+    p {
+        font-size: 0.9rem;
+    }
+    #status {
+        font-size: 1.4rem;
+    }
+
+        /* ---------- Notification Bar ---------- */
+        .notification-bar {
+            position: fixed;
+            top: -80px;
+            right: 20px;
+            background: rgba(30, 144, 255, 0.25);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(30,144,255,0.4);
+            color: #fff;
+            padding: 12px 18px;
+            border-radius: 12px;
+            font-size: 14px;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+            transition: top 0.5s ease, opacity 0.5s ease;
+            z-index: 9999;
+            opacity: 0;
+            max-width: 350px;
+            white-space: normal;
+            overflow: hidden;
+        }
+
+        .notification-bar.show { top: 20px; opacity: 1; }
+
+        .notification-bar::before {
+            content: '';
+            position: absolute;
+            left: -50%;
+            top: 0;
+            width: 50%;
+            height: 100%;
+            background: rgba(255,255,255,0.3);
+            transform: skewX(-25deg);
+            animation: liquidWave 2s linear infinite;
+        }
+
+        @keyframes liquidWave { 0% { left: -50%; } 100% { left: 100%; } }
+
+.payment-description{
+    margin-bottom:18px;
+    text-align:center;
+}
+
+.payment-title{
+    font-size:14px;
+    opacity:0.8;
+    margin:0;
+}
+
+.payment-plan{
+    font-size:18px;
+    font-weight:600;
+    margin-top:4px;
+}
+
+    /* Token Selector Mobile Adjustment */
+    #tokenSelector {
+        flex-direction: column;
+        gap: 10px; /* smaller spacing vertically */
+    }
+    #tokenSelector button {
+        width: 100%; /* full width for mobile */
+        padding: 10px 0;
+        font-size: 0.9rem;
+    }
+}
+    </style>
+</head>
+
+<body>
+
+  <div id="floating-bg"></div>
+
+  <div id="content">
+
+    <header style="text-align:center; padding:40px 0;">
+  <div class="logo-card">
+    <img src="assets/pictures/imagitool-export (26).jpg" alt="AvalonFlow Logo">
+  </div>
+</header>
+
+    <!-- Notification Bar -->
+    <div id="planNotification" class="notification-bar"></div>
+
+<div class="payment-description">
+    <p class="payment-title">You are making a payment to AvalonFlow</p>
+    <p class="payment-plan">AvalonCare Premium Access</p> 
+</div>
+
+    <!-- Token Selector -->
+    <div id="tokenSelector" style="margin-bottom:20px;">
+      <button onclick="showTokenCard('usdt')">Pay with USDT</button>
+      <button onclick="showTokenCard('usdc')">Pay with USDC</button>
+    </div>
+
+    <!-- Payment Container -->
+    <div id="payment-container">
+
+      <!-- USDT Card -->
+      <div class="token-card" id="usdt-card">
+        <div class="plan-pay">
+          <img class="plan-logo"
+               src="https://assets.coingecko.com/coins/images/325/large/Tether.png"
+               alt="AvalonCare Premium Logo">
+          <span class="token-name">USDT</span>
+          <span class="network">ERC-20</span>
+        </div>
+
+        <div class="amount-section">
+          <p>Send exactly:</p>
+          <p class="amount" id="usdt-amount">119.2037</p>
+        </div>
+
+        <<div class="wallet-section">
+  <p>Wallet Address:</p>
+  <p class="wallet" id="usdt-wallet">0x63d93f4348b109492d75aaaf10ac374d448178cd
+    <button class="copy-btn" onclick="copyWallet('usdt-wallet')">Copy</button>
+  </p>
+</div>
+
+
+        <div class="qr-section">
+          <div id="usdt-qr"></div>
+        </div>
+
+        <p id="usdt-timer">Address expires in 05:00</p>
+
+        <div class="progress-bar">
+          <div class="progress-fill" id="usdt-progress"></div>
+          <div class="status" id="usdt-status">Waiting for payment...</div>
+        </div>
+      </div>
+
+      <!-- USDC Card -->
+      <div class="token-card inactive" id="usdc-card">
+        <div class="plan-pay">
+          <img class="plan-logo"
+               src="https://assets.coingecko.com/coins/images/6319/large/USD_Coin_icon.png"
+               alt="AvalonCare Premium Logo">
+          <span class="token-name">USDC</span>
+          <span class="network">ERC-20</span>
+        </div>
+
+        <div class="amount-section">
+          <p>Send exactly:</p>
+          <p class="amount" id="usdc-amount">119.2037</p>
+        </div>
+
+        <<div class="wallet-section">
+  <p>Wallet Address:</p>
+  <p class="wallet" id="usdc-wallet">0x63d93f4348b109492d75aaaf10ac374d448178cd
+    <button class="copy-btn" onclick="copyWallet('usdt-wallet')">Copy</button>
+  </p>
+</div>
+
+
+        <div class="qr-section">
+          <div id="usdc-qr"></div>
+        </div>
+
+        <p id="usdc-timer">Address expires in 05:00</p>
+
+        <div class="progress-bar">
+          <div class="progress-fill" id="usdc-progress"></div>
+          <div class="status" id="usdc-status">Waiting for payment...</div>
+        </div>
+      </div>
+
+    </div>
+
+<footer>
+  © 2026 AvalonFlow • Powered by Centrical™
+  </footer>
+
+</body>
+<script>
+// ---------------- TIMER / SESSION INITIALIZATION ----------------
+const totalDuration = 5 * 60 * 1000; // 5 minutes
+
+let startTime = localStorage.getItem("avalonflowStartTime");
+if (startTime) {
+    const elapsed = Date.now() - parseInt(startTime, 10);
+    if (elapsed > totalDuration) {
+        // Clear expired session
+        localStorage.removeItem("avalonflowAmount");
+        localStorage.removeItem("avalonflowStartTime");
+        localStorage.removeItem("avalonflowWallet"); // also clear old wallet
+        startTime = null; // force a new session
+    } else {
+        startTime = parseInt(startTime, 10); // convert to number
+    }
+}
+
+if (!startTime) {
+    startTime = Date.now();
+    localStorage.setItem("avalonflowStartTime", startTime);
+}
+
+// ---------------- FLOATING PARTICLES ----------------
+const bg = document.getElementById('floating-bg');
+const colors = ['#6b2cd8', '#9b59b6', '#8e44ad'];
+
+function particle() {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    const s = Math.random() * 20 + 10;
+    p.style.width = s + 'px';
+    p.style.height = s + 'px';
+    p.style.left = Math.random() * 100 + 'vw';
+    p.style.background = `radial-gradient(circle, ${colors[Math.floor(Math.random()*3)]}, transparent)`;
+    p.style.animationDuration = (Math.random()*20 + 10) + 's';
+    bg.appendChild(p);
+    setTimeout(() => p.remove(), 30000);
+}
+setInterval(particle, 800);
+
+// ---------------- COPY WALLET ----------------
+function copyWallet(id) {
+    const walletP = document.getElementById(id);
+    const walletText = Array.from(walletP.childNodes)
+        .filter(node => node.nodeType === Node.TEXT_NODE)
+        .map(node => node.textContent.trim())
+        .join('');
+    navigator.clipboard.writeText(walletText)
+        .then(() => alert("Wallet copied!"))
+        .catch(() => alert("Failed to copy wallet."));
+}
+
+// ---------------- WALLET & TOKENS ----------------
+const wallets = [
+    "0x63d93f4348b109492d75aaaf10ac374d448178cd",
+    "0x6bC7a3943D217D2f80437b61a4D8898138f2EE5B"
+];
+
+const apiKey = "R53TCHYDZ9W1GJ4N861427HN52APJ5DZNI";
+
+const tokens = {
+    USDT:"0xdAC17F958D2ee523a2206206994597C13D831ec7",
+    USDC:"0xA0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
+};
+
+// ---------------- ASSIGN WALLET PAIR PER SESSION ----------------
+let walletPair = JSON.parse(localStorage.getItem("avalonflowWalletPair"));
+if(!walletPair){
+    walletPair = { USDT: wallets[0], USDC: wallets[1] };
+    localStorage.setItem("avalonflowWalletPair", JSON.stringify(walletPair));
+}
+
+// ---------------- ACTIVE WALLET PER SESSION ----------------
+let activeWallet = localStorage.getItem("avalonflowWallet");
+if (!activeWallet) {
+    activeWallet = wallets[Math.floor(Math.random() * wallets.length)];
+    localStorage.setItem("avalonflowWallet", activeWallet);
+}
+
+// ---------------- TOKEN SWITCH ----------------
+let activeToken = "USDT";
+function showTokenCard(selectedToken){
+    activeToken = selectedToken.toUpperCase();
+    const cards = document.querySelectorAll(".token-card");
+    cards.forEach(card => card.classList.add("inactive"));
+    const activeCard = document.getElementById(`${selectedToken}-card`);
+    if(activeCard) activeCard.classList.remove("inactive");
+
+ 

@@ -950,44 +950,42 @@ document.addEventListener('DOMContentLoaded', () => {
 const payout = document.getElementById('customPayout');
 const acuBar = document.querySelector('.acu-bar');
 const activateBtn = document.getElementById('customActivate');
-const inputError = document.querySelector('.input-error');
 
-const MIN_AMOUNT = 23.6;
+const forbiddenAmounts = [47, 73, 119]; // forbidden whole numbers
+const MIN_AMOUNT = 24; // rounded min for simplicity
 const MAX_AMOUNT = 4200;
 const PAYOUT_MULTIPLIER = 5;
-const forbiddenAmounts = [47, 73, 119];
-const MAX_BAR_PAYOUT = 366; // ACU bar full width reference
 
 input.addEventListener('input', () => {
-    let value = parseFloat(input.value);
+    // Only allow digits
+    let value = parseInt(input.value); // parseInt ignores decimals
 
-    // Reset if forbidden
-    if (forbiddenAmounts.includes(value)) {
-        input.value = '';
-        payout.textContent = '$0';
-        acuBar.style.width = '0%';
-        inputError.style.display = 'block';
-        return;
-    } else {
-        inputError.style.display = 'none';
-    }
+    // Reset if not a number
+    if (isNaN(value)) value = MIN_AMOUNT;
 
-    // Clamp value within min/max
-    if (isNaN(value) || value < MIN_AMOUNT) value = MIN_AMOUNT;
+    // Clamp value
+    if (value < MIN_AMOUNT) value = MIN_AMOUNT;
     if (value > MAX_AMOUNT) value = MAX_AMOUNT;
 
-    // Calculate projected payout
+    // Block forbidden amounts
+    if (forbiddenAmounts.includes(value)) {
+        input.value = '';
+        payout.textContent = '$0.20';
+        acuBar.style.width = '0%';
+        activateBtn.textContent = 'Activate Custom Access – $0.20 on ERC-20';
+        return;
+    }
+
+    // Update projected payout (multiply by 5)
     const projected = (value * PAYOUT_MULTIPLIER).toFixed(2);
     payout.textContent = `$${projected}`;
 
-    // Calculate ACU bar percentage (relative to MAX_BAR_PAYOUT)
-    let percentage = Math.min((projected / MAX_BAR_PAYOUT) * 100, 100);
+    // Update ACU bar percentage
+    const percentage = ((value - MIN_AMOUNT) / (MAX_AMOUNT - MIN_AMOUNT)) * 100;
     acuBar.style.width = `${percentage}%`;
 
-    // Highlight card if value entered
-    const card = document.querySelector('.glass-card.plan-custom');
-    if (value > MIN_AMOUNT) card.classList.add('active');
-    else card.classList.remove('active');
+    // Update activate button with .20 always
+    activateBtn.textContent = `Activate Custom Access – $${value}.20 on ERC-20`;
 });
 });
 

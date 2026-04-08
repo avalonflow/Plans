@@ -964,28 +964,31 @@ document.addEventListener('DOMContentLoaded', () => {
     const input = document.getElementById('customAmount');
 const payout = document.getElementById('customPayout');
 const acuBar = document.querySelector('.acu-bar');
-const activateBtn = document.querySelector('#customActivate span'); // span inside <a>
-const card = document.querySelector('.glass-card.plan-custom'); // card element
-const forbiddenAmounts = [47, 73, 119]; // integers only
-const MIN_AMOUNT = 23; // round up to nearest integer
+const activateBtn = document.querySelector('#customActivate span');
+const card = document.querySelector('.glass-card.plan-custom');
+
+const forbiddenAmounts = [47, 73, 119];
+const MIN_AMOUNT = 23;
 const MAX_AMOUNT = 4200;
 const PAYOUT_MULTIPLIER = 5;
 
 input.addEventListener('input', () => {
-    // Remove any non-digit characters (prevent decimals)
+    // Only digits
     input.value = input.value.replace(/\D/g, '');
     
-    let value = parseInt(input.value);
+    let rawValue = parseInt(input.value);
 
-    if (!value || value < MIN_AMOUNT) value = MIN_AMOUNT;
-    if (value > MAX_AMOUNT) value = MAX_AMOUNT;
-
-    // Dim card if below minimum
-    if (value < MIN_AMOUNT) {
+    // 👉 DIM LOGIC (use raw value BEFORE forcing min)
+    if (!rawValue || rawValue < MIN_AMOUNT) {
         card.classList.add('inactive');
     } else {
         card.classList.remove('inactive');
     }
+
+    // Now clamp for calculations
+    let value = rawValue;
+    if (!value || value < MIN_AMOUNT) value = MIN_AMOUNT;
+    if (value > MAX_AMOUNT) value = MAX_AMOUNT;
 
     // Block forbidden values
     if (forbiddenAmounts.includes(value)) {
@@ -994,20 +997,21 @@ input.addEventListener('input', () => {
         activateBtn.textContent = 'Activate Custom Access –on ERC-20';
         acuBar.style.width = '0%';
         document.querySelector('.input-error').style.display = 'block';
+        card.classList.add('inactive'); // also dim
         return;
     } else {
         document.querySelector('.input-error').style.display = 'none';
     }
 
-    // Projected payout
+    // Payout
     const projected = (value * PAYOUT_MULTIPLIER).toFixed(2);
     payout.textContent = `$${projected}`;
 
-    // Update ACU bar percentage
+    // ACU bar
     const percentage = ((value - MIN_AMOUNT) / (MAX_AMOUNT - MIN_AMOUNT)) * 100;
     acuBar.style.width = `${percentage}%`;
 
-    // Update button text (keep gradient span intact)
+    // Button text
     activateBtn.textContent = `Activate Custom Access – $${value}.20 on ERC-20`;
 });
 });

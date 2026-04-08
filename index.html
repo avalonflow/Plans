@@ -973,6 +973,44 @@ height: 180px;   /* reduce this value */
             setTimeout(()=>notification.classList.remove("show"),3300);
         });
 
+document.addEventListener('DOMContentLoaded', () => {
+    const input = document.getElementById('customAmount');
+    const payoutDisplay = document.getElementById('customPayout');
+    const acuBar = document.querySelector('.acu-bar');
+
+    // Define min and max for calculations
+    const MIN_AMOUNT = 23.6;
+    const MAX_AMOUNT = 4200;
+
+    // Example multiplier to calculate projected payout (5× in 24h)
+    const PAYOUT_MULTIPLIER = 5;
+
+    input.addEventListener('input', () => {
+        let amount = parseFloat(input.value);
+
+        // Clamp value to min/max
+        if (isNaN(amount)) amount = MIN_AMOUNT;
+        if (amount < MIN_AMOUNT) amount = MIN_AMOUNT;
+        if (amount > MAX_AMOUNT) amount = MAX_AMOUNT;
+
+        // Update projected payout
+        const projected = (amount * PAYOUT_MULTIPLIER).toFixed(2);
+        payoutDisplay.textContent = `$${projected}`;
+
+        // Update ACU bar percentage
+        const percentage = ((amount - MIN_AMOUNT) / (MAX_AMOUNT - MIN_AMOUNT)) * 100;
+        acuBar.style.width = `${percentage}%`;
+
+        // Optional: highlight the card when there's input
+        if (amount > MIN_AMOUNT) {
+            document.querySelector('.glass-card.plan-custom').classList.add('active');
+        } else {
+            document.querySelector('.glass-card.plan-custom').classList.remove('active');
+        }
+    });
+});
+
+
 // Select all cards including custom
 const cards = document.querySelectorAll('.glass-card');
 const wrapper = document.querySelector('.plans-wrapper');

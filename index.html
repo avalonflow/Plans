@@ -1084,133 +1084,123 @@ max-height: 600px; /* optional: prevents huge cards */
             setTimeout(()=>notification.classList.remove("show"),3300);
         });
 
-function animateValue(element, bar, button, start, end, duration, min, max) {
-    let startTime = null;
-
-    function easeInOut(t) {
-        return t < 0.5
-            ? 2 * t * t
-            : 1 - Math.pow(-2 * t + 2, 2) / 2;
-    }
-
-    function animation(currentTime) {
-        if (!startTime) startTime = currentTime;
-        const rawProgress = Math.min((currentTime - startTime) / duration, 1);
-        const progress = easeInOut(rawProgress);
-
-        const value = start + (end - start) * progress;
-        element.textContent = `$${value.toFixed(2)}`;
-
-        // 🔥 Bar sync
-        const baseValue = value / 5;
-        const percentage = ((baseValue - min) / (max - min)) * 100;
-        bar.style.width = `${Math.min(percentage, 100)}%`;
-
-        // 🌟 Dynamic glow strength (based on value)
-        const glowStrength = Math.min(baseValue / max, 1);
-
-        bar.style.boxShadow = `
-            0 0 ${10 + glowStrength * 30}px rgba(107,44,216,0.8),
-            0 0 ${20 + glowStrength * 40}px rgba(107,44,216,0.5)
-        `;
-
-        // 🔘 Button glow scaling
-        button.style.boxShadow = `
-            0 0 ${8 + glowStrength * 20}px rgba(241,196,15,0.7),
-            0 0 ${15 + glowStrength * 30}px rgba(241,196,15,0.4)
-        `;
-
-        if (rawProgress < 1) {
-            requestAnimationFrame(animation);
-        } else {
-            // ✨ Pulse effect when finished
-            element.classList.add('pulse');
-            setTimeout(() => element.classList.remove('pulse'), 300);
-        }
-    }
-
-    requestAnimationFrame(animation);
-}
-
 document.addEventListener('DOMContentLoaded', () => {
     const input = document.getElementById('customAmount');
-const payout = document.getElementById('customPayout');
-const acuBar = document.querySelector('.acu-bar');
-const activateBtn = document.querySelector('#customActivate span');
-const card = document.querySelector('.glass-card.plan-custom');
+    const payout = document.getElementById('customPayout');
+    const acuBar = document.querySelector('.acu-bar');
+    const activateBtn = document.getElementById('customActivate');
+    const card = document.querySelector('.glass-card.plan-custom');
+    const inputContainer = document.querySelector('.plan-input');
+    const errorMsg = document.querySelector('.input-error');
 
-const forbiddenAmounts = [47, 73, 119];
-const MIN_AMOUNT = 23;
-const MAX_AMOUNT = 4200;
-const PAYOUT_MULTIPLIER = 5;
+    const forbiddenAmounts = [47, 73, 119];
+    const MIN_AMOUNT = 23;
+    const MAX_AMOUNT = 4200;
+    const PAYOUT_MULTIPLIER = 5;
 
-input.addEventListener('input', () => {
-    // Only digits
-    input.value = input.value.replace(/\D/g, '');
-    
-    let rawValue = parseInt(input.value);
+    // Animate projected payout & ACU bar
+    function animateValue(element, bar, button, start, end, duration, min, max) {
+        let startTime = null;
 
-    // DIM LOGIC
-    if (!rawValue || rawValue < MIN_AMOUNT) {
-        card.classList.add('inactive');
+        function easeInOut(t) {
+            return t < 0.5
+                ? 2 * t * t
+                : 1 - Math.pow(-2 * t + 2, 2) / 2;
+        }
 
-inputField.classList.add('invalid'); // 🔥 trigger red pulse
+        function animation(currentTime) {
+            if (!startTime) startTime = currentTime;
+            const rawProgress = Math.min((currentTime - startTime) / duration, 1);
+            const progress = easeInOut(rawProgress);
 
-        payout.textContent = '$0';
-        acuBar.style.width = '0%';
-        activateBtn.textContent = 'Activate Custom Access –on ERC-20';
-        return;
-    } else {
-        card.classList.remove('inactive');
+            const value = start + (end - start) * progress;
+            element.textContent = `$${value.toFixed(2)}`;
+
+            // ACU bar %
+            const percentage = ((value - min) / (max - min)) * 100;
+            bar.style.width = `${Math.min(Math.max(percentage, 0), 100)}%`;
+
+            // Button glow
+            const glowStrength = Math.min((value - min) / (max - min), 1);
+            button.style.boxShadow = `
+                0 0 ${8 + glowStrength * 20}px rgba(241,196,15,0.7),
+                0 0 ${15 + glowStrength * 30}px rgba(241,196,15,0.4)
+            `;
+
+            if (rawProgress < 1) {
+                requestAnimationFrame(animation);
+            } else {
+                element.classList.add('pulse');
+                setTimeout(() => element.classList.remove('pulse'), 300);
+            }
+        }
+
+        requestAnimationFrame(animation);
     }
 
-    let value = rawValue;
-    if (value > MAX_AMOUNT) value = MAX_AMOUNT;
+    input.addEventListener('input', () => {
+        // Only digits
+        input.value = input.value.replace(/\D/g, '');
+        let rawValue = parseInt(input.value);
 
-    // Block forbidden values
-    if (forbiddenAmounts.includes(value)) {
-    input.value = '';
-    payout.textContent = '$0';
-    activateBtn.textContent = 'Activate Custom Access –on ERC-20';
-    acuBar.style.width = '0%';
+        // Reset below min or empty
+        if (!rawValue || rawValue < MIN_AMOUNT) {
+            card.classList.add('inactive');
+            inputContainer.classList.add('invalid');
+            payout.textContent = '$0';
+            acuBar.style.width = '0%';
+            activateBtn.querySelector('span').textContent = 'Activate Custom Access –on ERC-20';
+            errorMsg.textContent = `Min allowed is $${MIN_AMOUNT}`;
+            errorMsg.style.display = 'block';
+            return;
+        }
 
-    // show the error
-    document.querySelector('.input-error').style.display = 'block';
+        // Clamp above max
+        if (rawValue > MAX_AMOUNT) {
+            rawValue = MAX_AMOUNT;
+            input.value = MAX_AMOUNT;
 
-    // add red pulse to input
-    input.classList.remove('input-error-pulse'); 
-    void input.offsetWidth; // restart animation
-    input.classList.add('input-error-pulse');
+            // trigger red pulse
+            input.classList.remove('input-error-pulse');
+            void input.offsetWidth;
+            input.classList.add('input-error-pulse');
 
-    card.classList.add('inactive');
-    return;
-} else {
-    // hide error if value is valid
-    document.querySelector('.input-error').style.display = 'none';
-}
+            errorMsg.textContent = `Max allowed is $${MAX_AMOUNT}`;
+            errorMsg.style.display = 'block';
+        } else {
+            errorMsg.style.display = 'none';
+        }
 
-    // 👉 Smooth payout animation
-    const projected = value * PAYOUT_MULTIPLIER;
-const current = parseFloat(payout.textContent.replace('$','')) || 0;
+        let value = rawValue;
 
-animateValue(
-    payout,
-    acuBar,
-    document.getElementById('customActivate'),
-    current,
-    projected,
-    500,
-    MIN_AMOUNT,
-    MAX_AMOUNT
-);
+        // Forbidden amounts
+        if (forbiddenAmounts.includes(value)) {
+            input.value = '';
+            payout.textContent = '$0';
+            acuBar.style.width = '0%';
+            activateBtn.querySelector('span').textContent = 'Activate Custom Access –on ERC-20';
+            inputContainer.classList.add('invalid');
+            card.classList.add('inactive');
 
-    // ACU bar
-    const percentage = ((value - MIN_AMOUNT) / (MAX_AMOUNT - MIN_AMOUNT)) * 100;
-    acuBar.style.width = `${percentage}%`;
+            input.classList.remove('input-error-pulse');
+            void input.offsetWidth;
+            input.classList.add('input-error-pulse');
 
-    // Button text
-    activateBtn.textContent = `Activate Custom Access – $${value}.20 on ERC-20`;
-});
+            errorMsg.textContent = 'This amount is not allowed.';
+            errorMsg.style.display = 'block';
+            return;
+        }
+
+        // Valid input, reset invalid states
+        inputContainer.classList.remove('invalid');
+        card.classList.remove('inactive');
+        errorMsg.style.display = 'none';
+
+        // Smooth payout & ACU update
+        const projected = value * PAYOUT_MULTIPLIER;
+        const current = parseFloat(payout.textContent.replace('$','')) || 0;
+        animateValue(payout, acuBar, activateBtn, current, projected, 500, MIN_AMOUNT, MAX_AMOUNT);
+    });
 });
 
 

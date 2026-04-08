@@ -703,7 +703,7 @@ box-sizing: border-box; /* 🔥 THIS FIXES OVERFLOW */
     background: rgba(0,0,0,0.15);
 }
 
-/* ✨ Payout pulse (stronger + visible) */
+/* ✨ Payout pulse */
 #customPayout.pulse {
     animation: payoutPulse 0.4s ease;
 }
@@ -714,7 +714,7 @@ box-sizing: border-box; /* 🔥 THIS FIXES OVERFLOW */
     100% { transform: scale(1); }
 }
 
-/* Smooth transitions */
+/* Smooth ACU bar transitions */
 .acu-bar {
     transition: width 0.3s ease, box-shadow 0.3s ease;
 }
@@ -744,7 +744,8 @@ box-sizing: border-box; /* 🔥 THIS FIXES OVERFLOW */
     padding: 20px 24px; /* slightly bigger padding for breathing room */
     display: flex;
     flex-direction: column;
-    height: 100%;
+    height: auto;
+max-height: 600px; /* optional: prevents huge cards */
 }
 
 .glass-card.plan-custom > * {
@@ -789,7 +790,7 @@ box-sizing: border-box; /* 🔥 THIS FIXES OVERFLOW */
 }
 
 /* 🔴 Invalid input state */
-.plan-input input.invalid {
+.plan-input.invalid input {
     border: 1px solid #ff3b3b;
     box-shadow:
         0 0 10px rgba(255,59,59,0.6),
@@ -809,8 +810,7 @@ box-sizing: border-box; /* 🔥 THIS FIXES OVERFLOW */
 /* 🔥 Pulse glow */
 @keyframes inputPulse {
     0% {
-        box-shadow:
-            0 0 0 rgba(255,59,59,0);
+        box-shadow: 0 0 0 rgba(255,59,59,0);
     }
     50% {
         box-shadow:
@@ -987,10 +987,10 @@ box-sizing: border-box; /* 🔥 THIS FIXES OVERFLOW */
     </div>
 
     <!-- Input -->
-    <div class="plan-input input.invalid">
+    <div class="plan-input" id="customInputContainer">
         <label><strong>Enter Amount ($):</strong></label>
         <input type="text" id="customAmount" placeholder="e.g. 50">
-        <p class="input-error">This amount is not allowed.</p>
+        <p class="input-error" style="display:none;">This amount is not allowed.</p>
     </div>
 
     <!-- Payout -->
@@ -999,7 +999,7 @@ box-sizing: border-box; /* 🔥 THIS FIXES OVERFLOW */
         <div id="customPayout">$0</div>
     </div>
 
-    <!-- ACU -->
+    <!-- ACU Visualization -->
     <div class="acu-bar-section">
         <strong>ACU Payout Visualization:</strong>
         <div class="acu-bar-wrapper">

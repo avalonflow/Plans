@@ -687,37 +687,6 @@ height: 180px;   /* reduce this value */
     background: rgba(0,0,0,0.15);
 }
 
-/* Custom Plan Active Card Glow */
-.glass-card.plan-custom.active {
-  transform: scale(1);
-  opacity: 1;
-  filter: brightness(1);
-  z-index: 2;
-  box-shadow:
-    0 0 25px rgba(107,44,216,0.75),
-    0 0 50px rgba(107,44,216,0.5),
-    0 0 100px rgba(107,44,216,0.35);
-  border: 1px solid rgba(107,44,216,0.5);
-}
-
-.glass-card.plan-custom.active::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: 24px;
-  background: radial-gradient(circle, rgba(107,44,216,0.25), transparent 70%);
-  animation: activePulse 2s ease-in-out infinite;
-  z-index: -1;
-}
-
-/* Plan pay glow */
-.glass-card.active .plan-pay.plan-custom a {
-  transform: scale(1.06);
-  box-shadow:
-    0 0 20px rgba(241,196,15,0.9),
-    0 0 40px rgba(241,196,15,0.6);
-}
-
 
         /* ---------- Footer ---------- */
         footer {
@@ -780,7 +749,7 @@ height: 180px;   /* reduce this value */
             <div style="margin-top:12px; font-size:14px;">
                 <strong>Reference value:</strong> 1 USD = 1 ACU<br>
                 <strong>Cycle style:</strong> Limited exposure cycles<br>
-                <strong>Cycle rate (per 24 hours):</strong> 236.58 ACU<br>
+                <strong>Cycle rate (per 24 hours):</strong> $236.58<br>
                 ~ Designed for light entry and observation-level participation.
             </div>
 
@@ -816,7 +785,7 @@ height: 180px;   /* reduce this value */
             <div style="margin-top:12px; font-size:14px;">
                 <strong>Reference value:</strong> 1 USD = 1 ACU<br>
                 <strong>Cycle style:</strong> Structured ACU cycles<br>
-                <strong>Cycle rate (per 24 hours):</strong> 366.58 ACU<br>
+                <strong>Cycle rate (per 24 hours):</strong> $366.58<br>
                 ~ Offers more consistency and deeper engagement than Lite.
             </div>
 
@@ -852,7 +821,7 @@ height: 180px;   /* reduce this value */
             <div style="margin-top:12px; font-size:14px;">
                 <strong>Reference value:</strong> 1 USD = 1 ACU<br>
                 <strong>Cycle style:</strong> Complete 24-hour ACU cycles<br>
-                <strong>Cycle rate (per 24 hours):</strong> 596.58 ACU<br>
+                <strong>Cycle rate (per 24 hours):</strong> $596.58<br>
                 ~ Built for full continuity, stability, and system depth.
             </div>
 
@@ -876,7 +845,7 @@ height: 180px;   /* reduce this value */
 <!-- Custom Plan Glass Card -->
 <div class="glass-card plan-custom">
     <div>
-        <strong class="gradient-animation">🧮 Custom Plan</strong><br>
+        <strong class="gradient-animation">🪽 AvalonCare Custom</strong><br>
         <span class="gradient-text-sub">
             Enter any amount between <strong>$23.60</strong> and <strong>$4,200</strong>. See your projected payout instantly.
         </span>

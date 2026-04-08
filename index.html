@@ -207,6 +207,11 @@ opacity:0.35;
   border: 1px solid rgba(107,44,216,0.3);
 }
 
+.glass-card.plan-custom.inactive {
+    opacity: 0.5;          /* dims the card */
+    filter: grayscale(30%); /* optional */
+}
+
 /* Neon subtle border */
 .glass-card::before {
   content: "";
@@ -854,7 +859,7 @@ height: 180px;   /* reduce this value */
     <div class="plan-header">
         <strong class="gradient-animation">🪽 AvalonCare Custom</strong>
         <p class="plan-desc">
-            Enter any amount between <strong>$23.60</strong> and <strong>$4,200</strong>.
+            Enter any amount between <strong>$23</strong> and <strong>$4,200</strong>.
         </p>
     </div>
 

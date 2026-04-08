@@ -703,15 +703,21 @@ box-sizing: border-box; /* 🔥 THIS FIXES OVERFLOW */
     background: rgba(0,0,0,0.15);
 }
 
-/* ✨ Payout pulse */
-#customPayout.pulse {
-    animation: payoutPulse 0.4s ease;
+/* Example glowing gradient animation for projected payout */
+#customPayout {
+  font-weight: bold;
+  font-size: 1.2rem;
+  background: linear-gradient(90deg, #6b2cd8, #a569bd, #6b2cd8);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: gradientShift 4s linear infinite;
 }
 
-@keyframes payoutPulse {
-    0%   { transform: scale(1); }
-    40%  { transform: scale(1.12); }
-    100% { transform: scale(1); }
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }
 
 /* Smooth ACU bar transitions */
@@ -1018,6 +1024,7 @@ max-height: 600px; /* optional: prevents huge cards */
         </div>
     </div>
 </div>
+</div>
 
     <!-- Carousel Dots -->
     <div class="dots">
@@ -1109,7 +1116,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const rawProgress = Math.min((currentTime - startTime) / duration, 1);
             const progress = easeInOut(rawProgress);
             const value = start + (end - start) * progress;
-            element.textContent = `$${value.toFixed(2)}`;
+            element.textContent = `$${value.toFixed(0)}.20`;
 
             const percentage = ((value - min) / (max - min)) * 100;
             bar.style.width = `${Math.min(Math.max(percentage, 0), 100)}%`;
@@ -1189,7 +1196,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // Update button text
-        activateBtn.textContent = `Activate Custom Access – $${value} on ERC-20`;
+activateBtn.textContent = `Activate Custom Access – $${value}.20 on ERC-20`;
 
         // Smooth payout animation
         const projected = value * PAYOUT_MULTIPLIER;

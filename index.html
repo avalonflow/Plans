@@ -707,7 +707,7 @@ box-sizing: border-box; /* 🔥 THIS FIXES OVERFLOW */
 #customPayout {
   font-weight: bold;
   font-size: 1.2rem;
-  background: linear-gradient(90deg, #6b2cd8, #a569bd, #6b2cd8);
+  background: linear-gradient(90deg, #FFD700, #FFC107, #FFD700); /* gold shades */
   background-size: 200% auto;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -1045,7 +1045,11 @@ max-height: 600px; /* optional: prevents huge cards */
 
 
                 <!-- Mini TV: Member Reflection -->
-        <p style="text-align:center; font-weight:bold; margin-top:20px;">Live Tracking Walkthrough</p>
+        <p style="text-align:center; font-weight:bold; margin-top:20px; background: linear-gradient(90deg, #FFD700, #FFC107, #FFD700); /* gold shades */
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: gradientShift 4s linear infinite;">Live Tracking Walkthrough</p>
         <div class="video-container">
                 <video id="planVideo" controls controlsList="nodownload noplaybackrate" loop muted autoplay>
                 <source src="assets/videos/cc394a5131de3915483bdf23feb3f4cf.mp4" type="video/mp4">

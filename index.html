@@ -618,6 +618,105 @@ height: 180px;   /* reduce this value */
   position: relative;
 }
 
+/* ---------- ACU Bar Styles for Custom Plan ---------- */
+.acu-bar-wrapper {
+    background: rgba(255,255,255,0.05);
+    border-radius: 12px;
+    height: 16px;
+    overflow: hidden;
+    margin-top: 6px;
+}
+
+.acu-bar {
+    width: 0%; /* initial width */
+    height: 100%;
+    border-radius: 12px;
+    background: linear-gradient(90deg, #6b2cd8, #00f2fe, #6b2cd8);
+    box-shadow: 0 0 10px rgba(107,44,216,0.7);
+    transition: width 0.3s ease;
+    animation: neonPulse 2s ease-in-out infinite alternate;
+}
+
+/* Neon pulse effect */
+@keyframes neonPulse {
+    0% {
+        box-shadow:
+            0 0 8px rgba(107,44,216,0.6),
+            0 0 12px rgba(107,44,216,0.4),
+            0 0 20px rgba(107,44,216,0.2);
+    }
+    50% {
+        box-shadow:
+            0 0 15px rgba(107,44,216,0.9),
+            0 0 25px rgba(107,44,216,0.6),
+            0 0 40px rgba(107,44,216,0.35);
+    }
+    100% {
+        box-shadow:
+            0 0 8px rgba(107,44,216,0.6),
+            0 0 12px rgba(107,44,216,0.4),
+            0 0 20px rgba(107,44,216,0.2);
+    }
+}
+
+/* Optional: glowing hover effect when card is active */
+.glass-card.plan-custom.active .acu-bar {
+    box-shadow:
+        0 0 15px rgba(107,44,216,0.9),
+        0 0 30px rgba(107,44,216,0.6),
+        0 0 60px rgba(107,44,216,0.4);
+    transform: scaleY(1.1); /* subtle pulse stretch */
+}
+
+/* ---------- Custom Plan Input ---------- */
+.glass-card.plan-custom input#customAmount {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.2);
+    background: rgba(0,0,0,0.1);
+    color: #fff;
+    font-size: 14px;
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+.glass-card.plan-custom input#customAmount:focus {
+    border: 1px solid #6b2cd8;
+    box-shadow: 0 0 8px rgba(107,44,216,0.6);
+    background: rgba(0,0,0,0.15);
+}
+
+/* Custom Plan Active Card Glow */
+.glass-card.plan-custom.active {
+  transform: scale(1);
+  opacity: 1;
+  filter: brightness(1);
+  z-index: 2;
+  box-shadow:
+    0 0 25px rgba(107,44,216,0.75),
+    0 0 50px rgba(107,44,216,0.5),
+    0 0 100px rgba(107,44,216,0.35);
+  border: 1px solid rgba(107,44,216,0.5);
+}
+
+.glass-card.plan-custom.active::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 24px;
+  background: radial-gradient(circle, rgba(107,44,216,0.25), transparent 70%);
+  animation: activePulse 2s ease-in-out infinite;
+  z-index: -1;
+}
+
+/* Plan pay glow */
+.glass-card.active .plan-pay.plan-custom a {
+  transform: scale(1.06);
+  box-shadow:
+    0 0 20px rgba(241,196,15,0.9),
+    0 0 40px rgba(241,196,15,0.6);
+}
 
 
         /* ---------- Footer ---------- */
@@ -774,6 +873,39 @@ height: 180px;   /* reduce this value */
             </div>
         </div>
 
+<!-- Custom Plan Glass Card -->
+<div class="glass-card plan-custom">
+    <div>
+        <strong class="gradient-animation">🧮 Custom Plan</strong><br>
+        <span class="gradient-text-sub">
+            Enter any amount between <strong>$23.60</strong> and <strong>$4,200</strong>. See your projected payout instantly.
+        </span>
+    </div>
+
+    <div class="custom-input-container">
+        <label for="customAmount"><strong>Enter Amount ($):</strong></label><br>
+        <input type="number" id="customAmount" min="23.6" max="4200" step="0.01">
+    </div>
+
+    <div class="custom-payout-display">
+        <strong>Projected Payout (24h):</strong>
+        <div id="customPayout">$0</div>
+    </div>
+
+    <!-- Dynamic ACU bar INSIDE the card -->
+    <div class="custom-acu-bar-section">
+        <strong>ACU Payout Visualization:</strong>
+        <div class="acu-bar-wrapper">
+            <div class="acu-bar"></div>
+        </div>
+    </div>
+
+    <div class="plan-pay plan-custom">
+        <a href="#" id="customActivate" target="_blank">
+            <span class="gradient-animation">Activate Custom Access</span>
+        </a>
+    </div>
+</div>
     </div>
 
     <!-- Carousel Dots -->

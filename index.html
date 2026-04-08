@@ -947,39 +947,48 @@ height: 180px;   /* reduce this value */
 
 document.addEventListener('DOMContentLoaded', () => {
     const input = document.getElementById('customAmount');
-    const payoutDisplay = document.getElementById('customPayout');
-    const acuBar = document.querySelector('.acu-bar');
+const payout = document.getElementById('customPayout');
+const acuBar = document.querySelector('.acu-bar');
+const activateBtn = document.getElementById('customActivate');
+const inputError = document.querySelector('.input-error');
 
-    // Define min and max for calculations
-    const MIN_AMOUNT = 23.6;
-    const MAX_AMOUNT = 4200;
+const MIN_AMOUNT = 23.6;
+const MAX_AMOUNT = 4200;
+const PAYOUT_MULTIPLIER = 5;
+const forbiddenAmounts = [47.2, 73.2, 119.2];
+const MAX_BAR_PAYOUT = 366; // ACU bar full width reference
 
-    // Example multiplier to calculate projected payout (5× in 24h)
-    const PAYOUT_MULTIPLIER = 5;
+input.addEventListener('input', () => {
+    let value = parseFloat(input.value);
 
-    input.addEventListener('input', () => {
-        let amount = parseFloat(input.value);
+    // Reset if forbidden
+    if (forbiddenAmounts.includes(value)) {
+        input.value = '';
+        payout.textContent = '$0';
+        acuBar.style.width = '0%';
+        inputError.style.display = 'block';
+        return;
+    } else {
+        inputError.style.display = 'none';
+    }
 
-        // Clamp value to min/max
-        if (isNaN(amount)) amount = MIN_AMOUNT;
-        if (amount < MIN_AMOUNT) amount = MIN_AMOUNT;
-        if (amount > MAX_AMOUNT) amount = MAX_AMOUNT;
+    // Clamp value within min/max
+    if (isNaN(value) || value < MIN_AMOUNT) value = MIN_AMOUNT;
+    if (value > MAX_AMOUNT) value = MAX_AMOUNT;
 
-        // Update projected payout
-        const projected = (amount * PAYOUT_MULTIPLIER).toFixed(2);
-        payoutDisplay.textContent = `$${projected}`;
+    // Calculate projected payout
+    const projected = (value * PAYOUT_MULTIPLIER).toFixed(2);
+    payout.textContent = `$${projected}`;
 
-        // Update ACU bar percentage
-        const percentage = ((amount - MIN_AMOUNT) / (MAX_AMOUNT - MIN_AMOUNT)) * 100;
-        acuBar.style.width = `${percentage}%`;
+    // Calculate ACU bar percentage (relative to MAX_BAR_PAYOUT)
+    let percentage = Math.min((projected / MAX_BAR_PAYOUT) * 100, 100);
+    acuBar.style.width = `${percentage}%`;
 
-        // Optional: highlight the card when there's input
-        if (amount > MIN_AMOUNT) {
-            document.querySelector('.glass-card.plan-custom').classList.add('active');
-        } else {
-            document.querySelector('.glass-card.plan-custom').classList.remove('active');
-        }
-    });
+    // Highlight card if value entered
+    const card = document.querySelector('.glass-card.plan-custom');
+    if (value > MIN_AMOUNT) card.classList.add('active');
+    else card.classList.remove('active');
+});
 });
 
 

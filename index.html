@@ -633,6 +633,24 @@ height: 180px;   /* reduce this value */
   position: relative;
 }
 
+.acu-gradient-text {
+  font-weight: bold;          /* Bold text */
+  font-style: italic;         /* Italic text */
+  font-size: 1.1rem;          /* Adjust size here */
+  background: linear-gradient(90deg, #f1c40f, #f39c12, #f1c40f); /* Gold gradient */
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: gradientShift 4s linear infinite;
+  display: inline-block;      /* Needed for gradient text on multi-line */
+}
+
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
 /* ---------- ACU Bar Styles for Custom Plan ---------- */
 .acu-bar-wrapper {
     background: rgba(255,255,255,0.05);
@@ -869,11 +887,7 @@ max-height: 600px; /* optional: prevents huge cards */
 </p>
 
 <!-- ACU Explanation -->
-<p class="background: linear-gradient(90deg,#3498db,#5dade2,#3498db);
-  background-size: 200% auto;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  animation: gradientShift 4s linear infinite;">
+<p class="acu-gradient-text">
     <strong>ACU stands for AvalonCare Units — Returns earned according to your purchased plan and tracked on timed cycles through the Logical Wing.</strong>
     <div style="height:14px;"></div>
 </p>
@@ -1042,8 +1056,8 @@ max-height: 600px; /* optional: prevents huge cards */
     <button class="nav-btn right">&#8594;</button>
 
     <!-- ACU Mechanics Summary -->
-    <p>
-        <strong class="gradient-text">>ACU Returns and visibility unlock as your access activates within a 7-Day Duration.</strong>
+    <p class="acu-gradient-text">
+        <strong>>ACU Returns and visibility unlock as your access activates within a 7-Day Duration.</strong>
         <div style="height:14px;"></div>
     </p>
 

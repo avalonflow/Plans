@@ -965,6 +965,7 @@ document.addEventListener('DOMContentLoaded', () => {
 const payout = document.getElementById('customPayout');
 const acuBar = document.querySelector('.acu-bar');
 const activateBtn = document.querySelector('#customActivate span'); // span inside <a>
+const card = document.querySelector('.glass-card.plan-custom'); // card element
 const forbiddenAmounts = [47, 73, 119]; // integers only
 const MIN_AMOUNT = 23; // round up to nearest integer
 const MAX_AMOUNT = 4200;
@@ -975,9 +976,16 @@ input.addEventListener('input', () => {
     input.value = input.value.replace(/\D/g, '');
     
     let value = parseInt(input.value);
-    
+
     if (!value || value < MIN_AMOUNT) value = MIN_AMOUNT;
     if (value > MAX_AMOUNT) value = MAX_AMOUNT;
+
+    // Dim card if below minimum
+    if (value < MIN_AMOUNT) {
+        card.classList.add('inactive');
+    } else {
+        card.classList.remove('inactive');
+    }
 
     // Block forbidden values
     if (forbiddenAmounts.includes(value)) {

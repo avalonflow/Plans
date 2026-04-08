@@ -725,6 +725,105 @@ box-sizing: border-box; /* 🔥 THIS FIXES OVERFLOW */
     transition: all 0.3s ease;
 }
 
+.input-error {
+    display: none;       /* hidden initially */
+    color: #FF4D4F;      /* red for visibility */
+    font-size: 13px;
+    font-weight: 500;
+    margin-top: 6px;
+    transition: all 0.3s ease;
+}
+
+@keyframes inputErrorPulse {
+    0% { border-color: #FF4D4F; box-shadow: 0 0 0 rgba(255,77,79,0); }
+    50% { border-color: #FF4D4F; box-shadow: 0 0 8px rgba(255,77,79,0.7); }
+    100% { border-color: #FF4D4F; box-shadow: 0 0 0 rgba(255,77,79,0); }
+}
+
+.glass-card.plan-custom {
+    padding: 20px 24px; /* slightly bigger padding for breathing room */
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.glass-card.plan-custom > * {
+    margin-bottom: 12px; /* space between all child elements */
+}
+
+.glass-card.plan-custom > *:last-child {
+    margin-bottom: 0; /* remove extra space at bottom */
+}
+
+/* Inner structure */
+.glass-card.plan-custom .plan-header {
+    margin-bottom: 14px;
+}
+
+.glass-card.plan-custom .plan-desc {
+    font-size: 14px;
+    opacity: 0.85;
+    margin-top: 6px;
+}
+
+.glass-card.plan-custom .plan-input {
+    margin-top: 14px;
+}
+
+.glass-card.plan-custom .plan-payout {
+    margin-top: 18px;
+}
+
+.glass-card.plan-custom #customPayout {
+    margin-top: 6px;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.glass-card.plan-custom .acu-bar-section {
+    margin-top: 18px;
+}
+
+.glass-card.plan-custom .plan-footer {
+    margin-top: auto; /* pushes button to bottom */
+}
+
+/* 🔴 Invalid input state */
+.plan-input input.invalid {
+    border: 1px solid #ff3b3b;
+    box-shadow:
+        0 0 10px rgba(255,59,59,0.6),
+        0 0 20px rgba(255,59,59,0.4);
+    animation: inputShake 0.3s ease, inputPulse 0.6s ease;
+}
+
+/* 💥 Shake */
+@keyframes inputShake {
+    0% { transform: translateX(0); }
+    25% { transform: translateX(-4px); }
+    50% { transform: translateX(4px); }
+    75% { transform: translateX(-3px); }
+    100% { transform: translateX(0); }
+}
+
+/* 🔥 Pulse glow */
+@keyframes inputPulse {
+    0% {
+        box-shadow:
+            0 0 0 rgba(255,59,59,0);
+    }
+    50% {
+        box-shadow:
+            0 0 25px rgba(255,59,59,0.9),
+            0 0 50px rgba(255,59,59,0.5);
+    }
+    100% {
+        box-shadow:
+            0 0 10px rgba(255,59,59,0.6),
+            0 0 20px rgba(255,59,59,0.4);
+    }
+}
+
         /* ---------- Footer ---------- */
         footer {
             position: fixed;
@@ -918,7 +1017,6 @@ box-sizing: border-box; /* 🔥 THIS FIXES OVERFLOW */
             </a>
         </div>
     </div>
-</div>
 
     <!-- Carousel Dots -->
     <div class="dots">
@@ -1055,6 +1153,8 @@ input.addEventListener('input', () => {
     if (!rawValue || rawValue < MIN_AMOUNT) {
         card.classList.add('inactive');
 
+inputField.classList.add('invalid'); // 🔥 trigger red pulse
+
         payout.textContent = '$0';
         acuBar.style.width = '0%';
         activateBtn.textContent = 'Activate Custom Access –on ERC-20';
@@ -1068,16 +1168,25 @@ input.addEventListener('input', () => {
 
     // Block forbidden values
     if (forbiddenAmounts.includes(value)) {
-        input.value = '';
-        payout.textContent = '$0';
-        activateBtn.textContent = 'Activate Custom Access –on ERC-20';
-        acuBar.style.width = '0%';
-        document.querySelector('.input-error').style.display = 'block';
-        card.classList.add('inactive');
-        return;
-    } else {
-        document.querySelector('.input-error').style.display = 'none';
-    }
+    input.value = '';
+    payout.textContent = '$0';
+    activateBtn.textContent = 'Activate Custom Access –on ERC-20';
+    acuBar.style.width = '0%';
+
+    // show the error
+    document.querySelector('.input-error').style.display = 'block';
+
+    // add red pulse to input
+    input.classList.remove('input-error-pulse'); 
+    void input.offsetWidth; // restart animation
+    input.classList.add('input-error-pulse');
+
+    card.classList.add('inactive');
+    return;
+} else {
+    // hide error if value is valid
+    document.querySelector('.input-error').style.display = 'none';
+}
 
     // 👉 Smooth payout animation
     const projected = value * PAYOUT_MULTIPLIER;

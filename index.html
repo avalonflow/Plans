@@ -860,7 +860,7 @@ height: 180px;   /* reduce this value */
 
     <div class="plan-input">
         <label for="customAmount"><strong>Enter Amount ($):</strong></label>
-        <input type="number" id="customAmount" min="23.6" max="4200" step="0.01" placeholder="e.g. 50">
+        <input type="number" id="customAmount" min="23" max="4200" step="0.01" placeholder="e.g. 50">
         <p class="input-error" style="display:none; color:#ff6b6b; font-size:13px;">This amount is not allowed.</p>
     </div>
 
@@ -961,7 +961,7 @@ const payout = document.getElementById('customPayout');
 const acuBar = document.querySelector('.acu-bar');
 const activateBtn = document.querySelector('#customActivate span'); // span inside <a>
 const forbiddenAmounts = [47, 73, 119]; // integers only
-const MIN_AMOUNT = 24; // round up to nearest integer
+const MIN_AMOUNT = 23; // round up to nearest integer
 const MAX_AMOUNT = 4200;
 const PAYOUT_MULTIPLIER = 5;
 

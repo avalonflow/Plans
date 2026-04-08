@@ -848,6 +848,29 @@ max-height: 600px; /* optional: prevents huge cards */
     }
 }
 
+/* Glowing animated rainbow gradient text */
+.animated-gradient-text {
+  text-align: center;
+  font-weight: bold;       /* Bold */
+  font-style: italic;      /* Italic */
+  font-size: 1.2rem;       /* Adjust font size */
+  
+  background: linear-gradient(90deg, red, blue, green, purple, gold);
+  background-size: 200% auto;
+
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+
+  animation: gradientShift 4s linear infinite;
+}
+
+/* Gradient animation keyframes */
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
         /* ---------- Footer ---------- */
         footer {
             position: fixed;
@@ -1063,11 +1086,7 @@ max-height: 600px; /* optional: prevents huge cards */
 
 
                 <!-- Mini TV: Member Reflection -->
-        <p style="text-align:center; font-weight:bold; margin-top:20px; background: linear-gradient(90deg, #FFD700, #FFC107, #FFD700); /* gold shades */
-  background-size: 200% auto;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  animation: gradientShift 4s linear infinite;">Live Tracking Walkthrough</p>
+        <p class="animated-gradient-text">Live Tracking Walkthrough</p>
         <div class="video-container">
                 <video id="planVideo" controls controlsList="nodownload noplaybackrate" loop muted autoplay>
                 <source src="assets/videos/cc394a5131de3915483bdf23feb3f4cf.mp4" type="video/mp4">

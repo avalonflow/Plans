@@ -702,6 +702,25 @@ height: 180px;   /* reduce this value */
     background: rgba(0,0,0,0.15);
 }
 
+/* ✨ Payout pulse */
+#customPayout.pulse {
+    animation: payoutPulse 0.3s ease;
+}
+
+@keyframes payoutPulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.08); }
+    100% { transform: scale(1); }
+}
+
+/* Smooth transitions */
+.acu-bar {
+    transition: box-shadow 0.3s ease;
+}
+
+#customActivate {
+    transition: box-shadow 0.3s ease;
+}
 
         /* ---------- Footer ---------- */
         footer {
@@ -960,6 +979,54 @@ height: 180px;   /* reduce this value */
             setTimeout(()=>notification.classList.remove("show"),3300);
         });
 
+function animateValue(element, bar, button, start, end, duration, min, max) {
+    let startTime = null;
+
+    function easeInOut(t) {
+        return t < 0.5
+            ? 2 * t * t
+            : 1 - Math.pow(-2 * t + 2, 2) / 2;
+    }
+
+    function animation(currentTime) {
+        if (!startTime) startTime = currentTime;
+        const rawProgress = Math.min((currentTime - startTime) / duration, 1);
+        const progress = easeInOut(rawProgress);
+
+        const value = start + (end - start) * progress;
+        element.textContent = `$${value.toFixed(2)}`;
+
+        // 🔥 Bar sync
+        const baseValue = value / 5;
+        const percentage = ((baseValue - min) / (max - min)) * 100;
+        bar.style.width = `${Math.min(percentage, 100)}%`;
+
+        // 🌟 Dynamic glow strength (based on value)
+        const glowStrength = Math.min(baseValue / max, 1);
+
+        bar.style.boxShadow = `
+            0 0 ${10 + glowStrength * 30}px rgba(107,44,216,0.8),
+            0 0 ${20 + glowStrength * 40}px rgba(107,44,216,0.5)
+        `;
+
+        // 🔘 Button glow scaling
+        button.style.boxShadow = `
+            0 0 ${8 + glowStrength * 20}px rgba(241,196,15,0.7),
+            0 0 ${15 + glowStrength * 30}px rgba(241,196,15,0.4)
+        `;
+
+        if (rawProgress < 1) {
+            requestAnimationFrame(animation);
+        } else {
+            // ✨ Pulse effect when finished
+            element.classList.add('pulse');
+            setTimeout(() => element.classList.remove('pulse'), 300);
+        }
+    }
+
+    requestAnimationFrame(animation);
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     const input = document.getElementById('customAmount');
 const payout = document.getElementById('customPayout');
@@ -978,16 +1045,19 @@ input.addEventListener('input', () => {
     
     let rawValue = parseInt(input.value);
 
-    // 👉 DIM LOGIC (use raw value BEFORE forcing min)
+    // DIM LOGIC
     if (!rawValue || rawValue < MIN_AMOUNT) {
         card.classList.add('inactive');
+
+        payout.textContent = '$0';
+        acuBar.style.width = '0%';
+        activateBtn.textContent = 'Activate Custom Access –on ERC-20';
+        return;
     } else {
         card.classList.remove('inactive');
     }
 
-    // Now clamp for calculations
     let value = rawValue;
-    if (!value || value < MIN_AMOUNT) value = MIN_AMOUNT;
     if (value > MAX_AMOUNT) value = MAX_AMOUNT;
 
     // Block forbidden values
@@ -997,15 +1067,26 @@ input.addEventListener('input', () => {
         activateBtn.textContent = 'Activate Custom Access –on ERC-20';
         acuBar.style.width = '0%';
         document.querySelector('.input-error').style.display = 'block';
-        card.classList.add('inactive'); // also dim
+        card.classList.add('inactive');
         return;
     } else {
         document.querySelector('.input-error').style.display = 'none';
     }
 
-    // Payout
-    const projected = (value * PAYOUT_MULTIPLIER).toFixed(2);
-    payout.textContent = `$${projected}`;
+    // 👉 Smooth payout animation
+    const projected = value * PAYOUT_MULTIPLIER;
+const current = parseFloat(payout.textContent.replace('$','')) || 0;
+
+animateValue(
+    payout,
+    acuBar,
+    document.getElementById('customActivate'),
+    current,
+    projected,
+    500,
+    MIN_AMOUNT,
+    MAX_AMOUNT
+);
 
     // ACU bar
     const percentage = ((value - MIN_AMOUNT) / (MAX_AMOUNT - MIN_AMOUNT)) * 100;

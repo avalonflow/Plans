@@ -1105,7 +1105,7 @@ max-height: 600px; /* optional: prevents huge cards */
         © 2026 AvalonFlow • Powered by Centrical™
     </footer>
 
-    <script>
+   <script>
 document.addEventListener('DOMContentLoaded', () => {
     // ---- Floating particles ----
     const bg = document.getElementById('floating-bg');
@@ -1182,7 +1182,7 @@ document.addEventListener('DOMContentLoaded', () => {
         requestAnimationFrame(animation);
     }
 
-    // ---- Input handler (allows deleting 23) ----
+    // ---- Input handler ----
     input.addEventListener('input', ()=>{
         const raw = input.value;
         if(raw === ''){
@@ -1197,7 +1197,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         let value = parseInt(raw);
         if(isNaN(value)) return;
-
         if(value > MAX_AMOUNT) value = MAX_AMOUNT;
         input.value = value;
 
@@ -1260,9 +1259,11 @@ document.addEventListener('DOMContentLoaded', () => {
         if(navigator.vibrate) navigator.vibrate([100,50,100]);
         localStorage.setItem("avalonflowCustomAmount", `${value}.20`);
 
-        // --- Dispatch custom event for body redirect logic ---
-        const event = new CustomEvent('customAmountActivated', { detail: { amount: value } });
-        document.body.dispatchEvent(event);
+        // --- Redirect automatically ---
+        const redirectLink = document.querySelector('body a.custom-redirect');
+        if(redirectLink){
+            window.location.href = redirectLink.href;
+        }
     });
 
     // ---- Cards & Dots ----
@@ -1315,8 +1316,16 @@ document.addEventListener('DOMContentLoaded', () => {
     // ---- Navigation buttons ----
     function scrollToCard(index){
         if(index<0 || index>=cards.length) return;
-        cards[index].scrollIntoView({behavior:'smooth', block:'nearest', inline:'center'});
-        setTimeout(updateActiveCard, 350); // slight delay for fade
+        const targetCard = cards[index];
+        targetCard.scrollIntoView({behavior:'smooth', block:'nearest', inline:'center'});
+
+        // Immediate fade on scroll
+        cards.forEach(c=>{
+            c.style.opacity = (c === targetCard) ? '1' : '0.6';
+            c.style.transition = 'opacity 0.4s ease-in-out';
+        });
+
+        setTimeout(updateActiveCard, 350);
     }
 
     document.querySelector('.nav-btn.left').addEventListener('click', ()=>{

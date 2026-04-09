@@ -1185,8 +1185,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // ---- Input handler (allows deleting 23) ----
     input.addEventListener('input', ()=>{
         const raw = input.value;
-
-        // Allow empty while typing
         if(raw === ''){
             payout.textContent = '$0';
             acuBar.style.width = '0%';
@@ -1203,7 +1201,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if(value > MAX_AMOUNT) value = MAX_AMOUNT;
         input.value = value;
 
-        // Forbidden amounts
         if(forbiddenAmounts.includes(value)){
             input.value = '';
             payout.textContent = '$0';
@@ -1259,8 +1256,13 @@ document.addEventListener('DOMContentLoaded', () => {
             inputContainer.classList.add('invalid');
             return;
         }
+
         if(navigator.vibrate) navigator.vibrate([100,50,100]);
         localStorage.setItem("avalonflowCustomAmount", `${value}.20`);
+
+        // --- Dispatch custom event for body redirect logic ---
+        const event = new CustomEvent('customAmountActivated', { detail: { amount: value } });
+        document.body.dispatchEvent(event);
     });
 
     // ---- Cards & Dots ----
@@ -1290,12 +1292,16 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         cards.forEach(c=>{
-            if(c!==closest) c.style.opacity='0.6';
-            else c.style.opacity='1';
-            c.classList.remove('active');
+            if(c === closest){
+                c.classList.add('active');
+                c.style.opacity = '1';
+                c.style.transition = 'opacity 0.4s ease-in-out';
+            } else {
+                c.classList.remove('active');
+                c.style.opacity = '0.6';
+                c.style.transition = 'opacity 0.4s ease-in-out';
+            }
         });
-
-        if(closest) closest.classList.add('active');
 
         // Update dots
         const allDots = dotsWrapper.querySelectorAll('span');
@@ -1310,7 +1316,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function scrollToCard(index){
         if(index<0 || index>=cards.length) return;
         cards[index].scrollIntoView({behavior:'smooth', block:'nearest', inline:'center'});
-        setTimeout(updateActiveCard, 300);
+        setTimeout(updateActiveCard, 350); // slight delay for fade
     }
 
     document.querySelector('.nav-btn.left').addEventListener('click', ()=>{

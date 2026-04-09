@@ -1246,6 +1246,33 @@ activateBtn.textContent = `Activate Custom Access – $${value}.20 on ERC-20`;
     });
 });
 
+const activateButton = document.getElementById('customActivate');
+
+activateButton.addEventListener('click', () => {
+e.preventDefault(); // ✅ Prevent the # from jumping the page
+    let rawValue = parseInt(input.value);
+
+    // Re-validate before saving
+    if (!rawValue || rawValue < MIN_AMOUNT || forbiddenAmounts.includes(rawValue)) {
+        inputContainer.classList.add('invalid');
+
+        input.classList.remove('input-error-pulse');
+        void input.offsetWidth;
+        input.classList.add('input-error-pulse');
+
+        return;
+    }
+
+    let value = Math.min(rawValue, MAX_AMOUNT);
+
+    // ✅ Save FINAL locked value
+    localStorage.setItem("avalonflowCustomAmount", `${value}.20`);
+
+    // ✅ Redirect AFTER saving
+    setTimeout(() => {
+        window.location.href = "your-gateway-link";
+    }, 100);
+});
 
 // Select all cards including custom
 const cards = document.querySelectorAll('.glass-card');

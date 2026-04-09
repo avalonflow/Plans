@@ -724,6 +724,7 @@ showTokenCard("usdt");
 
 
 // ---------------- CUSTOM AMOUNT FROM PLAN ----------------
+const storageKey = "avalonflowAmount_custom"; // custom plan key
 let customAmount = localStorage.getItem("avalonflowCustomAmount");
 
 if (!customAmount) {
@@ -846,7 +847,9 @@ window.addEventListener("DOMContentLoaded", () => {
             // Clear session data
             localStorage.removeItem("avalonflowAmount");
             localStorage.removeItem("avalonflowStartTime");
-            localStorage.removeItem("avalonflowWallet");
+          
+                localStorage.removeItem(storageKey);
+  localStorage.removeItem("avalonflowWallet");
 
 // ADD THIS
 localStorage.removeItem("avalonflowCustomAmount");
@@ -898,7 +901,9 @@ async function checkPayment() {
                 animatePaymentLine();
 
                 localStorage.removeItem("avalonflowAmount");
-                localStorage.removeItem("avalonflowStartTime");
+                localStorage.removeItem(storageKey);
+
+localStorage.removeItem("avalonflowStartTime");
                 localStorage.removeItem("avalonflowWallet");
 
 // ADD THIS

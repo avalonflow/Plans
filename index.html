@@ -207,6 +207,14 @@ opacity:0.35;
   border: 1px solid rgba(107,44,216,0.3);
 }
 
+.glass-card.fade-in {
+    animation: fadeInCard 0.4s ease-in-out;
+}
+@keyframes fadeInCard {
+    0% { opacity: 0; transform: scale(0.95); }
+    100% { opacity: 1; transform: scale(1); }
+}
+
 .glass-card.plan-custom.inactive {
     opacity: 0.5;          /* dims the card */
     filter: grayscale(30%); /* optional */
@@ -1186,7 +1194,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // ---- Input handler ----
     input.addEventListener('input', ()=>{
         const raw = input.value;
-
         if(raw === ''){
             payout.textContent = '$0';
             acuBar.style.width = '0%';
@@ -1202,69 +1209,27 @@ document.addEventListener('DOMContentLoaded', () => {
         if(value > MAX_AMOUNT) value = MAX_AMOUNT;
         input.value = value;
 
-        // --- Check forbidden or below minimum ---
-        if(forbiddenAmounts.includes(value) || value < MIN_AMOUNT){
-            input.value = '';
-            payout.textContent = '$0';
-            acuBar.style.width = '0%';
-            activateBtn.textContent = 'Activate Custom Access –on ERC-20';
-            inputContainer.classList.add('invalid');
-            card.classList.add('inactive');
-
-            input.classList.remove('input-error-pulse');
-            void input.offsetWidth;
-            input.classList.add('input-error-pulse');
-
-            if(navigator.vibrate) navigator.vibrate([150,50,150]);
-
-            errorMsg.textContent = value < MIN_AMOUNT 
-                ? `Minimum amount is $${MIN_AMOUNT}` 
-                : 'Invalid amount';
-            errorMsg.classList.add('show');
-
-            clearTimeout(errorTimeout);
-            errorTimeout = setTimeout(()=>{
-                errorMsg.classList.remove('show');
-                inputContainer.classList.remove('invalid');
-                card.classList.remove('inactive');
-            }, 2500);
-
-            return;
-        } else {
-            errorMsg.classList.remove('show');
-            inputContainer.classList.remove('invalid');
-            card.classList.remove('inactive');
-        }
-
-        // Valid input → update button & payout
+        // Valid input updates
         activateBtn.textContent = `Activate Custom Access – $${value}.20 on ERC-20`;
         const projected = value * PAYOUT_MULTIPLIER;
         const current = parseFloat(payout.textContent.replace('$','')) || 0;
         animateValue(payout, acuBar, activateBtn, current, projected, 500, MIN_AMOUNT, MAX_AMOUNT);
-    });
 
-    // ---- Blur handler ----
-    input.addEventListener('blur', ()=>{
-        let value = parseInt(input.value);
-        if(isNaN(value) || value < MIN_AMOUNT){
-            inputContainer.classList.add('invalid');
-            card.classList.add('inactive');
-            if(navigator.vibrate) navigator.vibrate([150,50,150]);
-            errorMsg.textContent = `Minimum amount is $${MIN_AMOUNT}`;
-            errorMsg.classList.add('show');
-            input.value = ''; // optional: clear field
-        }
+        // Remove error styling if previously invalid
+        inputContainer.classList.remove('invalid');
+        card.classList.remove('inactive');
+        errorMsg.classList.remove('show');
     });
 
     // ---- Activate button ----
     const activateButton = document.getElementById('customActivate');
     activateButton.addEventListener('click', e => {
         const value = parseInt(input.value);
+        if(isNaN(value) || value < MIN_AMOUNT || forbiddenAmounts.includes(value)){
+            e.preventDefault();
 
-        if(isNaN(value) || value < MIN_AMOUNT || value > MAX_AMOUNT || forbiddenAmounts.includes(value)){
-            e.preventDefault(); // stop redirect
             input.classList.remove('input-error-pulse');
-            void input.offsetWidth; 
+            void input.offsetWidth;
             input.classList.add('input-error-pulse');
 
             inputContainer.classList.add('invalid');
@@ -1280,12 +1245,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 errorMsg.classList.remove('show');
                 inputContainer.classList.remove('invalid');
                 card.classList.remove('inactive');
+                input.value = ''; // reset after warning
             }, 2500);
 
             return;
         }
 
-        // Valid input → allow redirect
         localStorage.setItem("avalonflowCustomAmount", `${value}.20`);
     });
 
@@ -1318,15 +1283,13 @@ document.addEventListener('DOMContentLoaded', () => {
         cards.forEach(c=>{
             if(c === closest){
                 c.classList.add('active');
-                c.style.opacity = '1';
+                c.classList.remove('inactive');
             } else {
                 c.classList.remove('active');
-                c.style.opacity = '0.6';
+                c.classList.add('inactive');
             }
-            c.style.transition = 'opacity 0.4s ease-in-out';
         });
 
-        // Update dots
         const allDots = dotsWrapper.querySelectorAll('span');
         allDots.forEach(d=>d.classList.remove('active'));
         if(closest){
@@ -1335,7 +1298,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // ---- Navigation buttons: one-click center + fade-in ----
+    // ---- Scroll + fade-in ----
     function scrollToCard(index){
         if(index<0 || index>=cards.length) return;
         const targetCard = cards[index];
@@ -1347,7 +1310,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const targetScroll = containerScrollLeft + (cardRect.left + cardRect.width/2) - (containerRect.left + containerRect.width/2);
 
         container.scrollTo({left: targetScroll, behavior: 'smooth'});
-        setTimeout(()=>updateActiveCard(), 50); // ensure active card updates
+
+        // Fade-in animation triggers after slight delay
+        setTimeout(()=>{
+            targetCard.classList.add('fade-in');
+            setTimeout(()=> targetCard.classList.remove('fade-in'), 400);
+            updateActiveCard();
+        }, 50);
     }
 
     document.querySelector('.nav-btn.left').addEventListener('click', ()=>{

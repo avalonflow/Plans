@@ -1244,7 +1244,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // ---- Activate button & redirection ----
+    // ---- Activate button & block redirect if below MIN ----
     const activateButton = document.getElementById('customActivate');
     activateButton.addEventListener('click', e=>{
         const value = parseInt(input.value);
@@ -1309,12 +1309,20 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // ---- Navigation buttons ----
+    // ---- Navigation buttons: one-click center + fade-in ----
     function scrollToCard(index){
         if(index<0 || index>=cards.length) return;
         const targetCard = cards[index];
-        targetCard.scrollIntoView({behavior:'smooth', block:'nearest', inline:'center'});
-        updateActiveCard(); // immediately fade in
+        const container = targetCard.parentElement;
+
+        // Calculate exact scroll to center
+        const cardRect = targetCard.getBoundingClientRect();
+        const containerRect = container.getBoundingClientRect();
+        const containerScrollLeft = container.scrollLeft;
+        const targetScroll = containerScrollLeft + (cardRect.left + cardRect.width/2) - (containerRect.left + containerRect.width/2);
+
+        container.scrollTo({left: targetScroll, behavior: 'smooth'});
+        updateActiveCard(); // immediately apply fade-in
     }
 
     document.querySelector('.nav-btn.left').addEventListener('click', ()=>{
@@ -1331,8 +1339,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // ---- Initial card ----
     function centerInitialCard(){
         if(cards.length>0){
-            cards[0].scrollIntoView({behavior:'smooth', block:'nearest', inline:'center'});
-            updateActiveCard();
+            scrollToCard(0);
         }
     }
     centerInitialCard();

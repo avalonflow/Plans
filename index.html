@@ -1269,8 +1269,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // ---- Cards & Dots ----
 const cards = Array.from(document.querySelectorAll('.glass-card'));
 const dotsWrapper = document.querySelector('.dots');
-let isScrolling = false; // lock while smooth scrolling
+let isScrolling = false; // lock during smooth scroll
 
+// ---- Generate navigation dots ----
 function generateDots() {
     dotsWrapper.innerHTML = '';
     cards.forEach((_, idx) => {
@@ -1281,7 +1282,7 @@ function generateDots() {
 }
 generateDots();
 
-// ---- Update active card & dots ----
+// ---- Update active card & dots (only when not scrolling) ----
 function updateActiveCardSmooth() {
     if (isScrolling) return; // skip mid-scroll
 
@@ -1298,25 +1299,20 @@ function updateActiveCardSmooth() {
         }
     });
 
+    if (!closest) return;
+
+    cards.forEach(c => c.classList.remove('fade-in', 'active'));
+    closest.classList.add('fade-in', 'active');
+
     cards.forEach(c => {
-        c.classList.remove('fade-in');
-        if (c === closest) {
-            void c.offsetWidth; // force reflow
-            c.classList.add('fade-in', 'active');
-            c.classList.remove('inactive');
-        } else {
-            c.classList.remove('active');
-            c.classList.add('inactive');
-        }
+        if (c !== closest) c.classList.add('inactive');
     });
 
     // Update dots
     const allDots = dotsWrapper.querySelectorAll('span');
     allDots.forEach(d => d.classList.remove('active'));
-    if (closest) {
-        const idx = cards.indexOf(closest);
-        if (allDots[idx]) allDots[idx].classList.add('active');
-    }
+    const idx = cards.indexOf(closest);
+    if (allDots[idx]) allDots[idx].classList.add('active');
 }
 
 // ---- Smooth scroll to specific card ----
@@ -1325,32 +1321,46 @@ function scrollToCard(index) {
 
     const targetCard = cards[index];
     const container = targetCard.parentElement;
-    const cardRect = targetCard.getBoundingClientRect();
-    const containerRect = container.getBoundingClientRect();
-    const containerScrollLeft = container.scrollLeft;
-
-    const targetScroll = containerScrollLeft + (cardRect.left + cardRect.width / 2) - (containerRect.left + containerRect.width / 2);
-
     const startScroll = container.scrollLeft;
+    const targetScroll = targetCard.offsetLeft - container.offsetWidth / 2 + targetCard.offsetWidth / 2;
     const distance = targetScroll - startScroll;
     const duration = 400;
     let startTime = null;
-    isScrolling = true; // lock
+
+    isScrolling = true; // lock during scroll
 
     function smoothScroll(time) {
         if (!startTime) startTime = time;
         const elapsed = time - startTime;
         const progress = Math.min(elapsed / duration, 1);
-        const eased = progress < 0.5 ? 2 * progress * progress : 1 - Math.pow(-2 * progress + 2, 2) / 2;
+        const eased = progress < 0.5
+            ? 2 * progress * progress
+            : 1 - Math.pow(-2 * progress + 2, 2) / 2;
+
         container.scrollLeft = startScroll + distance * eased;
 
         if (progress < 1) {
             requestAnimationFrame(smoothScroll);
         } else {
-            isScrolling = false; // unlock
-            updateActiveCardSmooth(); // final update
+            // Scroll finished
+            isScrolling = false;
+
+            // Apply fade & active classes
+            cards.forEach(c => c.classList.remove('fade-in', 'active'));
+            targetCard.classList.add('fade-in', 'active');
+
+            cards.forEach(c => {
+                if (c !== targetCard) c.classList.add('inactive');
+            });
+
+            // Update dots
+            const allDots = dotsWrapper.querySelectorAll('span');
+            allDots.forEach(d => d.classList.remove('active'));
+            const idx = cards.indexOf(targetCard);
+            if (allDots[idx]) allDots[idx].classList.add('active');
         }
     }
+
     requestAnimationFrame(smoothScroll);
 }
 
@@ -1364,10 +1374,25 @@ document.querySelector('.nav-btn.right').addEventListener('click', () => {
     scrollToCard(activeIdx + 1);
 });
 
-// ---- Initial card ----
-if (cards.length > 0) scrollToCard(0);
+// ---- Initialize first card ----
+if (cards.length > 0) {
+    const firstCard = cards[0];
+    firstCard.classList.add('active', 'fade-in');
+    cards.forEach(c => {
+        if (c !== firstCard) c.classList.add('inactive');
+    });
 
-// ---- Scroll & resize ----
+    // Center the first card without animation
+    const container = firstCard.parentElement;
+    container.scrollLeft = firstCard.offsetLeft - container.offsetWidth / 2 + firstCard.offsetWidth / 2;
+
+    // Update dots
+    const allDots = dotsWrapper.querySelectorAll('span');
+    allDots.forEach(d => d.classList.remove('active'));
+    if (allDots[0]) allDots[0].classList.add('active');
+}
+
+// ---- Update on scroll & resize ----
 window.addEventListener('scroll', () => requestAnimationFrame(updateActiveCardSmooth));
 window.addEventListener('resize', () => requestAnimationFrame(updateActiveCardSmooth));
 

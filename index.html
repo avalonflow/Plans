@@ -1244,7 +1244,6 @@ activateBtn.textContent = `Activate Custom Access – $${value}.20 on ERC-20`;
         const current = parseFloat(payout.textContent.replace('$', '')) || 0;
         animateValue(payout, acuBar, activateBtn, current, projected, 500, MIN_AMOUNT, MAX_AMOUNT);
     });
-});
 
 const activateButton = document.getElementById('customActivate');
 
@@ -1276,6 +1275,7 @@ if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
     setTimeout(() => {
         window.location.href = "https://link.avalonflow.site/custom";
     }, 150);
+});
 });
 
 // Select all cards including custom

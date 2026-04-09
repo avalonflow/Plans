@@ -1147,7 +1147,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const PAYOUT_MULTIPLIER = 5;
     let errorTimeout;
 
-    function animateValue(element, bar, button, start, end, duration, min, max) {
+    let animationId;
+function animateValue(element, bar, button, start, end, duration, min, max) {
         let startTime = null;
         function easeInOut(t) {
             return t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
@@ -1247,8 +1248,8 @@ activateBtn.textContent = `Activate Custom Access – $${value}.20 on ERC-20`;
 
 const activateButton = document.getElementById('customActivate');
 
-activateButton.addEventListener('click', () => {
-e.preventDefault(); // ✅ Prevent the # from jumping the page
+activateButton.addEventListener('click', (e) => {
+    e.preventDefault();
     let rawValue = parseInt(input.value);
 
     // Re-validate before saving
@@ -1338,21 +1339,6 @@ updateActiveCard();
 // Run on scroll
 wrapper.addEventListener('scroll', () => {
     window.requestAnimationFrame(updateActiveCard);
-});
-
-// Optional: arrow navigation
-document.querySelector('.nav-btn.left')?.addEventListener('click', () => {
-  const active = document.querySelector('.glass-card.active');
-  if(active && active.previousElementSibling) {
-    active.previousElementSibling.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
-  }
-});
-
-document.querySelector('.nav-btn.right')?.addEventListener('click', () => {
-  const active = document.querySelector('.glass-card.active');
-  if(active && active.nextElementSibling) {
-    active.nextElementSibling.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
-  }
 });
 
         // Video volume

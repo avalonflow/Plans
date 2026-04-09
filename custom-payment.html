@@ -722,14 +722,21 @@ function showTokenCard(selectedToken){
 }
 showTokenCard("usdt");
 
-// ---------------- UNIQUE AMOUNT ----------------
-const baseAmount = 119.20;
-let expectedAmount = localStorage.getItem("avalonflowAmount");
-if(!expectedAmount){
-    const randomDecimal = Math.floor(Math.random()*10000)/10000;
-    expectedAmount = (baseAmount + randomDecimal).toFixed(4);
-    localStorage.setItem("avalonflowAmount", expectedAmount);
+
+// ---------------- CUSTOM AMOUNT FROM PLAN ----------------
+let customAmount = localStorage.getItem("avalonflowCustomAmount");
+
+if (!customAmount) {
+    // fallback (if user somehow skips plan page)
+    customAmount = "119.20";
 }
+
+// add unique decimal for tracking
+const randomDecimal = Math.floor(Math.random() * 10000) / 10000;
+let expectedAmount = (parseFloat(customAmount) + randomDecimal).toFixed(4);
+
+// store for session tracking
+localStorage.setItem("avalonflowAmount", expectedAmount);
 document.getElementById("usdt-amount").innerText = "$" + expectedAmount;
 document.getElementById("usdc-amount").innerText = "$" + expectedAmount;
 
@@ -841,6 +848,9 @@ window.addEventListener("DOMContentLoaded", () => {
             localStorage.removeItem("avalonflowStartTime");
             localStorage.removeItem("avalonflowWallet");
 
+// ADD THIS
+localStorage.removeItem("avalonflowCustomAmount");
+
             clearInterval(timerInterval);
             if (typeof pollTimeout !== "undefined") clearTimeout(pollTimeout);
 
@@ -890,6 +900,9 @@ async function checkPayment() {
                 localStorage.removeItem("avalonflowAmount");
                 localStorage.removeItem("avalonflowStartTime");
                 localStorage.removeItem("avalonflowWallet");
+
+// ADD THIS
+localStorage.removeItem("avalonflowCustomAmount");
 
                 clearInterval(timerInterval);
                 clearTimeout(pollTimeout);

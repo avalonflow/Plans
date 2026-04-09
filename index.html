@@ -1253,7 +1253,7 @@ e.preventDefault(); // ✅ Prevent the # from jumping the page
     let rawValue = parseInt(input.value);
 
     // Re-validate before saving
-    if (!rawValue || rawValue < MIN_AMOUNT || forbiddenAmounts.includes(rawValue)) {
+    if (!rawValue || rawValue < MIN_AMOUNT || rawValue > MAX_AMOUNT || forbiddenAmounts.includes(rawValue)) {
         inputContainer.classList.add('invalid');
 
         input.classList.remove('input-error-pulse');
@@ -1261,6 +1261,10 @@ e.preventDefault(); // ✅ Prevent the # from jumping the page
         input.classList.add('input-error-pulse');
 
         return;
+    }
+
+if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
+        return; // STOP here, no redirect
     }
 
     let value = Math.min(rawValue, MAX_AMOUNT);
@@ -1271,7 +1275,7 @@ e.preventDefault(); // ✅ Prevent the # from jumping the page
     // ✅ Redirect AFTER saving
     setTimeout(() => {
         window.location.href = "your-gateway-link";
-    }, 100);
+    }, 150);
 });
 
 // Select all cards including custom

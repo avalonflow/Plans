@@ -1256,49 +1256,55 @@ document.addEventListener('DOMContentLoaded', () => {
     const cards = Array.from(document.querySelectorAll('.glass-card'));
     const dotsWrapper = document.querySelector('.dots');
 
-    function generateDots(){
-        dotsWrapper.innerHTML = '';
-        cards.forEach((_, idx)=>{
-            const span = document.createElement('span');
-            if(idx===0) span.classList.add('active');
-            dotsWrapper.appendChild(span);
-        });
+function generateDots() {
+    dotsWrapper.innerHTML = '';
+    cards.forEach((_, idx) => {
+        const span = document.createElement('span');
+        if(idx === 0) span.classList.add('active');
+        dotsWrapper.appendChild(span);
+    });
+}
+generateDots();
+
+    function updateActiveCard() {
+    const viewportCenter = window.innerWidth / 2;
+    let closest = null, minDist = Infinity;
+
+    cards.forEach(card => {
+        const rect = card.getBoundingClientRect();
+        const cardCenter = rect.left + rect.width / 2;
+        const dist = Math.abs(viewportCenter - cardCenter);
+        if(dist < minDist){ minDist = dist; closest = card; }
+    });
+
+    cards.forEach(c => c.classList.remove('active'));
+    if(closest) closest.classList.add('active');
+
+    // Update dots
+    const allDots = dotsWrapper.querySelectorAll('span');
+    allDots.forEach(d => d.classList.remove('active'));
+    if(closest){
+        const idx = cards.indexOf(closest);
+        if(allDots[idx]) allDots[idx].classList.add('active');
     }
-    generateDots();
+}
 
-    function updateActiveCard(){
-        const wrapperCenter = wrapper.scrollLeft + wrapper.offsetWidth/2;
-        let closest = null, minDist = Infinity;
-        cards.forEach(card=>{
-            const cardCenter = card.offsetLeft + card.offsetWidth/2;
-            const dist = Math.abs(wrapperCenter - cardCenter);
-            if(dist < minDist){ minDist = dist; closest = card; }
-        });
-        cards.forEach(c=>c.classList.remove('active'));
-        if(closest) closest.classList.add('active');
-
-        const allDots = dotsWrapper.querySelectorAll('span');
-        allDots.forEach(d=>d.classList.remove('active'));
-        if(closest){
-            const idx = cards.indexOf(closest);
-            if(allDots[idx]) allDots[idx].classList.add('active');
-        }
-    }
-
-    wrapper.addEventListener('scroll', ()=>window.requestAnimationFrame(updateActiveCard));
-    updateActiveCard();
+// Run on scroll and initially
+window.addEventListener('scroll', () => requestAnimationFrame(updateActiveCard));
+updateActiveCard();
 
     // Navigation buttons
-    document.querySelector('.nav-btn.left').addEventListener('click', ()=>{
-        const active = document.querySelector('.glass-card.active');
-        const idx = cards.indexOf(active);
-        if(idx>0) cards[idx-1].scrollIntoView({behavior:'smooth', block:'nearest', inline:'center'});
-    });
-    document.querySelector('.nav-btn.right').addEventListener('click', ()=>{
-        const active = document.querySelector('.glass-card.active');
-        const idx = cards.indexOf(active);
-        if(idx<cards.length-1) cards[idx+1].scrollIntoView({behavior:'smooth', block:'nearest', inline:'center'});
-    });
+    document.querySelector('.nav-btn.left').addEventListener('click', () => {
+    const active = document.querySelector('.glass-card.active');
+    const idx = cards.indexOf(active);
+    if(idx > 0) cards[idx - 1].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+});
+
+document.querySelector('.nav-btn.right').addEventListener('click', () => {
+    const active = document.querySelector('.glass-card.active');
+    const idx = cards.indexOf(active);
+    if(idx < cards.length - 1) cards[idx + 1].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+});
 
 // Initial active card
 updateActiveCard();

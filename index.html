@@ -1106,6 +1106,7 @@ max-height: 600px; /* optional: prevents huge cards */
     </footer>
 
     <script>
+document.addEventListener('DOMContentLoaded', () => {
         // Floating particles
         const bg = document.getElementById('floating-bg');
         const colors = ['#6b2cd8', '#9b59b6', '#8e44ad'];
@@ -1132,7 +1133,7 @@ max-height: 600px; /* optional: prevents huge cards */
             setTimeout(()=>notification.classList.remove("show"),3300);
         });
 
-document.addEventListener('DOMContentLoaded', () => {
+
     const input = document.getElementById('customAmount');
     const payout = document.getElementById('customPayout');
     const acuBar = document.querySelector('.acu-bar');

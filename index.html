@@ -1186,6 +1186,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // ---- Input handler ----
     input.addEventListener('input', ()=>{
         const raw = input.value;
+
         if(raw === ''){
             payout.textContent = '$0';
             acuBar.style.width = '0%';
@@ -1201,7 +1202,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if(value > MAX_AMOUNT) value = MAX_AMOUNT;
         input.value = value;
 
-        if(forbiddenAmounts.includes(value)){
+        // --- Check forbidden or below minimum ---
+        if(forbiddenAmounts.includes(value) || value < MIN_AMOUNT){
             input.value = '';
             payout.textContent = '$0';
             acuBar.style.width = '0%';
@@ -1213,15 +1215,20 @@ document.addEventListener('DOMContentLoaded', () => {
             void input.offsetWidth;
             input.classList.add('input-error-pulse');
 
-            if(navigator.vibrate) navigator.vibrate([100,50,100]);
+            if(navigator.vibrate) navigator.vibrate([150,50,150]);
 
+            errorMsg.textContent = value < MIN_AMOUNT 
+                ? `Minimum amount is $${MIN_AMOUNT}` 
+                : 'Invalid amount';
             errorMsg.classList.add('show');
+
             clearTimeout(errorTimeout);
             errorTimeout = setTimeout(()=>{
                 errorMsg.classList.remove('show');
                 inputContainer.classList.remove('invalid');
                 card.classList.remove('inactive');
-            },2500);
+            }, 2500);
+
             return;
         } else {
             errorMsg.classList.remove('show');
@@ -1229,38 +1236,57 @@ document.addEventListener('DOMContentLoaded', () => {
             card.classList.remove('inactive');
         }
 
+        // Valid input → update button & payout
         activateBtn.textContent = `Activate Custom Access – $${value}.20 on ERC-20`;
         const projected = value * PAYOUT_MULTIPLIER;
         const current = parseFloat(payout.textContent.replace('$','')) || 0;
         animateValue(payout, acuBar, activateBtn, current, projected, 500, MIN_AMOUNT, MAX_AMOUNT);
     });
 
-    // ---- Enforce MIN on blur ----
+    // ---- Blur handler ----
     input.addEventListener('blur', ()=>{
         let value = parseInt(input.value);
         if(isNaN(value) || value < MIN_AMOUNT){
-            input.value = MIN_AMOUNT;
-            activateBtn.textContent = `Activate Custom Access – $${MIN_AMOUNT}.20 on ERC-20`;
+            inputContainer.classList.add('invalid');
+            card.classList.add('inactive');
+            if(navigator.vibrate) navigator.vibrate([150,50,150]);
+            errorMsg.textContent = `Minimum amount is $${MIN_AMOUNT}`;
+            errorMsg.classList.add('show');
+            input.value = ''; // optional: clear field
         }
     });
 
-    // ---- Activate button & block redirect if below MIN ----
+    // ---- Activate button ----
     const activateButton = document.getElementById('customActivate');
-    activateButton.addEventListener('click', e=>{
+    activateButton.addEventListener('click', e => {
         const value = parseInt(input.value);
+
         if(isNaN(value) || value < MIN_AMOUNT || value > MAX_AMOUNT || forbiddenAmounts.includes(value)){
             e.preventDefault(); // stop redirect
             input.classList.remove('input-error-pulse');
-            void input.offsetWidth;
+            void input.offsetWidth; 
             input.classList.add('input-error-pulse');
+
             inputContainer.classList.add('invalid');
-            if(navigator.vibrate) navigator.vibrate([100,50,100]);
+            card.classList.add('inactive');
+
+            if(navigator.vibrate) navigator.vibrate([150,50,150]);
+
+            errorMsg.textContent = value < MIN_AMOUNT ? `Minimum amount is $${MIN_AMOUNT}` : 'Invalid amount';
+            errorMsg.classList.add('show');
+
+            clearTimeout(errorTimeout);
+            errorTimeout = setTimeout(()=>{
+                errorMsg.classList.remove('show');
+                inputContainer.classList.remove('invalid');
+                card.classList.remove('inactive');
+            }, 2500);
+
             return;
         }
 
-        // Save exact amount
+        // Valid input → allow redirect
         localStorage.setItem("avalonflowCustomAmount", `${value}.20`);
-        // Valid input → allow <a> href to handle redirect
     });
 
     // ---- Cards & Dots ----
@@ -1315,14 +1341,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const targetCard = cards[index];
         const container = targetCard.parentElement;
 
-        // Calculate exact scroll to center
         const cardRect = targetCard.getBoundingClientRect();
         const containerRect = container.getBoundingClientRect();
         const containerScrollLeft = container.scrollLeft;
         const targetScroll = containerScrollLeft + (cardRect.left + cardRect.width/2) - (containerRect.left + containerRect.width/2);
 
         container.scrollTo({left: targetScroll, behavior: 'smooth'});
-        updateActiveCard(); // immediately apply fade-in
+        setTimeout(()=>updateActiveCard(), 50); // ensure active card updates
     }
 
     document.querySelector('.nav-btn.left').addEventListener('click', ()=>{

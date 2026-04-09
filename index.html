@@ -1266,172 +1266,236 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.setItem("avalonflowCustomAmount", `${value}.20`);
     });
 
-    // ---- Cards & Dots ----
-const cards = Array.from(document.querySelectorAll('.glass-card'));
-const dotsWrapper = document.querySelector('.dots');
-let isScrolling = false;
+    const cards = Array.from(document.querySelectorAll('.glass-card'));
+    const dotsWrapper = document.querySelector('.dots');
+    const container = cards[0].parentElement;
 
-// ---- Generate navigation dots ----
-function generateDots() {
-    dotsWrapper.innerHTML = '';
-    cards.forEach((_, idx) => {
-        const span = document.createElement('span');
-        if (idx === 0) span.classList.add('active');
-        dotsWrapper.appendChild(span);
-    });
-}
-generateDots();
+    let isScrolling = false;
+    let isDragging = false;
 
-// ---- Helper: clamp scroll ----
-function clampScroll(left, container) {
-    const maxScroll = container.scrollWidth - container.clientWidth;
-    return Math.max(0, Math.min(left, maxScroll));
-}
+    let dragStartX = 0;
+    let scrollStart = 0;
+    let lastX = 0;
+    let velocity = 0;
 
-// ---- Set active card ----
-function setActiveCard(targetCard) {
-    if (!targetCard) return;
+    // ---- Snap Feedback ----
+    function snapFeedback() {
+        if (navigator.vibrate) navigator.vibrate(10);
+    }
 
-    cards.forEach(c => c.classList.remove('fade-in', 'active'));
-    targetCard.classList.add('fade-in', 'active');
+    // ---- Generate Dots ----
+    function generateDots() {
+        dotsWrapper.innerHTML = '';
+        cards.forEach((_, i) => {
+            const d = document.createElement('span');
+            if (i === 0) d.classList.add('active');
+            dotsWrapper.appendChild(d);
+        });
+    }
+    generateDots();
 
-    cards.forEach(c => {
-        if (c !== targetCard) c.classList.add('inactive');
-    });
+    // ---- Clamp ----
+    function clampScroll(left) {
+        const max = container.scrollWidth - container.clientWidth;
+        return Math.max(0, Math.min(left, max));
+    }
 
-    const allDots = dotsWrapper.querySelectorAll('span');
-    allDots.forEach(d => d.classList.remove('active'));
-    const idx = cards.indexOf(targetCard);
-    if (allDots[idx]) allDots[idx].classList.add('active');
-}
+    // ---- 3D DEPTH EFFECT 💎 ----
+    function update3D() {
+        const center = container.scrollLeft + container.clientWidth / 2;
 
-// ---- Smooth scroll to card ----
-function scrollToCard(index, duration = 400) {
-    if (index < 0 || index >= cards.length) return;
+        cards.forEach(card => {
+            const cardCenter = card.offsetLeft + card.offsetWidth / 2;
+            const dist = Math.abs(center - cardCenter);
 
-    const targetCard = cards[index];
-    const container = targetCard.parentElement;
-    const startScroll = container.scrollLeft;
-    let targetScroll = targetCard.offsetLeft - container.offsetWidth / 2 + targetCard.offsetWidth / 2;
-    targetScroll = clampScroll(targetScroll, container);
+            const maxDist = container.clientWidth;
+            const ratio = Math.min(dist / maxDist, 1);
 
-    const distance = targetScroll - startScroll;
-    let startTime = null;
-    isScrolling = true;
+            const scale = 1 - (ratio * 0.15); // shrink sides
+            const opacity = 1 - (ratio * 0.5);
+            const rotateY = (cardCenter < center ? 1 : -1) * ratio * 15;
 
-    function smoothScroll(time) {
-        if (!startTime) startTime = time;
-        const elapsed = time - startTime;
-        const progress = Math.min(elapsed / duration, 1);
-        const eased = progress < 0.5
-            ? 2 * progress * progress
-            : 1 - Math.pow(-2 * progress + 2, 2) / 2;
+            card.style.transform = `
+                scale(${scale})
+                perspective(1000px)
+                rotateY(${rotateY}deg)
+            `;
+            card.style.opacity = opacity;
+        });
+    }
 
-        container.scrollLeft = startScroll + distance * eased;
+    // ---- Active Card ----
+    function setActiveCard(target) {
+        if (!target) return;
 
-        if (progress < 1) {
-            requestAnimationFrame(smoothScroll);
-        } else {
-            isScrolling = false;
-            setActiveCard(targetCard);
+        cards.forEach(c => {
+            c.classList.remove('active', 'inactive', 'fade-in');
+        });
+
+        target.classList.add('active', 'fade-in');
+
+        cards.forEach(c => {
+            if (c !== target) c.classList.add('inactive');
+        });
+
+        const dots = dotsWrapper.querySelectorAll('span');
+        dots.forEach(d => d.classList.remove('active'));
+
+        const idx = cards.indexOf(target);
+        if (dots[idx]) dots[idx].classList.add('active');
+    }
+
+    // ---- Easing ----
+    function easeOutExpo(t) {
+        return t === 1 ? 1 : 1 - Math.pow(2, -10 * t);
+    }
+
+    // ---- Scroll To ----
+    function scrollToCard(index, duration = 280) {
+        if (index < 0 || index >= cards.length) return;
+
+        const target = cards[index];
+        const start = container.scrollLeft;
+
+        let dest = target.offsetLeft - container.offsetWidth/2 + target.offsetWidth/2;
+        dest = clampScroll(dest);
+
+        const dist = dest - start;
+        let startTime = null;
+
+        isScrolling = true;
+
+        function anim(t) {
+            if (!startTime) startTime = t;
+            const p = Math.min((t - startTime)/duration, 1);
+            const eased = easeOutExpo(p);
+
+            container.scrollLeft = start + dist * eased;
+
+            update3D();
+
+            if (p < 1) {
+                requestAnimationFrame(anim);
+            } else {
+                isScrolling = false;
+                setActiveCard(target);
+                snapFeedback();
+            }
         }
+
+        requestAnimationFrame(anim);
     }
 
-    requestAnimationFrame(smoothScroll);
-}
+    // ---- Predictive Snap 🧠 ----
+    function predictIndex() {
+        const activeIdx = cards.findIndex(c => c.classList.contains('active'));
 
-// ---- Navigation buttons ----
-document.querySelector('.nav-btn.left').addEventListener('click', () => {
-    const activeIdx = cards.findIndex(c => c.classList.contains('active'));
-    scrollToCard(activeIdx - 1);
-});
-document.querySelector('.nav-btn.right').addEventListener('click', () => {
-    const activeIdx = cards.findIndex(c => c.classList.contains('active'));
-    scrollToCard(activeIdx + 1);
-});
+        const velocityBoost = velocity * 0.25;
+        const dragDistance = (dragStartX - lastX) * 0.15;
 
-// ---- Touch / drag with momentum ----
-let isDragging = false, dragStartX = 0, scrollStart = 0, lastX = 0, velocity = 0;
-const container = cards[0].parentElement;
+        const intent = velocityBoost + dragDistance;
 
-container.addEventListener('pointerdown', e => {
-    isDragging = true;
-    dragStartX = e.clientX;
-    lastX = e.clientX;
-    scrollStart = container.scrollLeft;
-    velocity = 0;
-    container.setPointerCapture(e.pointerId);
-});
-
-container.addEventListener('pointermove', e => {
-    if (!isDragging) return;
-    const dx = dragStartX - e.clientX;
-    container.scrollLeft = scrollStart + dx;
-
-    // calculate velocity for momentum
-    velocity = lastX - e.clientX;
-    lastX = e.clientX;
-});
-
-container.addEventListener('pointerup', e => {
-    if (!isDragging) return;
-    isDragging = false;
-
-    // momentum scroll
-    let momentum = velocity * 10; // adjust multiplier for sensitivity
-    let target = clampScroll(container.scrollLeft + momentum, container);
-    let duration = Math.min(Math.abs(momentum), 600); // cap duration
-
-    // Animate momentum
-    const start = container.scrollLeft;
-    const distance = target - start;
-    let startTime = null;
-
-    function momentumScroll(time) {
-        if (!startTime) startTime = time;
-        const elapsed = time - startTime;
-        const progress = Math.min(elapsed / duration, 1);
-        const eased = 1 - Math.pow(1 - progress, 3); // ease out cubic
-
-        container.scrollLeft = start + distance * eased;
-
-        if (progress < 1) {
-            requestAnimationFrame(momentumScroll);
-        } else {
-            // Snap to closest card after momentum
-            let closest = null, minDist = Infinity;
-            const viewportCenter = container.scrollLeft + container.clientWidth / 2;
-
-            cards.forEach(c => {
-                const cardCenter = c.offsetLeft + c.offsetWidth / 2;
-                const dist = Math.abs(viewportCenter - cardCenter);
-                if (dist < minDist) {
-                    minDist = dist;
-                    closest = c;
-                }
-            });
-
-            if (closest) scrollToCard(cards.indexOf(closest));
+        if (Math.abs(intent) > 5) {
+            if (intent > 0) return activeIdx + 1;
+            else return activeIdx - 1;
         }
+
+        // fallback to closest
+        let closest = null, min = Infinity;
+        const center = container.scrollLeft + container.clientWidth / 2;
+
+        cards.forEach(c => {
+            const cc = c.offsetLeft + c.offsetWidth / 2;
+            const d = Math.abs(center - cc);
+            if (d < min) {
+                min = d;
+                closest = c;
+            }
+        });
+
+        return cards.indexOf(closest);
     }
 
-    requestAnimationFrame(momentumScroll);
-});
+    // ---- NAV ----
+    document.querySelector('.nav-btn.left').onclick = () => {
+        const i = cards.findIndex(c => c.classList.contains('active'));
+        scrollToCard(i - 1);
+    };
 
-// ---- Initialize first card ----
-if (cards.length > 0) {
-    const firstCard = cards[0];
-    setActiveCard(firstCard);
-    container.scrollLeft = clampScroll(firstCard.offsetLeft - container.offsetWidth / 2 + firstCard.offsetWidth / 2, container);
-}
+    document.querySelector('.nav-btn.right').onclick = () => {
+        const i = cards.findIndex(c => c.classList.contains('active'));
+        scrollToCard(i + 1);
+    };
 
-// ---- Update on resize ----
-window.addEventListener('resize', () => {
-    if (!isScrolling) {
-        const activeCard = cards.find(c => c.classList.contains('active'));
-        setActiveCard(activeCard);
+    // ---- POINTER ----
+    container.addEventListener('pointerdown', e => {
+        if (isScrolling) return;
+
+        isDragging = true;
+        dragStartX = e.clientX;
+        scrollStart = container.scrollLeft;
+        lastX = e.clientX;
+        velocity = 0;
+
+        container.setPointerCapture(e.pointerId);
+    });
+
+    container.addEventListener('pointermove', e => {
+        if (!isDragging) return;
+
+        const dx = dragStartX - e.clientX;
+        container.scrollLeft = scrollStart + dx;
+
+        velocity = lastX - e.clientX;
+        lastX = e.clientX;
+
+        update3D();
+
+        // live active update
+        let closest = null, min = Infinity;
+        const center = container.scrollLeft + container.clientWidth / 2;
+
+        cards.forEach(c => {
+            const cc = c.offsetLeft + c.offsetWidth / 2;
+            const d = Math.abs(center - cc);
+            if (d < min) {
+                min = d;
+                closest = c;
+            }
+        });
+
+        if (closest) setActiveCard(closest);
+    });
+
+    container.addEventListener('pointerup', e => {
+        if (!isDragging) return;
+        isDragging = false;
+
+        container.releasePointerCapture(e.pointerId);
+
+        const predicted = predictIndex();
+        scrollToCard(predicted);
+    });
+
+    // ---- INIT ----
+    if (cards.length) {
+        const first = cards[0];
+        setActiveCard(first);
+
+        container.scrollLeft = clampScroll(
+            first.offsetLeft - container.offsetWidth/2 + first.offsetWidth/2
+        );
+
+        update3D();
     }
-});
+
+    // ---- Resize ----
+    window.addEventListener('resize', () => {
+        if (!isScrolling) {
+            const active = cards.find(c => c.classList.contains('active'));
+            if (active) scrollToCard(cards.indexOf(active), 200);
+        }
+    });
 
     // ---- Video volume ----
     const video = document.getElementById("planVideo");

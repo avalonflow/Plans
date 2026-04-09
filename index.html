@@ -1124,7 +1124,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     setInterval(particle, 800);
 
-    // ---- Notification ----
+    // ---- Notification bar ----
     window.addEventListener("load", () => {
         const notification = document.getElementById("planNotification");
         if(notification){
@@ -1149,41 +1149,31 @@ document.addEventListener('DOMContentLoaded', () => {
     const PAYOUT_MULTIPLIER = 5;
     let errorTimeout;
 
-    // ---- Cards & dots ----
-    const cards = Array.from(document.body.querySelectorAll('.glass-card'));
-    const dotsWrapper = document.querySelector('.dots');
+    input.type = 'number';
+    input.min = MIN_AMOUNT;
+    input.max = MAX_AMOUNT;
+    input.step = 1;
 
-    function generateDots() {
-        dotsWrapper.innerHTML = '';
-        cards.forEach((_, idx) => {
-            const span = document.createElement('span');
-            if(idx === 0) span.classList.add('active');
-            dotsWrapper.appendChild(span);
-        });
-    }
-    generateDots();
-
-    // ---- Animate payout ----
     function animateValue(element, bar, button, start, end, duration, min, max) {
         let startTime = null;
-        function easeInOut(t) { return t < 0.5 ? 2*t*t : 1 - Math.pow(-2*t+2,2)/2; }
-        function animation(currentTime) {
+        function easeInOut(t){ return t<0.5 ? 2*t*t : 1-Math.pow(-2*t+2,2)/2; }
+        function animation(currentTime){
             if(!startTime) startTime = currentTime;
-            const rawProgress = Math.min((currentTime - startTime)/duration,1);
+            const rawProgress = Math.min((currentTime-startTime)/duration,1);
             const progress = easeInOut(rawProgress);
             const value = start + (end-start)*progress;
             element.textContent = `$${value.toFixed(0)}.20`;
 
-            const percentage = ((value - min)/(max - min))*100;
+            const percentage = ((value-min)/(max-min))*100;
             bar.style.width = `${Math.min(Math.max(percentage,0),100)}%`;
 
-            const glowStrength = Math.min((value - min)/(max-min),1);
+            const glowStrength = Math.min((value-min)/(max-min),1);
             button.style.boxShadow = `
-                0 0 ${8 + glowStrength*20}px rgba(241,196,15,0.7),
-                0 0 ${15 + glowStrength*30}px rgba(241,196,15,0.4)
+                0 0 ${8+glowStrength*20}px rgba(241,196,15,0.7),
+                0 0 ${15+glowStrength*30}px rgba(241,196,15,0.4)
             `;
 
-            if(rawProgress < 1) requestAnimationFrame(animation);
+            if(rawProgress<1) requestAnimationFrame(animation);
             else {
                 element.classList.add('pulse');
                 setTimeout(()=>element.classList.remove('pulse'),300);
@@ -1192,26 +1182,33 @@ document.addEventListener('DOMContentLoaded', () => {
         requestAnimationFrame(animation);
     }
 
-    // ---- Input handling ----
-    input.type = 'number';
-    input.min = MIN_AMOUNT;
-    input.max = MAX_AMOUNT;
-    input.step = 1;
+    // ---- Input handler (allows deleting 23) ----
+    input.addEventListener('input', ()=>{
+        const raw = input.value;
 
-    input.addEventListener('input', () => {
-        let value = parseInt(input.value);
-        if(isNaN(value)) value = MIN_AMOUNT;
+        // Allow empty while typing
+        if(raw === ''){
+            payout.textContent = '$0';
+            acuBar.style.width = '0%';
+            activateBtn.textContent = 'Activate Custom Access –on ERC-20';
+            card.classList.remove('inactive');
+            inputContainer.classList.remove('invalid');
+            errorMsg.classList.remove('show');
+            return;
+        }
+
+        let value = parseInt(raw);
+        if(isNaN(value)) return;
 
         if(value > MAX_AMOUNT) value = MAX_AMOUNT;
         input.value = value;
 
-        // Forbidden values only affect custom card
+        // Forbidden amounts
         if(forbiddenAmounts.includes(value)){
             input.value = '';
             payout.textContent = '$0';
             acuBar.style.width = '0%';
             activateBtn.textContent = 'Activate Custom Access –on ERC-20';
-
             inputContainer.classList.add('invalid');
             card.classList.add('inactive');
 
@@ -1236,18 +1233,26 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         activateBtn.textContent = `Activate Custom Access – $${value}.20 on ERC-20`;
-
         const projected = value * PAYOUT_MULTIPLIER;
         const current = parseFloat(payout.textContent.replace('$','')) || 0;
         animateValue(payout, acuBar, activateBtn, current, projected, 500, MIN_AMOUNT, MAX_AMOUNT);
     });
 
+    // ---- Enforce MIN on blur ----
+    input.addEventListener('blur', ()=>{
+        let value = parseInt(input.value);
+        if(isNaN(value) || value < MIN_AMOUNT){
+            input.value = MIN_AMOUNT;
+            activateBtn.textContent = `Activate Custom Access – $${MIN_AMOUNT}.20 on ERC-20`;
+        }
+    });
+
     // ---- Activate button ----
     const activateButton = document.getElementById('customActivate');
-    activateButton.addEventListener('click', e => {
+    activateButton.addEventListener('click', e=>{
         e.preventDefault();
         const value = parseInt(input.value);
-        if(isNaN(value) || value < MIN_AMOUNT || value > MAX_AMOUNT || forbiddenAmounts.includes(value)){
+        if(isNaN(value) || value<MIN_AMOUNT || value>MAX_AMOUNT || forbiddenAmounts.includes(value)){
             input.classList.remove('input-error-pulse');
             void input.offsetWidth;
             input.classList.add('input-error-pulse');
@@ -1258,58 +1263,85 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.setItem("avalonflowCustomAmount", `${value}.20`);
     });
 
-    // ---- Active card detection ----
-    function updateActiveCard() {
-        const viewportCenter = window.innerWidth / 2;
-        let closest = null, minDist = Infinity;
+    // ---- Cards & Dots ----
+    const cards = Array.from(document.body.querySelectorAll('.glass-card'));
+    const dotsWrapper = document.querySelector('.dots');
 
-        cards.forEach(card => {
-            const rect = card.getBoundingClientRect();
-            const cardCenter = rect.left + rect.width / 2;
-            const dist = Math.abs(viewportCenter - cardCenter);
-            if(dist < minDist){ minDist = dist; closest = card; }
+    function generateDots(){
+        dotsWrapper.innerHTML = '';
+        cards.forEach((_, idx)=>{
+            const span = document.createElement('span');
+            if(idx===0) span.classList.add('active');
+            dotsWrapper.appendChild(span);
+        });
+    }
+    generateDots();
+
+    // ---- Active card detection + fade ----
+    function updateActiveCard(){
+        const viewportCenter = window.innerWidth/2;
+        let closest=null, minDist=Infinity;
+
+        cards.forEach(c=>{
+            const rect = c.getBoundingClientRect();
+            const cardCenter = rect.left + rect.width/2;
+            const dist = Math.abs(viewportCenter-cardCenter);
+            if(dist<minDist){ minDist=dist; closest=c; }
         });
 
-        cards.forEach(c => c.classList.remove('active'));
+        cards.forEach(c=>{
+            if(c!==closest) c.style.opacity='0.6';
+            else c.style.opacity='1';
+            c.classList.remove('active');
+        });
+
         if(closest) closest.classList.add('active');
 
         // Update dots
         const allDots = dotsWrapper.querySelectorAll('span');
-        allDots.forEach(d => d.classList.remove('active'));
+        allDots.forEach(d=>d.classList.remove('active'));
         if(closest){
             const idx = cards.indexOf(closest);
             if(allDots[idx]) allDots[idx].classList.add('active');
         }
     }
 
-    // ---- Center initial card ----
-    function centerInitialCard() {
-        if(cards.length) cards[0].scrollIntoView({behavior:'smooth', block:'nearest', inline:'center'});
-        updateActiveCard();
+    // ---- Navigation buttons ----
+    function scrollToCard(index){
+        if(index<0 || index>=cards.length) return;
+        cards[index].scrollIntoView({behavior:'smooth', block:'nearest', inline:'center'});
+        setTimeout(updateActiveCard, 300);
     }
 
-    // Run on scroll + resize + initial
-    window.addEventListener('scroll', ()=>requestAnimationFrame(updateActiveCard));
-    window.addEventListener('resize', ()=>requestAnimationFrame(updateActiveCard));
+    document.querySelector('.nav-btn.left').addEventListener('click', ()=>{
+        const active = cards.find(c=>c.classList.contains('active'));
+        const idx = cards.indexOf(active);
+        scrollToCard(idx-1);
+    });
+    document.querySelector('.nav-btn.right').addEventListener('click', ()=>{
+        const active = cards.find(c=>c.classList.contains('active'));
+        const idx = cards.indexOf(active);
+        scrollToCard(idx+1);
+    });
+
+    // ---- Initial card ----
+    function centerInitialCard(){
+        if(cards.length>0){
+            cards[0].scrollIntoView({behavior:'smooth', block:'nearest', inline:'center'});
+            updateActiveCard();
+        }
+    }
     centerInitialCard();
 
-    // ---- Navigation buttons ----
-    document.querySelector('.nav-btn.left').addEventListener('click', () => {
-        const active = document.querySelector('.glass-card.active');
-        const idx = cards.indexOf(active);
-        if(idx > 0) cards[idx-1].scrollIntoView({ behavior: 'smooth', block: 'nearest', inline:'center' });
-    });
-    document.querySelector('.nav-btn.right').addEventListener('click', () => {
-        const active = document.querySelector('.glass-card.active');
-        const idx = cards.indexOf(active);
-        if(idx < cards.length-1) cards[idx+1].scrollIntoView({ behavior: 'smooth', block: 'nearest', inline:'center' });
-    });
+    // ---- Run on scroll & resize ----
+    window.addEventListener('scroll', ()=>requestAnimationFrame(updateActiveCard));
+    window.addEventListener('resize', ()=>requestAnimationFrame(updateActiveCard));
 
     // ---- Video volume ----
     const video = document.getElementById("planVideo");
     const volumeControl = document.getElementById("volumeControl");
     if(video && volumeControl){
-        volumeControl.addEventListener("input", e => { video.volume = e.target.value; });
+        volumeControl.addEventListener('input', e=>{ video.volume = e.target.value; });
     }
 });
 </script>

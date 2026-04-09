@@ -1269,7 +1269,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // ---- Cards & Dots ----
 const cards = Array.from(document.querySelectorAll('.glass-card'));
 const dotsWrapper = document.querySelector('.dots');
-let isScrolling = false; // lock during smooth scroll
+let isScrolling = false;
 
 // ---- Generate navigation dots ----
 function generateDots() {
@@ -1282,52 +1282,42 @@ function generateDots() {
 }
 generateDots();
 
-// ---- Update active card & dots (only when not scrolling) ----
-function updateActiveCardSmooth() {
-    if (isScrolling) return; // skip mid-scroll
+// ---- Helper: clamp scroll ----
+function clampScroll(left, container) {
+    const maxScroll = container.scrollWidth - container.clientWidth;
+    return Math.max(0, Math.min(left, maxScroll));
+}
 
-    const viewportCenter = window.innerWidth / 2;
-    let closest = null, minDist = Infinity;
-
-    cards.forEach(c => {
-        const rect = c.getBoundingClientRect();
-        const cardCenter = rect.left + rect.width / 2;
-        const dist = Math.abs(viewportCenter - cardCenter);
-        if (dist < minDist) {
-            minDist = dist;
-            closest = c;
-        }
-    });
-
-    if (!closest) return;
+// ---- Set active card ----
+function setActiveCard(targetCard) {
+    if (!targetCard) return;
 
     cards.forEach(c => c.classList.remove('fade-in', 'active'));
-    closest.classList.add('fade-in', 'active');
+    targetCard.classList.add('fade-in', 'active');
 
     cards.forEach(c => {
-        if (c !== closest) c.classList.add('inactive');
+        if (c !== targetCard) c.classList.add('inactive');
     });
 
-    // Update dots
     const allDots = dotsWrapper.querySelectorAll('span');
     allDots.forEach(d => d.classList.remove('active'));
-    const idx = cards.indexOf(closest);
+    const idx = cards.indexOf(targetCard);
     if (allDots[idx]) allDots[idx].classList.add('active');
 }
 
-// ---- Smooth scroll to specific card ----
-function scrollToCard(index) {
+// ---- Smooth scroll to card ----
+function scrollToCard(index, duration = 400) {
     if (index < 0 || index >= cards.length) return;
 
     const targetCard = cards[index];
     const container = targetCard.parentElement;
     const startScroll = container.scrollLeft;
-    const targetScroll = targetCard.offsetLeft - container.offsetWidth / 2 + targetCard.offsetWidth / 2;
-    const distance = targetScroll - startScroll;
-    const duration = 400;
-    let startTime = null;
+    let targetScroll = targetCard.offsetLeft - container.offsetWidth / 2 + targetCard.offsetWidth / 2;
+    targetScroll = clampScroll(targetScroll, container);
 
-    isScrolling = true; // lock during scroll
+    const distance = targetScroll - startScroll;
+    let startTime = null;
+    isScrolling = true;
 
     function smoothScroll(time) {
         if (!startTime) startTime = time;
@@ -1342,22 +1332,8 @@ function scrollToCard(index) {
         if (progress < 1) {
             requestAnimationFrame(smoothScroll);
         } else {
-            // Scroll finished
             isScrolling = false;
-
-            // Apply fade & active classes
-            cards.forEach(c => c.classList.remove('fade-in', 'active'));
-            targetCard.classList.add('fade-in', 'active');
-
-            cards.forEach(c => {
-                if (c !== targetCard) c.classList.add('inactive');
-            });
-
-            // Update dots
-            const allDots = dotsWrapper.querySelectorAll('span');
-            allDots.forEach(d => d.classList.remove('active'));
-            const idx = cards.indexOf(targetCard);
-            if (allDots[idx]) allDots[idx].classList.add('active');
+            setActiveCard(targetCard);
         }
     }
 
@@ -1374,27 +1350,88 @@ document.querySelector('.nav-btn.right').addEventListener('click', () => {
     scrollToCard(activeIdx + 1);
 });
 
+// ---- Touch / drag with momentum ----
+let isDragging = false, dragStartX = 0, scrollStart = 0, lastX = 0, velocity = 0;
+const container = cards[0].parentElement;
+
+container.addEventListener('pointerdown', e => {
+    isDragging = true;
+    dragStartX = e.clientX;
+    lastX = e.clientX;
+    scrollStart = container.scrollLeft;
+    velocity = 0;
+    container.setPointerCapture(e.pointerId);
+});
+
+container.addEventListener('pointermove', e => {
+    if (!isDragging) return;
+    const dx = dragStartX - e.clientX;
+    container.scrollLeft = scrollStart + dx;
+
+    // calculate velocity for momentum
+    velocity = lastX - e.clientX;
+    lastX = e.clientX;
+});
+
+container.addEventListener('pointerup', e => {
+    if (!isDragging) return;
+    isDragging = false;
+
+    // momentum scroll
+    let momentum = velocity * 10; // adjust multiplier for sensitivity
+    let target = clampScroll(container.scrollLeft + momentum, container);
+    let duration = Math.min(Math.abs(momentum), 600); // cap duration
+
+    // Animate momentum
+    const start = container.scrollLeft;
+    const distance = target - start;
+    let startTime = null;
+
+    function momentumScroll(time) {
+        if (!startTime) startTime = time;
+        const elapsed = time - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        const eased = 1 - Math.pow(1 - progress, 3); // ease out cubic
+
+        container.scrollLeft = start + distance * eased;
+
+        if (progress < 1) {
+            requestAnimationFrame(momentumScroll);
+        } else {
+            // Snap to closest card after momentum
+            let closest = null, minDist = Infinity;
+            const viewportCenter = container.scrollLeft + container.clientWidth / 2;
+
+            cards.forEach(c => {
+                const cardCenter = c.offsetLeft + c.offsetWidth / 2;
+                const dist = Math.abs(viewportCenter - cardCenter);
+                if (dist < minDist) {
+                    minDist = dist;
+                    closest = c;
+                }
+            });
+
+            if (closest) scrollToCard(cards.indexOf(closest));
+        }
+    }
+
+    requestAnimationFrame(momentumScroll);
+});
+
 // ---- Initialize first card ----
 if (cards.length > 0) {
     const firstCard = cards[0];
-    firstCard.classList.add('active', 'fade-in');
-    cards.forEach(c => {
-        if (c !== firstCard) c.classList.add('inactive');
-    });
-
-    // Center the first card without animation
-    const container = firstCard.parentElement;
-    container.scrollLeft = firstCard.offsetLeft - container.offsetWidth / 2 + firstCard.offsetWidth / 2;
-
-    // Update dots
-    const allDots = dotsWrapper.querySelectorAll('span');
-    allDots.forEach(d => d.classList.remove('active'));
-    if (allDots[0]) allDots[0].classList.add('active');
+    setActiveCard(firstCard);
+    container.scrollLeft = clampScroll(firstCard.offsetLeft - container.offsetWidth / 2 + firstCard.offsetWidth / 2, container);
 }
 
-// ---- Update on scroll & resize ----
-window.addEventListener('scroll', () => requestAnimationFrame(updateActiveCardSmooth));
-window.addEventListener('resize', () => requestAnimationFrame(updateActiveCardSmooth));
+// ---- Update on resize ----
+window.addEventListener('resize', () => {
+    if (!isScrolling) {
+        const activeCard = cards.find(c => c.classList.contains('active'));
+        setActiveCard(activeCard);
+    }
+});
 
     // ---- Video volume ----
     const video = document.getElementById("planVideo");

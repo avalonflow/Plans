@@ -1107,33 +1107,34 @@ max-height: 600px; /* optional: prevents huge cards */
 
     <script>
 document.addEventListener('DOMContentLoaded', () => {
-        // Floating particles
-        const bg = document.getElementById('floating-bg');
-        const colors = ['#6b2cd8', '#9b59b6', '#8e44ad'];
+    // ---- Floating particles ----
+    const bg = document.getElementById('floating-bg');
+    const colors = ['#6b2cd8', '#9b59b6', '#8e44ad'];
+    function particle() {
+        const p = document.createElement('div');
+        p.className = 'particle';
+        const s = Math.random() * 20 + 10;
+        p.style.width = s + 'px';
+        p.style.height = s + 'px';
+        p.style.left = Math.random() * 100 + 'vw';
+        p.style.background = `radial-gradient(circle, ${colors[Math.floor(Math.random() * 3)]}, transparent)`;
+        p.style.animationDuration = (Math.random() * 20 + 10) + 's';
+        bg.appendChild(p);
+        setTimeout(() => p.remove(), 30000);
+    }
+    setInterval(particle, 800);
 
-        function particle() {
-            const p = document.createElement('div');
-            p.className = 'particle';
-            const s = Math.random() * 20 + 10;
-            p.style.width = s + 'px';
-            p.style.height = s + 'px';
-            p.style.left = Math.random() * 100 + 'vw';
-            p.style.background = `radial-gradient(circle, ${colors[Math.floor(Math.random() * 3)]}, transparent)`;
-            p.style.animationDuration = (Math.random() * 20 + 10) + 's';
-            bg.appendChild(p);
-            setTimeout(() => p.remove(), 30000);
-        }
-        setInterval(particle, 800);
-
-        // Notification bar
-        window.addEventListener("load", () => {
-            const notification = document.getElementById("planNotification");
+    // ---- Notification ----
+    window.addEventListener("load", () => {
+        const notification = document.getElementById("planNotification");
+        if(notification){
             notification.textContent = "Select a membership access plan.";
             setTimeout(()=>notification.classList.add("show"),300);
             setTimeout(()=>notification.classList.remove("show"),3300);
-        });
+        }
+    });
 
-
+    // ---- Input & payout ----
     const input = document.getElementById('customAmount');
     const payout = document.getElementById('customPayout');
     const acuBar = document.querySelector('.acu-bar');
@@ -1148,9 +1149,21 @@ document.addEventListener('DOMContentLoaded', () => {
     const PAYOUT_MULTIPLIER = 5;
     let errorTimeout;
 
-    const wrapper = document.querySelector('.plans-wrapper');
+    // ---- Cards & dots ----
+    const cards = Array.from(document.body.querySelectorAll('.glass-card'));
+    const dotsWrapper = document.querySelector('.dots');
 
-    // Smooth payout animation
+    function generateDots() {
+        dotsWrapper.innerHTML = '';
+        cards.forEach((_, idx) => {
+            const span = document.createElement('span');
+            if(idx === 0) span.classList.add('active');
+            dotsWrapper.appendChild(span);
+        });
+    }
+    generateDots();
+
+    // ---- Animate payout ----
     function animateValue(element, bar, button, start, end, duration, min, max) {
         let startTime = null;
         function easeInOut(t) { return t < 0.5 ? 2*t*t : 1 - Math.pow(-2*t+2,2)/2; }
@@ -1179,28 +1192,20 @@ document.addEventListener('DOMContentLoaded', () => {
         requestAnimationFrame(animation);
     }
 
-    // Input handling
+    // ---- Input handling ----
+    input.type = 'number';
+    input.min = MIN_AMOUNT;
+    input.max = MAX_AMOUNT;
+    input.step = 1;
+
     input.addEventListener('input', () => {
         let value = parseInt(input.value);
         if(isNaN(value)) value = MIN_AMOUNT;
 
-        // Clamp value
         if(value > MAX_AMOUNT) value = MAX_AMOUNT;
         input.value = value;
 
-        if(value < MIN_AMOUNT){
-            card.classList.add('inactive');
-            inputContainer.classList.add('invalid');
-            payout.textContent = '$0';
-            acuBar.style.width = '0%';
-            activateBtn.textContent = 'Activate Custom Access –on ERC-20';
-            return;
-        } else {
-            card.classList.remove('inactive');
-            inputContainer.classList.remove('invalid');
-        }
-
-        // Forbidden amounts
+        // Forbidden values only affect custom card
         if(forbiddenAmounts.includes(value)){
             input.value = '';
             payout.textContent = '$0';
@@ -1221,11 +1226,13 @@ document.addEventListener('DOMContentLoaded', () => {
             errorTimeout = setTimeout(()=>{
                 errorMsg.classList.remove('show');
                 inputContainer.classList.remove('invalid');
+                card.classList.remove('inactive');
             },2500);
             return;
         } else {
             errorMsg.classList.remove('show');
             inputContainer.classList.remove('invalid');
+            card.classList.remove('inactive');
         }
 
         activateBtn.textContent = `Activate Custom Access – $${value}.20 on ERC-20`;
@@ -1235,7 +1242,7 @@ document.addEventListener('DOMContentLoaded', () => {
         animateValue(payout, acuBar, activateBtn, current, projected, 500, MIN_AMOUNT, MAX_AMOUNT);
     });
 
-    // Activate button
+    // ---- Activate button ----
     const activateButton = document.getElementById('customActivate');
     activateButton.addEventListener('click', e => {
         e.preventDefault();
@@ -1249,75 +1256,62 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         if(navigator.vibrate) navigator.vibrate([100,50,100]);
         localStorage.setItem("avalonflowCustomAmount", `${value}.20`);
-        // stop here, no redirect
     });
 
-    // Carousel logic
-    const cards = Array.from(document.querySelectorAll('.glass-card'));
-    const dotsWrapper = document.querySelector('.dots');
-
-function generateDots() {
-    dotsWrapper.innerHTML = '';
-    cards.forEach((_, idx) => {
-        const span = document.createElement('span');
-        if(idx === 0) span.classList.add('active');
-        dotsWrapper.appendChild(span);
-    });
-}
-generateDots();
-
+    // ---- Active card detection ----
     function updateActiveCard() {
-    const viewportCenter = window.innerWidth / 2;
-    let closest = null, minDist = Infinity;
+        const viewportCenter = window.innerWidth / 2;
+        let closest = null, minDist = Infinity;
 
-    cards.forEach(card => {
-        const rect = card.getBoundingClientRect();
-        const cardCenter = rect.left + rect.width / 2;
-        const dist = Math.abs(viewportCenter - cardCenter);
-        if(dist < minDist){ minDist = dist; closest = card; }
+        cards.forEach(card => {
+            const rect = card.getBoundingClientRect();
+            const cardCenter = rect.left + rect.width / 2;
+            const dist = Math.abs(viewportCenter - cardCenter);
+            if(dist < minDist){ minDist = dist; closest = card; }
+        });
+
+        cards.forEach(c => c.classList.remove('active'));
+        if(closest) closest.classList.add('active');
+
+        // Update dots
+        const allDots = dotsWrapper.querySelectorAll('span');
+        allDots.forEach(d => d.classList.remove('active'));
+        if(closest){
+            const idx = cards.indexOf(closest);
+            if(allDots[idx]) allDots[idx].classList.add('active');
+        }
+    }
+
+    // ---- Center initial card ----
+    function centerInitialCard() {
+        if(cards.length) cards[0].scrollIntoView({behavior:'smooth', block:'nearest', inline:'center'});
+        updateActiveCard();
+    }
+
+    // Run on scroll + resize + initial
+    window.addEventListener('scroll', ()=>requestAnimationFrame(updateActiveCard));
+    window.addEventListener('resize', ()=>requestAnimationFrame(updateActiveCard));
+    centerInitialCard();
+
+    // ---- Navigation buttons ----
+    document.querySelector('.nav-btn.left').addEventListener('click', () => {
+        const active = document.querySelector('.glass-card.active');
+        const idx = cards.indexOf(active);
+        if(idx > 0) cards[idx-1].scrollIntoView({ behavior: 'smooth', block: 'nearest', inline:'center' });
+    });
+    document.querySelector('.nav-btn.right').addEventListener('click', () => {
+        const active = document.querySelector('.glass-card.active');
+        const idx = cards.indexOf(active);
+        if(idx < cards.length-1) cards[idx+1].scrollIntoView({ behavior: 'smooth', block: 'nearest', inline:'center' });
     });
 
-    cards.forEach(c => c.classList.remove('active'));
-    if(closest) closest.classList.add('active');
-
-    // Update dots
-    const allDots = dotsWrapper.querySelectorAll('span');
-    allDots.forEach(d => d.classList.remove('active'));
-    if(closest){
-        const idx = cards.indexOf(closest);
-        if(allDots[idx]) allDots[idx].classList.add('active');
-    }
-}
-
-// Run on scroll and initially
-window.addEventListener('scroll', () => requestAnimationFrame(updateActiveCard));
-updateActiveCard();
-
-    // Navigation buttons
-    document.querySelector('.nav-btn.left').addEventListener('click', () => {
-    const active = document.querySelector('.glass-card.active');
-    const idx = cards.indexOf(active);
-    if(idx > 0) cards[idx - 1].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-});
-
-document.querySelector('.nav-btn.right').addEventListener('click', () => {
-    const active = document.querySelector('.glass-card.active');
-    const idx = cards.indexOf(active);
-    if(idx < cards.length - 1) cards[idx + 1].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-});
-
-// Initial active card
-updateActiveCard();
-
-// Run on scroll
-wrapper.addEventListener('scroll', () => {
-    window.requestAnimationFrame(updateActiveCard);
-});
-
-        // Video volume
-        const video = document.getElementById("planVideo");
-        const volumeControl = document.getElementById("volumeControl");
+    // ---- Video volume ----
+    const video = document.getElementById("planVideo");
+    const volumeControl = document.getElementById("volumeControl");
+    if(video && volumeControl){
         volumeControl.addEventListener("input", e => { video.volume = e.target.value; });
-    </script>
+    }
+});
+</script>
 </body>
 </html>

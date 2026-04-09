@@ -1267,101 +1267,109 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // ---- Cards & Dots ----
-    const cards = Array.from(document.body.querySelectorAll('.glass-card'));
-    const dotsWrapper = document.querySelector('.dots');
+const cards = Array.from(document.querySelectorAll('.glass-card'));
+const dotsWrapper = document.querySelector('.dots');
+let isScrolling = false; // lock while smooth scrolling
 
-    function generateDots(){
-        dotsWrapper.innerHTML = '';
-        cards.forEach((_, idx)=>{
-            const span = document.createElement('span');
-            if(idx===0) span.classList.add('active');
-            dotsWrapper.appendChild(span);
-        });
-    }
-    generateDots();
-
-    // ---- Smooth active card + fade ----
-    function updateActiveCardSmooth(){
-        const viewportCenter = window.innerWidth / 2;
-        let closest = null, minDist = Infinity;
-
-        cards.forEach(c => {
-            const rect = c.getBoundingClientRect();
-            const cardCenter = rect.left + rect.width / 2;
-            const dist = Math.abs(viewportCenter - cardCenter);
-            if(dist < minDist){ minDist = dist; closest = c; }
-        });
-
-        cards.forEach(c => {
-            c.classList.remove('fade-in'); // reset fade
-            if(c === closest){
-                void c.offsetWidth; // force reflow
-                c.classList.add('fade-in');
-                c.classList.add('active');
-                c.classList.remove('inactive');
-            } else {
-                c.classList.remove('active');
-                c.classList.add('inactive');
-            }
-        });
-
-        // Update dots
-        const allDots = dotsWrapper.querySelectorAll('span');
-        allDots.forEach(d => d.classList.remove('active'));
-        if(closest){
-            const idx = cards.indexOf(closest);
-            if(allDots[idx]) allDots[idx].classList.add('active');
-        }
-    }
-
-    // ---- Smooth scroll helper ----
-    function scrollToCard(index){
-        if(index<0 || index>=cards.length) return;
-        const targetCard = cards[index];
-        const container = targetCard.parentElement;
-
-        const cardRect = targetCard.getBoundingClientRect();
-        const containerRect = container.getBoundingClientRect();
-        const containerScrollLeft = container.scrollLeft;
-        const targetScroll = containerScrollLeft + (cardRect.left + cardRect.width/2) - (containerRect.left + containerRect.width/2);
-
-        const startScroll = container.scrollLeft;
-        const distance = targetScroll - startScroll;
-        const duration = 400;
-        let startTime = null;
-
-        function smoothScroll(time){
-            if(!startTime) startTime = time;
-            const elapsed = time - startTime;
-            const progress = Math.min(elapsed/duration, 1);
-            const eased = progress < 0.5 ? 2*progress*progress : 1-Math.pow(-2*progress+2,2)/2;
-            container.scrollLeft = startScroll + distance * eased;
-
-            updateActiveCardSmooth();
-
-            if(progress<1) requestAnimationFrame(smoothScroll);
-        }
-        requestAnimationFrame(smoothScroll);
-    }
-
-    // ---- Navigation buttons ----
-    document.querySelector('.nav-btn.left').addEventListener('click', ()=>{
-        const active = cards.find(c=>c.classList.contains('active'));
-        const idx = cards.indexOf(active);
-        scrollToCard(idx-1);
+function generateDots() {
+    dotsWrapper.innerHTML = '';
+    cards.forEach((_, idx) => {
+        const span = document.createElement('span');
+        if (idx === 0) span.classList.add('active');
+        dotsWrapper.appendChild(span);
     });
-    document.querySelector('.nav-btn.right').addEventListener('click', ()=>{
-        const active = cards.find(c=>c.classList.contains('active'));
-        const idx = cards.indexOf(active);
-        scrollToCard(idx+1);
+}
+generateDots();
+
+// ---- Update active card & dots ----
+function updateActiveCardSmooth() {
+    if (isScrolling) return; // skip mid-scroll
+
+    const viewportCenter = window.innerWidth / 2;
+    let closest = null, minDist = Infinity;
+
+    cards.forEach(c => {
+        const rect = c.getBoundingClientRect();
+        const cardCenter = rect.left + rect.width / 2;
+        const dist = Math.abs(viewportCenter - cardCenter);
+        if (dist < minDist) {
+            minDist = dist;
+            closest = c;
+        }
     });
 
-    // ---- Initial card ----
-    if(cards.length>0) scrollToCard(0);
+    cards.forEach(c => {
+        c.classList.remove('fade-in');
+        if (c === closest) {
+            void c.offsetWidth; // force reflow
+            c.classList.add('fade-in', 'active');
+            c.classList.remove('inactive');
+        } else {
+            c.classList.remove('active');
+            c.classList.add('inactive');
+        }
+    });
 
-    // ---- Scroll & resize ----
-    window.addEventListener('scroll', ()=>requestAnimationFrame(updateActiveCardSmooth));
-    window.addEventListener('resize', ()=>requestAnimationFrame(updateActiveCardSmooth));
+    // Update dots
+    const allDots = dotsWrapper.querySelectorAll('span');
+    allDots.forEach(d => d.classList.remove('active'));
+    if (closest) {
+        const idx = cards.indexOf(closest);
+        if (allDots[idx]) allDots[idx].classList.add('active');
+    }
+}
+
+// ---- Smooth scroll to specific card ----
+function scrollToCard(index) {
+    if (index < 0 || index >= cards.length) return;
+
+    const targetCard = cards[index];
+    const container = targetCard.parentElement;
+    const cardRect = targetCard.getBoundingClientRect();
+    const containerRect = container.getBoundingClientRect();
+    const containerScrollLeft = container.scrollLeft;
+
+    const targetScroll = containerScrollLeft + (cardRect.left + cardRect.width / 2) - (containerRect.left + containerRect.width / 2);
+
+    const startScroll = container.scrollLeft;
+    const distance = targetScroll - startScroll;
+    const duration = 400;
+    let startTime = null;
+    isScrolling = true; // lock
+
+    function smoothScroll(time) {
+        if (!startTime) startTime = time;
+        const elapsed = time - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        const eased = progress < 0.5 ? 2 * progress * progress : 1 - Math.pow(-2 * progress + 2, 2) / 2;
+        container.scrollLeft = startScroll + distance * eased;
+
+        if (progress < 1) {
+            requestAnimationFrame(smoothScroll);
+        } else {
+            isScrolling = false; // unlock
+            updateActiveCardSmooth(); // final update
+        }
+    }
+    requestAnimationFrame(smoothScroll);
+}
+
+// ---- Navigation buttons ----
+document.querySelector('.nav-btn.left').addEventListener('click', () => {
+    const activeIdx = cards.findIndex(c => c.classList.contains('active'));
+    scrollToCard(activeIdx - 1);
+});
+document.querySelector('.nav-btn.right').addEventListener('click', () => {
+    const activeIdx = cards.findIndex(c => c.classList.contains('active'));
+    scrollToCard(activeIdx + 1);
+});
+
+// ---- Initial card ----
+if (cards.length > 0) scrollToCard(0);
+
+// ---- Scroll & resize ----
+window.addEventListener('scroll', () => requestAnimationFrame(updateActiveCardSmooth));
+window.addEventListener('resize', () => requestAnimationFrame(updateActiveCardSmooth));
 
     // ---- Video volume ----
     const video = document.getElementById("planVideo");

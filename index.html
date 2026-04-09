@@ -1110,6 +1110,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // ---- Floating particles ----
     const bg = document.getElementById('floating-bg');
     const colors = ['#6b2cd8', '#9b59b6', '#8e44ad'];
+
     function particle() {
         const p = document.createElement('div');
         p.className = 'particle';
@@ -1243,27 +1244,23 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // ---- Activate button ----
+    // ---- Activate button & redirection ----
     const activateButton = document.getElementById('customActivate');
     activateButton.addEventListener('click', e=>{
-        e.preventDefault();
         const value = parseInt(input.value);
-        if(isNaN(value) || value<MIN_AMOUNT || value>MAX_AMOUNT || forbiddenAmounts.includes(value)){
+        if(isNaN(value) || value < MIN_AMOUNT || value > MAX_AMOUNT || forbiddenAmounts.includes(value)){
+            e.preventDefault(); // stop redirect
             input.classList.remove('input-error-pulse');
             void input.offsetWidth;
             input.classList.add('input-error-pulse');
             inputContainer.classList.add('invalid');
+            if(navigator.vibrate) navigator.vibrate([100,50,100]);
             return;
         }
 
-        if(navigator.vibrate) navigator.vibrate([100,50,100]);
+        // Save exact amount
         localStorage.setItem("avalonflowCustomAmount", `${value}.20`);
-
-        // --- Redirect automatically ---
-        const redirectLink = document.querySelector('body a.custom-redirect');
-        if(redirectLink){
-            window.location.href = redirectLink.href;
-        }
+        // Valid input → allow <a> href to handle redirect
     });
 
     // ---- Cards & Dots ----
@@ -1296,12 +1293,11 @@ document.addEventListener('DOMContentLoaded', () => {
             if(c === closest){
                 c.classList.add('active');
                 c.style.opacity = '1';
-                c.style.transition = 'opacity 0.4s ease-in-out';
             } else {
                 c.classList.remove('active');
                 c.style.opacity = '0.6';
-                c.style.transition = 'opacity 0.4s ease-in-out';
             }
+            c.style.transition = 'opacity 0.4s ease-in-out';
         });
 
         // Update dots
@@ -1318,14 +1314,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if(index<0 || index>=cards.length) return;
         const targetCard = cards[index];
         targetCard.scrollIntoView({behavior:'smooth', block:'nearest', inline:'center'});
-
-        // Immediate fade on scroll
-        cards.forEach(c=>{
-            c.style.opacity = (c === targetCard) ? '1' : '0.6';
-            c.style.transition = 'opacity 0.4s ease-in-out';
-        });
-
-        setTimeout(updateActiveCard, 350);
+        updateActiveCard(); // immediately fade in
     }
 
     document.querySelector('.nav-btn.left').addEventListener('click', ()=>{

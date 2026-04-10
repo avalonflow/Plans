@@ -151,6 +151,37 @@ opacity:0.35;
     0 0 40px rgba(241,196,15,0.6);
 }
 
+                    /* ---------- Sidebar ---------- */
+        #sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 280px;
+            height: 100%;
+            background: rgba(15, 15, 25, 0.95);
+            backdrop-filter: blur(14px);
+            z-index: 5;
+            padding: 25px;
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+        }
+        #sidebar.open { transform: translateX(0); }
+        #sidebar h2{
+font-size:22px;
+margin-bottom:20px;
+color:#a78bfa;
+}
+        #sidebar button {
+            width: 100%;
+            margin: 12px 0;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+            font-size: 16px;
+        }
+
 /* ---------- Plans Wrapper ---------- */
 .plans-wrapper {
   display: flex;
@@ -913,6 +944,16 @@ max-height: 600px; /* optional: prevents huge cards */
   </div>
 </header>
 
+    <div id="sidebar">
+        <h2>AvalonFlow</h2>
+    <button onclick="window.location.href='/dashboard'">Dashboard</button>
+    <button onclick="window.location.href='/ecosystem'">Ecosystem</button>
+    <button onclick="window.location.href='https://link.avalonflow.site/access-plans'">Plans</button>
+    <button onclick="window.location.href='/returns'">Returns</button>
+    <button onclick="window.location.href='/support'">Support</button>
+    <button onclick="logout()">Logout</button>
+</div>
+
     <!-- Notification Bar -->
     <div id="planNotification" class="notification-bar"></div>
 
@@ -1139,6 +1180,24 @@ document.addEventListener('DOMContentLoaded', () => {
         setTimeout(() => p.remove(), 30000);
     }
     setInterval(particle, 800);
+
+                    /* Sidebar toggle */
+        const sidebar = document.getElementById('sidebar');
+const content = document.getElementById('content');
+
+const menuBtn = document.getElementById('menuBtn');
+
+function toggleSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const menuBtn = document.getElementById('menuBtn');
+
+    sidebar.classList.toggle('open');
+    menuBtn.classList.toggle('shift');
+}
+
+function navigateTo(page){
+    window.location.href = page;
+}
 
     // ---- Notification bar ----
     window.addEventListener("load", () => {

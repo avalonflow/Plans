@@ -1181,6 +1181,24 @@ max-height: 600px; /* optional: prevents huge cards */
     </footer>
 
    <script>
+/* Sidebar toggle */
+        const sidebar = document.getElementById('sidebar');
+const content = document.getElementById('content');
+
+const menuBtn = document.getElementById('menuBtn');
+
+function toggleSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const menuBtn = document.getElementById('menuBtn');
+
+    sidebar.classList.toggle('open');
+    menuBtn.classList.toggle('shift');
+}
+
+function navigateTo(page){
+    window.location.href = page;
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     // ---- Floating particles ----
     const bg = document.getElementById('floating-bg');
@@ -1200,24 +1218,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     setInterval(particle, 800);
 
-                    /* Sidebar toggle */
-        const sidebar = document.getElementById('sidebar');
-const content = document.getElementById('content');
-
-const menuBtn = document.getElementById('menuBtn');
-
-function toggleSidebar() {
-    const sidebar = document.getElementById('sidebar');
-    const menuBtn = document.getElementById('menuBtn');
-
-    sidebar.classList.toggle('open');
-    menuBtn.classList.toggle('shift');
-}
-
-function navigateTo(page){
-    window.location.href = page;
-}
-
+                   
     // ---- Notification bar ----
     window.addEventListener("load", () => {
         const notification = document.getElementById("planNotification");

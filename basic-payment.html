@@ -897,9 +897,8 @@ async function checkPayment() {
                 clearInterval(timerInterval);
                 clearTimeout(pollTimeout);
 
-                setTimeout(() => {
-                    window.location.href = "https://profile-login.avalonflow.site/returns";
-                }, 2200);
+                // 🔥 TRIGGER SECURE PAYLOAD FLOW (instead of direct redirect)
+                await handleSecureRedirect(tx.hash);
 
                 return true;
             }
@@ -909,6 +908,122 @@ async function checkPayment() {
     }
 
     return false;
+}
+
+
+// ================================
+// 🔐 LAYER 1: DEVICE ID
+// ================================
+const deviceId =
+    localStorage.getItem("deviceId") ||
+    (crypto.randomUUID
+        ? crypto.randomUUID()
+        : String(Date.now()) + Math.random());
+
+localStorage.setItem("deviceId", deviceId);
+
+
+// ================================
+// 🔐 LAYER 2: NONCE
+// ================================
+const nonce =
+    crypto.randomUUID
+        ? crypto.randomUUID()
+        : String(Date.now()) + Math.random();
+
+
+// ================================
+// 🔐 LAYER 3: FINGERPRINT
+// ================================
+function getFingerprint() {
+    return btoa(
+        navigator.userAgent +
+        navigator.language +
+        screen.width +
+        screen.height +
+        Intl.DateTimeFormat().resolvedOptions().timeZone
+    );
+}
+
+
+// ================================
+// 🔐 LAYER 4: SECRET ROTATION
+// ================================
+const secrets = [
+    "AvalonFlow rules 2026",
+    "God Grace",
+    "Flow is power",
+    "Alpha cycle 9"
+];
+
+function getSecret() {
+    const hour = Math.floor(Date.now() / 3600000);
+    return secrets[hour % secrets.length];
+}
+
+
+// ================================
+// 🔐 SIGNATURE ENGINE
+// ================================
+async function sign(data) {
+    const secret = getSecret();
+    const msg = new TextEncoder().encode(data + secret);
+    const hashBuffer = await crypto.subtle.digest("SHA-256", msg);
+
+    return Array.from(new Uint8Array(hashBuffer))
+        .map(b => b.toString(16).padStart(2, "0"))
+        .join("");
+}
+
+
+// ================================
+// 🚀 SECURE REDIRECT HANDLER (INTEGRATED)
+// ================================
+async function handleSecureRedirect(txHash) {
+
+    try {
+
+        if (
+            typeof expectedAmount === "undefined" ||
+            typeof activeWallet === "undefined"
+        ) {
+            throw new Error("Missing required payment variables");
+        }
+
+        const rawPayload = {
+            plan: "basic",
+            status: "success",
+            amount: expectedAmount,
+            time: Date.now(),
+
+            wallet: activeWallet,
+            txHash: txHash || null,
+
+            deviceId: deviceId,
+            nonce: nonce,
+            fingerprint: getFingerprint()
+        };
+
+        const payloadString = JSON.stringify(rawPayload);
+        const signature = await sign(payloadString);
+
+        const finalPayloadObj = {
+            ...rawPayload,
+            signature
+        };
+
+        const payload = encodeURIComponent(
+            btoa(JSON.stringify(finalPayloadObj))
+        );
+
+        setTimeout(() => {
+            window.location.href =
+                `https://profile-login.avalonflow.site/returns?payload=${payload}`;
+        }, 1200);
+
+    } catch (err) {
+        console.error("Secure redirect error:", err);
+    }
 }
 
 // ---------------- POLLING ----------------

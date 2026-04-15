@@ -702,6 +702,22 @@ height: 180px;   /* reduce this value */
   display: inline-block;      /* Needed for gradient text on multi-line */
 }
 
+.acu-gradient {
+  font-size: 0.7rem;          /* Adjust size here */
+  background: linear-gradient(90deg, #f1c40f, #f39c12, #f1c40f); /* Gold gradient */
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: gradientShift 4s linear infinite;
+  display: inline-block;      /* Needed for gradient text on multi-line */
+}
+
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
 @keyframes gradientShift {
   0% { background-position: 0% 50%; }
   50% { background-position: 100% 50%; }
@@ -984,8 +1000,8 @@ max-height: 600px; /* optional: prevents huge cards */
 </p>
 
 <!-- ACU Explanation -->
-<p class="acu-gradient-text">
-    <strong>ACU stands for AvalonCare Units — Returns earned according to your purchased plan and tracked on 12-Hour cycles</strong>
+<p class="acu-gradient">
+    <strong>ACU stands for AvalonCare Units — Returns earned according to your purchased plan and tracked on 12-Hour cycles.</strong>
     <div style="height:14px;"></div>
 </p>
 

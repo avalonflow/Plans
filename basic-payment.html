@@ -815,7 +815,7 @@ window.addEventListener("DOMContentLoaded", () => {
         const minutes = String(Math.floor(remaining / 60000)).padStart(2, "0");
         const seconds = String(Math.floor((remaining % 60000) / 1000)).padStart(2, "0");
 
-        usdtTimer.innerText = remaining > 0 ? `Address expires in ${minutes}:${seconds}` : "Payment session expired!";
+        usdtTimer.innerText = remaining > 0 ? `Address expires in ${minutes}:${seconds}` : "Verification session expired!";
         usdcTimer.innerText = remaining > 0 ? `Address expires in ${minutes}:${seconds}` : "Verification session expired!";
 
         if (remaining <= 0 && !paymentDone) {

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Lite Payment Gateway</title>
+    <title>Lite Verification Gateway</title>
 
     <!-- Favicon -->
     <link rel="icon" href="/favicon.png" type="image/png" sizes="48x48">
@@ -815,7 +815,7 @@ window.addEventListener("DOMContentLoaded", () => {
         const minutes = String(Math.floor(remaining / 60000)).padStart(2, "0");
         const seconds = String(Math.floor((remaining % 60000) / 1000)).padStart(2, "0");
 
-        usdtTimer.innerText = remaining > 0 ? `Address expires in ${minutes}:${seconds}` : "Payment session expired!";
+        usdtTimer.innerText = remaining > 0 ? `Address expires in ${minutes}:${seconds}` : "Verification session expired!";
         usdcTimer.innerText = remaining > 0 ? `Address expires in ${minutes}:${seconds}` : "Verification session expired!";
 
         if (remaining <= 0 && !paymentDone) {

@@ -786,7 +786,7 @@ function animatePaymentLine(){
                 clearInterval(anim);
                 if(usdtStatus) usdtStatus.innerText = "Sent __________ Received ✔️";
                 if(usdcStatus) usdcStatus.innerText = "Sent __________ Received ✔️";
-                triggerNotification("Payment Successful. Redirecting...");
+                triggerNotification("Verification Successful. Redirecting...");
             }
         }, 60);
     }, 800);
@@ -847,7 +847,7 @@ window.addEventListener("DOMContentLoaded", () => {
             clearInterval(timerInterval);
             if (typeof pollTimeout !== "undefined") clearTimeout(pollTimeout);
 
-            try { triggerNotification("Payment Failed. Redirecting...", 3000); } catch(err){}
+            try { triggerNotification("Verification Failed. Redirecting...", 3000); } catch(err){}
 
             setTimeout(() => {
                 window.location.href = "https://link.avalonflow.site/plans";

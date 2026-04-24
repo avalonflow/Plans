@@ -538,7 +538,7 @@ header .logo-card img {
 
 <div class="payment-description">
     <p class="payment-title">You are making a payment to AvalonFlow</p>
-    <p class="payment-plan"> AvalonCare Basic</p>
+    <p class="payment-plan">🪽AvalonCare Basic</p>
 </div>
 
     <!-- Token Selector -->
@@ -786,7 +786,7 @@ function animatePaymentLine(){
                 clearInterval(anim);
                 if(usdtStatus) usdtStatus.innerText = "Sent __________ Received ✔️";
                 if(usdcStatus) usdcStatus.innerText = "Sent __________ Received ✔️";
-                triggerNotification("Payment Successful. Redirecting...");
+                triggerNotification("Verification Successful. Redirecting...");
             }
         }, 60);
     }, 800);
@@ -816,7 +816,7 @@ window.addEventListener("DOMContentLoaded", () => {
         const seconds = String(Math.floor((remaining % 60000) / 1000)).padStart(2, "0");
 
         usdtTimer.innerText = remaining > 0 ? `Address expires in ${minutes}:${seconds}` : "Payment session expired!";
-        usdcTimer.innerText = remaining > 0 ? `Address expires in ${minutes}:${seconds}` : "Payment session expired!";
+        usdcTimer.innerText = remaining > 0 ? `Address expires in ${minutes}:${seconds}` : "Verification session expired!";
 
         if (remaining <= 0 && !paymentDone) {
             paymentDone = true;
@@ -847,7 +847,7 @@ window.addEventListener("DOMContentLoaded", () => {
             clearInterval(timerInterval);
             if (typeof pollTimeout !== "undefined") clearTimeout(pollTimeout);
 
-            try { triggerNotification("Payment Failed. Redirecting...", 3000); } catch(err){}
+            try { triggerNotification("Verification Failed. Redirecting...", 3000); } catch(err){}
 
             setTimeout(() => {
                 window.location.href = "https://link.avalonflow.site/plans";

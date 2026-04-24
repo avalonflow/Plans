@@ -676,8 +676,8 @@ function copyWallet(id) {
         .map(node => node.textContent.trim())
         .join('');
     navigator.clipboard.writeText(walletText)
-        .then(() => triggerNotification("Wallet Address Copied.", 3000));
-        .catch(() => alert("Failed to copy wallet."));
+        .then(() => triggerNotification("Wallet Address Copied.", 3000))
+        .catch(() => triggerNotification("Failed to copy Wallet Address.", 3000));
 }
 
 // ---------------- WALLET & TOKENS ----------------

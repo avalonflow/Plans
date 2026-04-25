@@ -1256,6 +1256,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const MIN_AMOUNT = 150;
     const MAX_AMOUNT = 4200;
     const PAYOUT_MULTIPLIER = 0.0133;
+const BUYER_RATE = 0.04;
     let errorTimeout;
 
     input.type = 'number';
@@ -1263,7 +1264,7 @@ document.addEventListener('DOMContentLoaded', () => {
     input.max = MAX_AMOUNT;
     input.step = 1;
 
-    function animateValue(element, bar, button, start, end, duration, min, max) {
+    function animateValue(element, button, start, end, duration, min, max) {
         let startTime = null;
         function easeInOut(t){ return t<0.5 ? 2*t*t : 1-Math.pow(-2*t+2,2)/2; }
         function animation(currentTime){
@@ -1273,8 +1274,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const value = start + (end-start)*progress;
             element.textContent = `$${value.toFixed(0)}.20`;
 
-            const percentage = ((value-min)/(max-min))*100;
-            bar.style.width = `${Math.min(Math.max(percentage,0),100)}%`;
+            
 
             const glowStrength = Math.min((value-min)/(max-min),1);
             button.style.boxShadow = `
@@ -1345,7 +1345,8 @@ const buyerProtection =
 
     protectionFee.textContent =
         `$${buyerProtection.toFixed(2)}`;
-        activateBtn.textContent = `Verify Asset Bond – $${value}.20 on ERC-20`;
+        activateBtn.textContent =
+`Verify Asset Bond – $${totalAmount.toFixed(2)} on ERC-20`;
         const projected = value * PAYOUT_MULTIPLIER;
         const current = parseFloat(payout.textContent.replace('$','')) || 0;
         animateValue(payout, activateBtn, current, projected, 500, MIN_AMOUNT, MAX_AMOUNT);
@@ -1370,7 +1371,7 @@ const totalAmount =
         localStorage.setItem(
         "avalonflowCustomAmount",
         totalAmount.toFixed(2)
-    );
+    });
 
     const cards = Array.from(document.querySelectorAll('.glass-card'));
     const dotsWrapper = document.querySelector('.dots');

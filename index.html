@@ -693,7 +693,7 @@ height: 180px;   /* reduce this value */
 
 .acu-gradient-text {
   font-style: italic;         /* Italic text */
-  font-size: 1.05rem;          /* Adjust size here */
+  font-size: 0.8rem;          /* Adjust size here */
   background: linear-gradient(90deg, #f1c40f, #f39c12, #f1c40f); /* Gold gradient */
   background-size: 200% auto;
   -webkit-background-clip: text;
@@ -1120,29 +1120,27 @@ max-height: 600px; /* optional: prevents huge cards */
     <div class="plan-header">
         <strong class="gradient-animation">🪽 AvalonCare Custom</strong>
         <p class="plan-desc">
-            Enter any amount between <strong>$150</strong> and <strong>$4,200</strong>.
-        </p>
+    Enter a listing amount from <strong>$150</strong> to <strong>$4,200</strong> to verify your Asset Bond.
+</p>
     </div>
 
     <!-- Input -->
     <div class="plan-input" id="customInputContainer">
-        <label><strong>Enter Listing Price ($):</strong></label>
+        <label><strong>Listing Price ($):</strong></label>
         <input type="number" id="customAmount" placeholder="e.g. 50">
         <p class="input-error" style="display:none;">This amount is not allowed.</p>
+    </div>
+
+<!-- Buyer Protection Value -->
+    <div class="protection-fee-section">
+        <strong>Buyer Protection Value (4%):</strong>
+        <div id="protectionFee">$0</div>
     </div>
 
     <!-- Payout -->
     <div class="plan-payout">
         <strong>Projected Cashback:</strong>
         <div id="customPayout">$0</div>
-    </div>
-
-    <!-- ACU Visualization -->
-    <div class="acu-bar-section">
-        <strong>ACU Payout Visualization:</strong>
-        <div class="acu-bar-wrapper">
-            <div class="acu-bar"></div>
-        </div>
     </div>
 
     <!-- Push button to bottom -->
@@ -1248,7 +1246,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // ---- Input & payout ----
     const input = document.getElementById('customAmount');
     const payout = document.getElementById('customPayout');
-    const acuBar = document.querySelector('.acu-bar');
+    const protectionFee = document.getElementById('protectionFee');
     const activateBtn = document.querySelector('#customActivate span');
     const card = document.querySelector('.glass-card.plan-custom');
     const inputContainer = document.querySelector('.plan-input');
@@ -1319,8 +1317,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const raw = input.value;
         if(raw === ''){
             payout.textContent = '$0';
-            acuBar.style.width = '0%';
-            activateBtn.textContent = 'Activate Custom Bond – on ERC-20';
+            protectionFee.textContent = '$0';
+activateBtn.textContent = 'Verify Asset Bond – on ERC-20';
             card.classList.remove('inactive');
             inputContainer.classList.remove('invalid');
             errorMsg.style.display = 'none';
@@ -1338,10 +1336,19 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // Valid input
+const buyerProtection =
+        value * BUYER_RATE;
+
+    const totalAmount =
+        value + buyerProtection;
+
+
+    protectionFee.textContent =
+        `$${buyerProtection.toFixed(2)}`;
         activateBtn.textContent = `Verify Asset Bond – $${value}.20 on ERC-20`;
         const projected = value * PAYOUT_MULTIPLIER;
         const current = parseFloat(payout.textContent.replace('$','')) || 0;
-        animateValue(payout, acuBar, activateBtn, current, projected, 500, MIN_AMOUNT, MAX_AMOUNT);
+        animateValue(payout, activateBtn, current, projected, 500, MIN_AMOUNT, MAX_AMOUNT);
 
         inputContainer.classList.remove('invalid');
         card.classList.remove('inactive');
@@ -1358,8 +1365,12 @@ document.addEventListener('DOMContentLoaded', () => {
             input.value = '';
             return;
         }
-        localStorage.setItem("avalonflowCustomAmount", `${value}.20`);
-    });
+const totalAmount =
+        value + (value * 0.04);
+        localStorage.setItem(
+        "avalonflowCustomAmount",
+        totalAmount.toFixed(2)
+    );
 
     const cards = Array.from(document.querySelectorAll('.glass-card'));
     const dotsWrapper = document.querySelector('.dots');

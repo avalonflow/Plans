@@ -692,7 +692,6 @@ height: 180px;   /* reduce this value */
 }
 
 .acu-gradient-text {
-  font-style: italic;         /* Italic text */
   font-size: 0.8rem;          /* Adjust size here */
   background: linear-gradient(90deg, #f1c40f, #f39c12, #f1c40f); /* Gold gradient */
   background-size: 200% auto;
@@ -1272,7 +1271,7 @@ const BUYER_RATE = 0.04;
             const rawProgress = Math.min((currentTime-startTime)/duration,1);
             const progress = easeInOut(rawProgress);
             const value = start + (end-start)*progress;
-            element.textContent = `$${value.toFixed(0)}.20`;
+            element.textContent = `$${value.toFixed(2)}`;
 
             
 
@@ -1367,7 +1366,7 @@ const buyerProtection =
             return;
         }
 const totalAmount =
-        value + (value * 0.04);
+        value + (value * BUYER_RATE);
         localStorage.setItem(
         "avalonflowCustomAmount",
         totalAmount.toFixed(2)

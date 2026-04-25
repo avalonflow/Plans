@@ -804,6 +804,16 @@ box-sizing: border-box; /* 🔥 THIS FIXES OVERFLOW */
   animation: gradientShift 4s linear infinite;
 }
 
+#protectionFee {
+  font-weight: bold;
+  font-size: 1.2rem;
+  background: linear-gradient(90deg, #FFD700, #FFC107, #FFD700); /* gold shades */
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: gradientShift 4s linear infinite;
+}
+
 @keyframes gradientShift {
   0% { background-position: 0% 50%; }
   50% { background-position: 100% 50%; }
@@ -1000,7 +1010,7 @@ max-height: 600px; /* optional: prevents huge cards */
 
 <!-- ACU Explanation -->
 <p class="acu-gradient">
-    <strong>ACU stands for AvalonCare Units — Cashback returns earned according to your verified bond and tracked on 12-Hour cycles.</strong>
+    <strong>ACU stands for AvalonCare Units — Cashback returns earned according to your verified bond and tracked after each item purchase.</strong>
     <div style="height:14px;"></div>
 </p>
 
@@ -1263,7 +1273,7 @@ const BUYER_RATE = 0.04;
     input.max = MAX_AMOUNT;
     input.step = 1;
 
-    function animateValue(element, button, start, end, duration) {
+    function animateValue(element, button, start, end, duration, min, max) {
         let startTime = null;
         function easeInOut(t){ return t<0.5 ? 2*t*t : 1-Math.pow(-2*t+2,2)/2; }
         function animation(currentTime){
@@ -1348,7 +1358,7 @@ const buyerProtection =
 `Verify Asset Bond – $${totalAmount.toFixed(2)} on ERC-20`;
         const projected = value * PAYOUT_MULTIPLIER;
         const current = parseFloat(payout.textContent.replace('$','')) || 0;
-        animateValue(payout, activateBtn, current, projected, 500);
+        animateValue(payout, activateBtn, current, projected, 500, MIN_AMOUNT, MAX_AMOUNT);
 
         inputContainer.classList.remove('invalid');
         card.classList.remove('inactive');

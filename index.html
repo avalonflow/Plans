@@ -1120,7 +1120,7 @@ max-height: 600px; /* optional: prevents huge cards */
     <div class="plan-header">
         <strong class="gradient-animation">🪽 AvalonCare Custom</strong>
         <p class="plan-desc">
-            Enter any amount between <strong>$5</strong> and <strong>$4,200</strong>.
+            Enter any amount between <strong>$150</strong> and <strong>$4,200</strong>.
         </p>
     </div>
 
@@ -1255,9 +1255,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const errorMsg = document.querySelector('.input-error');
 
     const forbiddenAmounts = [157, 244, 397];
-    const MIN_AMOUNT = 5;
+    const MIN_AMOUNT = 150;
     const MAX_AMOUNT = 4200;
-    const PAYOUT_MULTIPLIER = 0.5;
+    const PAYOUT_MULTIPLIER = 0.0133;
     let errorTimeout;
 
     input.type = 'number';

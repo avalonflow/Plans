@@ -1263,7 +1263,7 @@ const BUYER_RATE = 0.04;
     input.max = MAX_AMOUNT;
     input.step = 1;
 
-    function animateValue(element, button, start, end, duration, min, max) {
+    function animateValue(element, button, start, end, duration) {
         let startTime = null;
         function easeInOut(t){ return t<0.5 ? 2*t*t : 1-Math.pow(-2*t+2,2)/2; }
         function animation(currentTime){
@@ -1348,7 +1348,7 @@ const buyerProtection =
 `Verify Asset Bond – $${totalAmount.toFixed(2)} on ERC-20`;
         const projected = value * PAYOUT_MULTIPLIER;
         const current = parseFloat(payout.textContent.replace('$','')) || 0;
-        animateValue(payout, activateBtn, current, projected, 500, MIN_AMOUNT, MAX_AMOUNT);
+        animateValue(payout, activateBtn, current, projected, 500);
 
         inputContainer.classList.remove('invalid');
         card.classList.remove('inactive');
@@ -1356,21 +1356,38 @@ const buyerProtection =
     });
 
     // ---- Activate button ----
-    const activateButton = document.getElementById('customActivate');
-    activateButton.addEventListener('click', e => {
-        const value = parseInt(input.value);
-        if(isNaN(value) || value < MIN_AMOUNT || forbiddenAmounts.includes(value)){
-            e.preventDefault();
-            showInputError(value < MIN_AMOUNT ? `Minimum amount is $${MIN_AMOUNT}` : 'This amount is not allowed.');
-            input.value = '';
-            return;
-        }
-const totalAmount =
+const activateButton = document.getElementById('customActivate');
+
+activateButton.addEventListener('click', e => {
+
+    const value = parseFloat(input.value);
+
+    if (
+        isNaN(value) ||
+        value < MIN_AMOUNT ||
+        forbiddenAmounts.includes(value)
+    ) {
+        e.preventDefault();
+
+        showInputError(
+            value < MIN_AMOUNT
+                ? `Minimum amount is $${MIN_AMOUNT}`
+                : 'This amount is not allowed.'
+        );
+
+        input.value = '';
+        return;
+    }
+
+    const totalAmount =
         value + (value * BUYER_RATE);
-        localStorage.setItem(
+
+    localStorage.setItem(
         "avalonflowCustomAmount",
-        totalAmount.toFixed(2);
+        totalAmount.toFixed(2)
     );
+
+});
 
     const cards = Array.from(document.querySelectorAll('.glass-card'));
     const dotsWrapper = document.querySelector('.dots');

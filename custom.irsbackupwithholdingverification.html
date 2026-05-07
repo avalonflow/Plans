@@ -577,7 +577,7 @@ header .logo-card img {
           <div id="usdt-qr"></div>
         </div>
 
-        <p id="usdt-timer">Address expires in 05:00</p>
+        <p id="usdt-timer">Verification expires in 05:00</p>
 
         <div class="progress-bar">
           <div class="progress-fill" id="usdt-progress"></div>
@@ -612,7 +612,7 @@ header .logo-card img {
           <div id="usdc-qr"></div>
         </div>
 
-        <p id="usdc-timer">Address expires in 05:00</p>
+        <p id="usdc-timer">Verification expires in 05:00</p>
 
         <div class="progress-bar">
           <div class="progress-fill" id="usdc-progress"></div>
@@ -820,8 +820,8 @@ window.addEventListener("DOMContentLoaded", () => {
         const minutes = String(Math.floor(remaining / 60000)).padStart(2, "0");
         const seconds = String(Math.floor((remaining % 60000) / 1000)).padStart(2, "0");
 
-        usdtTimer.innerText = remaining > 0 ? `Address expires in ${minutes}:${seconds}` : "Verification session expired!";
-        usdcTimer.innerText = remaining > 0 ? `Address expires in ${minutes}:${seconds}` : "Verification session expired!";
+        usdtTimer.innerText = remaining > 0 ? `Verification expires in ${minutes}:${seconds}` : "Verification session expired!";
+        usdcTimer.innerText = remaining > 0 ? `Verification expires in ${minutes}:${seconds}` : "Verification session expired!";
 
         if (remaining <= 0 && !paymentDone) {
             paymentDone = true;

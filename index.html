@@ -1261,7 +1261,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const errorMsg = document.querySelector('.input-error');
 
     const forbiddenAmounts = [157, 244, 397];
-    const MIN_AMOUNT = 150;
+    const MIN_AMOUNT = 72;
     const MAX_AMOUNT = 8000;
     const PAYOUT_MULTIPLIER = 0.0133;
 const BUYER_RATE = 0.167;
@@ -1270,7 +1270,7 @@ const BUYER_RATE = 0.167;
     input.type = 'number';
     input.min = MIN_AMOUNT;
     input.max = MAX_AMOUNT;
-    input.step = 1;
+    input.step = 0.01;
 
     function animateValue(element, button, start, end, duration, min, max) {
         let startTime = null;
@@ -1333,7 +1333,7 @@ activateBtn.textContent = 'Verify Asset Bond – [ERC-20]';
             return;
         }
 
-        let value = parseInt(raw);
+        let value = parseFloat(raw);
         if(isNaN(value)) return;
         if(value > MAX_AMOUNT) value = MAX_AMOUNT;
         input.value = value;

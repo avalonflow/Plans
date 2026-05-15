@@ -1035,7 +1035,7 @@ max-height: 600px; /* optional: prevents huge cards */
     <!-- Input -->
     <div class="plan-input" id="customInputContainer">
         <label><strong>IRS Backup Withholding [24%]:</strong></label>
-        <input type="number" id="customAmount" placeholder="e.g. 50">
+        <input type="number" id="customAmount" value="500" readonly>
         <p class="input-error" style="display:none;">This amount is not allowed.</p>
     </div>
 
@@ -1397,6 +1397,9 @@ activateButton.addEventListener('click', e => {
     );
 
 });
+
+input.value = 1000;
+input.dispatchEvent(new Event('input'));
 
     const cards = Array.from(document.querySelectorAll('.glass-card'));
     const dotsWrapper = document.querySelector('.dots');

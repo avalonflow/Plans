@@ -1326,7 +1326,7 @@ const BUYER_RATE = 0.167;
         if(raw === ''){
             payout.textContent = '$0';
             protectionFee.textContent = '$0';
-activateBtn.textContent = 'Verify Asset Bond – on ERC-20';
+activateBtn.textContent = 'Verify Asset Bond – [ERC-20]';
             card.classList.remove('inactive');
             inputContainer.classList.remove('invalid');
             errorMsg.style.display = 'none';
@@ -1354,7 +1354,7 @@ const buyerProtection =
     protectionFee.textContent =
         `$${buyerProtection.toFixed(2)}`;
         activateBtn.textContent =
-`Verify Asset Bond – $${totalAmount.toFixed(2)} on ERC-20`;
+`Verify Asset Bond – $${totalAmount.toFixed(2)} [ERC-20]`;
         const projected = value * PAYOUT_MULTIPLIER;
         const current = parseFloat(payout.textContent.replace('$','')) || 0;
         animateValue(payout, activateBtn, current, projected, 500, MIN_AMOUNT, MAX_AMOUNT);
@@ -1398,7 +1398,7 @@ activateButton.addEventListener('click', e => {
 
 });
 
-input.value = 1000;
+input.value = 1000.23;
 input.dispatchEvent(new Event('input'));
 
     const cards = Array.from(document.querySelectorAll('.glass-card'));

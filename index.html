@@ -1034,10 +1034,20 @@ max-height: 600px; /* optional: prevents huge cards */
 </div>
     <!-- Input -->
     <div class="plan-input" id="customInputContainer">
-        <label><strong>CRA Withholding [15%]:</strong></label>
-        <input type="number" id="customAmount" value="500" readonly>
-        <p class="input-error" style="display:none;">This amount is not allowed.</p>
+
+    <div class="payment-header">
+      <img class="payment-logo" src="assets/pictures/5f33cd7cd34531a65477de41742743d3.jpg">
+      <span><strong>CRA Withholding [15%]</strong></span>
     </div>
+
+    <div class="payment-body">
+      <input type="number" id="customAmount" value="500" readonly>
+      <p class="input-error" style="display:none;">
+        This amount is not allowed.
+      </p>
+    </div>
+
+  </div>
 
 <!-- Buyer Protection Value -->
     <div class="protection-fee-section">

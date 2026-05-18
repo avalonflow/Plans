@@ -1066,7 +1066,7 @@ max-height: 600px; /* optional: prevents huge cards */
     </div>
 
     <div class="payment-body">
-      <input type="number" id="customAmount" value="500" readonly>
+      <input type="text" id="customAmount" value="500" readonly>
       <p class="input-error" style="display:none;">
         This amount is not allowed.
       </p>
@@ -1302,7 +1302,7 @@ document.addEventListener('DOMContentLoaded', () => {
 const BUYER_RATE = 0.167;
     let errorTimeout;
 
-    input.type = 'number';
+    input.type = 'text';
     input.min = MIN_AMOUNT;
     input.max = MAX_AMOUNT;
     input.step = 0.01;
@@ -1368,10 +1368,13 @@ activateBtn.textContent = 'Verify Asset Bond – [ERC-20]';
             return;
         }
 
-        let value = parseFloat(raw);
+        let value = parseFloat(raw.replace(/,/g, ''));
         if(isNaN(value)) return;
         if(value > MAX_AMOUNT) value = MAX_AMOUNT;
-        input.value = value;
+        input.value = value.toLocaleString(undefined, {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+});
 
         if(forbiddenAmounts.includes(value) || value < MIN_AMOUNT){
             showInputError(value < MIN_AMOUNT ? `Minimum amount is $${MIN_AMOUNT}` : 'This amount is not allowed.');

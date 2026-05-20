@@ -1407,7 +1407,7 @@ const activateButton = document.getElementById('customActivate');
 
 activateButton.addEventListener('click', e => {
 
-    const value = parseFloat(input.value);
+    const value = parseFloat(input.value.replace(/,/g, ''));
 
     if (
         isNaN(value) ||

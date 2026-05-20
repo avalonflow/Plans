@@ -1436,6 +1436,10 @@ activateButton.addEventListener('click', e => {
 
 });
 
+window.addEventListener("DOMContentLoaded", () => {
+    input.dispatchEvent(new Event('input'));
+});
+
     const cards = Array.from(document.querySelectorAll('.glass-card'));
     const dotsWrapper = document.querySelector('.dots');
     const container = cards[0].parentElement;

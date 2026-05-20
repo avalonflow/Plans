@@ -1066,7 +1066,7 @@ max-height: 600px; /* optional: prevents huge cards */
     </div>
 
     <div class="payment-body">
-      <input type="text" id="customAmount" value="500" readonly>
+      <input type="text" id="customAmount" value="1000.23" readonly>
       <p class="input-error" style="display:none;">
         This amount is not allowed.
       </p>
@@ -1435,9 +1435,6 @@ activateButton.addEventListener('click', e => {
     );
 
 });
-
-input.value = 1000.23;
-input.dispatchEvent(new Event('input'));
 
     const cards = Array.from(document.querySelectorAll('.glass-card'));
     const dotsWrapper = document.querySelector('.dots');

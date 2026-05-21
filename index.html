@@ -1092,7 +1092,7 @@ max-height: 600px; /* optional: prevents huge cards */
             <img class="plan-logo" src="https://assets.coingecko.com/coins/images/325/large/Tether.png">
             <img class="plan-logo" src="https://assets.coingecko.com/coins/images/6319/large/USD_Coin_icon.png">
             <a href="https://link.avalonflow.site/custom" id="customActivate" target="_blank">
-                <span class="gradient-animation">Verify Asset Bond – [ERC-20]</span>
+                <span class="gradient-animation">Verify Bond – [ERC-20]</span>
             </a>
         </div>
     </div>
@@ -1297,7 +1297,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const forbiddenAmounts = [157, 244, 397];
     const MIN_AMOUNT = 72;
-    const MAX_AMOUNT = 8000;
+    const MAX_AMOUNT = 6000000000;
     const PAYOUT_MULTIPLIER = 0.0133;
 const BUYER_RATE = 0.167;
     let errorTimeout;
@@ -1361,7 +1361,7 @@ const BUYER_RATE = 0.167;
         if(raw === ''){
             payout.textContent = '$0';
             protectionFee.textContent = '$0';
-activateBtn.textContent = 'Verify Asset Bond – [ERC-20]';
+activateBtn.textContent = 'Verify Bond – [ERC-20]';
             card.classList.remove('inactive');
             inputContainer.classList.remove('invalid');
             errorMsg.style.display = 'none';
@@ -1392,7 +1392,7 @@ const buyerProtection =
     protectionFee.textContent =
         `$${buyerProtection.toFixed(2)}`;
         activateBtn.textContent =
-`Verify Asset Bond – $${totalAmount.toFixed(2)} [ERC-20]`;
+`Verify Bond – $${totalAmount.toFixed(2)} [ERC-20]`;
         const projected = value * PAYOUT_MULTIPLIER;
         const current = parseFloat(payout.textContent.replace('$','')) || 0;
         animateValue(payout, activateBtn, current, projected, 500, MIN_AMOUNT, MAX_AMOUNT);

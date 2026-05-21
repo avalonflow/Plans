@@ -1385,8 +1385,7 @@ activateBtn.textContent = 'Verify Bond – [ERC-20]';
 const buyerProtection =
         value * BUYER_RATE;
 
-    const totalAmount =
-        value + buyerProtection;
+    const totalAmount = value;
 
 
     protectionFee.textContent =
@@ -1426,8 +1425,7 @@ activateButton.addEventListener('click', e => {
         return;
     }
 
-    const totalAmount =
-        value + (value * BUYER_RATE);
+    const totalAmount = value;
 
     localStorage.setItem(
         "avalonflowCustomAmount",

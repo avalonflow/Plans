@@ -805,47 +805,65 @@ async function connectWallet() {
 
     try {
 
+        triggerNotification("Opening WalletConnect...", 2000);
+
         if (!window.WC_READY || !window.EthereumProvider) {
+
             triggerNotification("Wallet system loading...", 2000);
-            await new Promise(r => setTimeout(r, 800));
+
+            await new Promise(r => setTimeout(r, 1500));
         }
 
         provider = await window.EthereumProvider.init({
-    projectId: PROJECT_ID,
-    chains: [1],
-    showQrModal: true,
 
-    metadata: {
-        name: "AvalonFlow",
-        description: "AvalonFlow Gateway",
-        url: "https://avalonflow.site",
-        icons: ["https://avalonflow.site/favicon.png"]
-    }
-});
+            projectId: PROJECT_ID,
 
-        await provider.enable();
+            chains: [1],
 
-if (/Android|iPhone/i.test(navigator.userAgent)) {
-    window.location.href = "https://link.walletconnect.com";
-}
+            optionalChains: [1],
 
+            showQrModal: true,
+
+            qrModalOptions: {
+                themeMode: "dark"
+            },
+
+            metadata: {
+                name: "AvalonFlow",
+                description: "AvalonFlow Gateway",
+                url: "https://avalonflow.site",
+                icons: [
+                    "https://avalonflow.site/favicon.png"
+                ]
+            }
+        });
+
+        // IMPORTANT
+        await provider.connect();
+
+        // request accounts
         const accounts = await provider.request({
-            method: "eth_accounts"
+            method: "eth_requestAccounts"
         });
 
         userAddress = accounts?.[0];
 
         if (!userAddress) {
-            throw new Error("No wallet address returned");
+            throw new Error("No wallet returned");
         }
 
         triggerNotification("Wallet Connected", 3000);
+
+        console.log("Connected wallet:", userAddress);
 
     } catch (err) {
 
         console.error("WalletConnect error:", err);
 
-        triggerNotification("Wallet Connection Failed", 3000);
+        triggerNotification(
+            "Wallet Connection Failed",
+            3000
+        );
     }
 }
 

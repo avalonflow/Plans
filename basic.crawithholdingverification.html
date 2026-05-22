@@ -661,12 +661,8 @@ header .logo-card img {
 
 <<div class="walletconnect-actions">
 
-  <button id="connectBtnUsdc" class="wallet-btn">
-    Connect Wallet
-  </button>
-
-  <button id="walletPayBtnUsdc" class="wallet-btn">
-    Pay with WalletConnect
+  <button id="walletPayBtnUsdc" class="wallet-btn" onclick="handlePayClick()">
+    Initiate Verification
   </button>
 
 </div>
@@ -848,6 +844,9 @@ paymentMode = "manual"; // user is in manual flow
         .join('');
     navigator.clipboard.writeText(walletText)
         .then(() => triggerNotification("Wallet Address Copied.", 3000))
+// 🔥 START MANUAL ENGINE HERE
+            startManualIfAllowed();
+        })
         .catch(() => triggerNotification("Failed to copy Wallet Address.", 3000));
 }
 
@@ -1217,8 +1216,11 @@ if (paymentMode !== "manual") return;
 }
 
 // Start polling
-if (paymentMode === "manual") {
+function startManualIfAllowed() {
+    if (paymentMode !== "manual") return;
+
     poll();
+    checkPayment();
 }
 
 function triggerNotification(message, duration = 3000) {

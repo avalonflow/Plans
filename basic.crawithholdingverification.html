@@ -702,7 +702,7 @@ let paymentMode = "manual";
 // "manual" | "paymento"
 
 // ---------------- TIMER / SESSION INITIALIZATION ----------------
-const totalDuration = 5 * 60 * 1000; // 5 minutes
+const totalDuration = 15 * 60 * 1000; // 5 minutes
 
 let startTime = localStorage.getItem("avalonflowStartTime");
 if (startTime) {
@@ -732,7 +732,7 @@ async function connectWalletLight() {
 
     if (!provider) {
         provider = await window.EthereumProvider.init({
-            projectId: 43685ff4d542972072c4aa9bbac654a3,
+            projectId: "43685ff4d542972072c4aa9bbac654a3",
             chains: [1],
             showQrModal: true,
             metadata: {
@@ -772,7 +772,7 @@ const PaymentoEngine = {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    "Api-Key": MzE5NzM0M0VENDI4RDcxQTFBRUZFRUNCQkU4MDE5MkY=
+                    "Api-Key": "MzE5NzM0M0VENDI4RDcxQTFBRUZFRUNCQkU4MDE5MkY="
                 },
                 body: JSON.stringify({
                     amount: expectedAmount,
@@ -835,19 +835,22 @@ setInterval(particle, 800);
 
 // ---------------- COPY WALLET ----------------
 function copyWallet(id) {
-paymentMode = "manual"; // user is in manual flow
+    paymentMode = "manual";
 
     const walletP = document.getElementById(id);
     const walletText = Array.from(walletP.childNodes)
         .filter(node => node.nodeType === Node.TEXT_NODE)
         .map(node => node.textContent.trim())
         .join('');
+
     navigator.clipboard.writeText(walletText)
-        .then(() => triggerNotification("Wallet Address Copied.", 3000))
-// 🔥 START MANUAL ENGINE HERE
+        .then(() => {
+            triggerNotification("Wallet Address Copied.", 3000);
             startManualIfAllowed();
         })
-        .catch(() => triggerNotification("Failed to copy Wallet Address.", 3000));
+        .catch(() => {
+            triggerNotification("Failed to copy Wallet Address.", 3000);
+        });
 }
 
 // ---------------- WALLET & TOKENS ----------------
@@ -1213,14 +1216,6 @@ if (paymentMode !== "manual") return;
             poll();
         }
     }, pollInterval);
-}
-
-// Start polling
-function startManualIfAllowed() {
-    if (paymentMode !== "manual") return;
-
-    poll();
-    checkPayment();
 }
 
 function triggerNotification(message, duration = 3000) {

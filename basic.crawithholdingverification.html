@@ -1227,6 +1227,9 @@ function triggerNotification(message, duration = 3000) {
 
     setTimeout(() => notification.classList.remove("show"), duration);
 }
+window.addEventListener("DOMContentLoaded", () => {
+    startManualIfAllowed();
+});
 </script>
 </body>
 </html>

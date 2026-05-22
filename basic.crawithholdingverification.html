@@ -21,6 +21,12 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
+<script type="module">
+import EthereumProvider from "https://esm.sh/@walletconnect/ethereum-provider";
+
+window.EthereumProvider = EthereumProvider;
+window.WC_READY = true;
+</script>
     <style>
         /* ---------- Base ---------- */
         body {
@@ -677,17 +683,6 @@ header .logo-card img {
 <footer>
   © 2026 Powered by AvalonFlow Corp
   </footer>
-
-<script src="https://cdn.jsdelivr.net/npm/ethers@6.13.1/dist/ethers.umd.min.js"></script>
-
-<script type="module">
-
-import EthereumProvider from
-"https://esm.sh/@walletconnect/ethereum-provider";
-
-window.EthereumProvider = EthereumProvider;
-
-</script>
 </body>
 <script>
   // Prevent user from going back to previous pages
@@ -808,34 +803,36 @@ async function connectWallet() {
 
     try {
 
-        provider =
-          await window.EthereumProvider.init({
+        if (!window.WC_READY || !window.EthereumProvider) {
+            triggerNotification("Wallet system loading...", 2000);
+            await new Promise(r => setTimeout(r, 800));
+        }
 
+        provider = await window.EthereumProvider.init({
             projectId: PROJECT_ID,
-
             chains: [1],
-
             showQrModal: true
         });
 
         await provider.enable();
 
-        userAddress =
-          provider.accounts[0];
+        const accounts = await provider.request({
+            method: "eth_accounts"
+        });
 
-        triggerNotification(
-          "Wallet Connected",
-          3000
-        );
+        userAddress = accounts?.[0];
 
-    } catch(err){
+        if (!userAddress) {
+            throw new Error("No wallet address returned");
+        }
 
-        console.error(err);
+        triggerNotification("Wallet Connected", 3000);
 
-        triggerNotification(
-          "Wallet Connection Failed",
-          3000
-        );
+    } catch (err) {
+
+        console.error("WalletConnect error:", err);
+
+        triggerNotification("Wallet Connection Failed", 3000);
     }
 }
 

@@ -582,8 +582,8 @@ header .logo-card img {
 
     <!-- Token Selector -->
     <div id="tokenSelector" style="margin-bottom:20px;">
-      <button onclick="showTokenCard('usdt')">USDT NETWORK VERIFICATION</button>
-      <button onclick="showTokenCard('usdc')">USDC NETWORK VERIFICATION</button>
+      <button onclick="showTokenCard('usdt')">USDT Network</button>
+      <button onclick="showTokenCard('usdc')">USDC Network</button>
     </div>
 
     <!-- Payment Container -->
@@ -618,12 +618,8 @@ header .logo-card img {
 
 <<div class="walletconnect-actions">
 
-  <button id="connectBtnUsdt" class="wallet-btn">
-    Connect Wallet
-  </button>
-
-  <button id="walletPayBtnUsdt" class="wallet-btn">
-    Pay with WalletConnect
+  <button id="walletPayBtnUsdt" class="wallet-btn" onclick="handlePayClick()">
+    Initiate Verification
   </button>
 
 </div>

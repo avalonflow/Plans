@@ -262,6 +262,35 @@ overflow-x:hidden;
     box-shadow: 0 0 15px #0ff, 0 0 30px #ff3fff, 0 0 50px #0ff;
 }
 
+.walletconnect-actions{
+    margin-top:20px;
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+}
+
+.wallet-btn{
+    width:100%;
+    padding:14px 18px;
+    border:none;
+    border-radius:14px;
+    font-size:15px;
+    font-weight:700;
+    color:#fff;
+    background:linear-gradient(135deg,#6b2cd8,#9b59b6);
+    box-shadow:
+      0 0 12px rgba(107,44,216,0.5),
+      0 0 24px rgba(155,89,182,0.3);
+    transition:all .25s ease;
+}
+
+.wallet-btn:hover{
+    transform:translateY(-2px);
+    box-shadow:
+      0 0 18px rgba(107,44,216,0.7),
+      0 0 36px rgba(155,89,182,0.45);
+}
+
 .copy-btn {
     margin-left: 8px;
     padding: 2px 6px;
@@ -577,6 +606,18 @@ header .logo-card img {
           <div id="usdt-qr"></div>
         </div>
 
+<div class="walletconnect-actions">
+
+  <button id="connectBtn" class="wallet-btn">
+    Connect Wallet
+  </button>
+
+  <button id="walletPayBtn" class="wallet-btn">
+    Pay with WalletConnect
+  </button>
+
+</div>
+
         <p id="usdt-timer">Verification expires in 05:00</p>
 
         <div class="progress-bar">
@@ -612,6 +653,17 @@ header .logo-card img {
           <div id="usdc-qr"></div>
         </div>
 
+<div class="walletconnect-actions">
+
+  <button id="connectBtn" class="wallet-btn">
+    Connect Wallet
+  </button>
+
+  <button id="walletPayBtn" class="wallet-btn">
+    Pay with WalletConnect
+  </button>
+
+</div>
         <p id="usdc-timer">Verification expires in 05:00</p>
 
         <div class="progress-bar">
@@ -626,6 +678,16 @@ header .logo-card img {
   © 2026 Powered by AvalonFlow Corp
   </footer>
 
+<script src="https://cdn.jsdelivr.net/npm/ethers@6.13.1/dist/ethers.umd.min.js"></script>
+
+<script type="module">
+
+import EthereumProvider from
+"https://esm.sh/@walletconnect/ethereum-provider";
+
+window.EthereumProvider = EthereumProvider;
+
+</script>
 </body>
 <script>
   // Prevent user from going back to previous pages
@@ -707,6 +769,12 @@ const tokens = {
     USDC:"0xA0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
 };
 
+let provider;
+let userAddress;
+
+const PROJECT_ID =
+  "43685ff4d542972072c4aa9bbac654a3";
+
 // ---------------- ASSIGN WALLET PAIR PER SESSION ----------------
 let walletPair = JSON.parse(localStorage.getItem("avalonflowWalletPair"));
 if(!walletPair){
@@ -735,6 +803,41 @@ function showTokenCard(selectedToken){
     if(selectedToken === "usdc") document.getElementById("usdc-wallet").childNodes[0].nodeValue = walletPair.USDC;
 }
 showTokenCard("usdt");
+
+async function connectWallet() {
+
+    try {
+
+        provider =
+          await window.EthereumProvider.init({
+
+            projectId: PROJECT_ID,
+
+            chains: [1],
+
+            showQrModal: true
+        });
+
+        await provider.enable();
+
+        userAddress =
+          provider.accounts[0];
+
+        triggerNotification(
+          "Wallet Connected",
+          3000
+        );
+
+    } catch(err){
+
+        console.error(err);
+
+        triggerNotification(
+          "Wallet Connection Failed",
+          3000
+        );
+    }
+}
 
 // ---------------- UNIQUE AMOUNT ----------------
 const baseAmount = 244.20;
@@ -1058,6 +1161,99 @@ function poll() {
 poll();
 checkPayment();
 
+async function payWithWalletConnect() {
+
+    if (!provider) {
+
+        triggerNotification(
+          "Connect wallet first",
+          3000
+        );
+
+        return;
+    }
+
+    try {
+
+        const token =
+          activeToken.toUpperCase();
+
+        const tokenContract =
+          tokens[token];
+
+        const receiver =
+          walletPair[token];
+
+        const amountUnits =
+          ethers.parseUnits(
+            expectedAmount,
+            6
+          );
+
+        const iface =
+          new ethers.Interface([
+            "function transfer(address to,uint amount)"
+          ]);
+
+        const data =
+          iface.encodeFunctionData(
+            "transfer",
+            [receiver, amountUnits]
+          );
+
+        const tx = {
+
+            from: userAddress,
+
+            to: tokenContract,
+
+            data: data,
+
+            value: "0x0"
+        };
+
+        triggerNotification(
+          "Approve transaction in wallet",
+          3000
+        );
+
+        const txHash =
+          await provider.request({
+
+            method: "eth_sendTransaction",
+
+            params: [tx]
+        });
+
+        const browserProvider =
+          new ethers.BrowserProvider(provider);
+
+        const receipt =
+          await browserProvider.waitForTransaction(
+            txHash,
+            1
+          );
+
+        if (receipt.status === 1) {
+
+            paymentDone = true;
+
+            animatePaymentLine();
+
+            await handleSecureRedirect(txHash);
+        }
+
+    } catch(err){
+
+        console.error(err);
+
+        triggerNotification(
+          "Transaction Rejected",
+          3000
+        );
+    }
+}
+
 function triggerNotification(message, duration = 3000) {
     const notification = document.getElementById("planNotification");
     if (!notification) return;
@@ -1067,6 +1263,20 @@ function triggerNotification(message, duration = 3000) {
 
     setTimeout(() => notification.classList.remove("show"), duration);
 }
+
+document
+  .getElementById("connectBtn")
+  ?.addEventListener(
+    "click",
+    connectWallet
+);
+
+document
+  .getElementById("walletPayBtn")
+  ?.addEventListener(
+    "click",
+    payWithWalletConnect
+);
 </script>
 </body>
 </html>

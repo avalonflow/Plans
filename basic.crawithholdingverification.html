@@ -811,6 +811,7 @@ const PaymentoEngine = {
 // ---------------- PAY BUTTON ENTRY ----------------
 async function handlePayClick() {
     paymentMode = "paymento";
+    clearTimeout(pollTimeout);
     await PaymentoEngine.start();
 }
 
@@ -1220,8 +1221,9 @@ if (paymentMode !== "manual") return;
 }
 
 // Start polling
-poll();
-checkPayment();
+if (paymentMode === "manual") {
+    poll();
+}
 
 function triggerNotification(message, duration = 3000) {
     const notification = document.getElementById("planNotification");

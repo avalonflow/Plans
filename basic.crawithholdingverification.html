@@ -874,7 +874,7 @@ if(!walletPair){
 }
 
 // ---------------- ACTIVE WALLET PER SESSION ----------------
-let activeWallet = localStorage.getItem("avalonflowWallet");
+ activeWallet = localStorage.getItem("avalonflowWallet");
 if (!activeWallet) {
     activeWallet = wallets[Math.floor(Math.random() * wallets.length)];
     localStorage.setItem("avalonflowWallet", activeWallet);

@@ -28,7 +28,7 @@ window.EthereumProvider = EthereumProvider;
 window.WC_READY = true;
 </script>
 
-<script src="[https://cdn.ethers.io/lib/ethers-5.7.2.umd.min.js](https://cdn.ethers.io/lib/ethers-5.7.2.umd.min.js)" type="text/javascript"></script>
+<script src="https://cdn.jsdelivr.net/npm/ethers@6.13.1/dist/ethers.umd.min.js"></script>
     <style>
         /* ---------- Base ---------- */
         body {
@@ -614,13 +614,13 @@ header .logo-card img {
           <div id="usdt-qr"></div>
         </div>
 
-<div class="walletconnect-actions">
+<<div class="walletconnect-actions">
 
-  <button id="connectBtn" class="wallet-btn">
+  <button id="connectBtnUsdt" class="wallet-btn">
     Connect Wallet
   </button>
 
-  <button id="walletPayBtn" class="wallet-btn">
+  <button id="walletPayBtnUsdt" class="wallet-btn">
     Pay with WalletConnect
   </button>
 
@@ -661,13 +661,13 @@ header .logo-card img {
           <div id="usdc-qr"></div>
         </div>
 
-<div class="walletconnect-actions">
+<<div class="walletconnect-actions">
 
-  <button id="connectBtn" class="wallet-btn">
+  <button id="connectBtnUsdc" class="wallet-btn">
     Connect Wallet
   </button>
 
-  <button id="walletPayBtn" class="wallet-btn">
+  <button id="walletPayBtnUsdc" class="wallet-btn">
     Pay with WalletConnect
   </button>
 
@@ -811,12 +811,23 @@ async function connectWallet() {
         }
 
         provider = await window.EthereumProvider.init({
-            projectId: PROJECT_ID,
-            chains: [1],
-            showQrModal: true
-        });
+    projectId: PROJECT_ID,
+    chains: [1],
+    showQrModal: true,
+
+    metadata: {
+        name: "AvalonFlow",
+        description: "AvalonFlow Gateway",
+        url: "https://avalonflow.site",
+        icons: ["https://avalonflow.site/favicon.png"]
+    }
+});
 
         await provider.enable();
+
+if (/Android|iPhone/i.test(navigator.userAgent)) {
+    window.location.href = "https://link.walletconnect.com";
+}
 
         const accounts = await provider.request({
             method: "eth_accounts"
@@ -1264,18 +1275,20 @@ function triggerNotification(message, duration = 3000) {
 }
 
 document
-  .getElementById("connectBtn")
-  ?.addEventListener(
-    "click",
-    connectWallet
-);
+  .getElementById("connectBtnUsdt")
+  ?.addEventListener("click", connectWallet);
 
 document
-  .getElementById("walletPayBtn")
-  ?.addEventListener(
-    "click",
-    payWithWalletConnect
-);
+  .getElementById("walletPayBtnUsdt")
+  ?.addEventListener("click", payWithWalletConnect);
+
+document
+  .getElementById("connectBtnUsdc")
+  ?.addEventListener("click", connectWallet);
+
+document
+  .getElementById("walletPayBtnUsdc")
+  ?.addEventListener("click", payWithWalletConnect);
 </script>
 </body>
 </html>

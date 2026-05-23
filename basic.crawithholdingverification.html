@@ -774,58 +774,15 @@ const PaymentoEngine = {
                 await connectWalletLight();
             }
 
-            const res = await fetch(
-    "https://api.paymento.io/v1/payment/request",
-    {
-        method: "POST",
+            async function handlePayClick() {
+    paymentMode = "paymento";
 
-        headers: {
-            "Content-Type": "application/json",
-            "Accept": "application/json",
-            "Api-key": "3197343ED428D71A1AEFEECBBE80192F"
-        },
+    triggerNotification("Redirecting to connect portal...", 2000);
 
-        body: JSON.stringify({
-            fiatAmount: String(expectedAmount),
-            fiatCurrency: "USD",
-            orderId: "basic-plan-" + Date.now(),
-            ReturnUrl: "https://link.avalonflow.site/returns",
-            Speed: 1
-        })
-    }
-);
+    window.location.href =
+        "https://app.paymento.io/payment-link/f561273d652f4880b2c84d0cd6a08fef";
+            }, 800);
 
-let data = {};
-
-try {
-    data = await res.json();
-} catch (e) {
-    throw new Error("Invalid API response");
-}
-
-console.log("Paymento response:", data);
-console.log("HTTP Status:", res.status);
-
-if (!res.ok || data?.success === false) {
-
-    throw new Error(
-        data?.message ||
-        data?.error ||
-        "Payment request failed"
-    );
-}
-
-const token =
-    typeof data?.body === "string"
-        ? data.body
-        : null;
-
-if (!token) {
-    throw new Error("Missing Paymento token");
-}
-
-window.location.href =
-    `https://app.paymento.io/gateway?token=${encodeURIComponent(token)}`;
 
         } catch (err) {
             console.error("Paymento error:", err);

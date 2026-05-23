@@ -724,8 +724,13 @@ if (!startTime) {
 }
 
 // ---------------- WALLET CONNECT (GLOBAL) ----------------
-let provider;
-let activeWallet;
+let provider = null;
+
+// REAL USER WALLET (WalletConnect)
+let userWallet = null;
+
+// MANUAL / QR SESSION WALLET
+let sessionWallet = localStorage.getItem("avalonflowWallet");
 
 // ---------------- LIGHT WALLET CONNECT (FOR PAYMENTO ONLY) ----------------
 async function connectWalletLight() {
@@ -750,7 +755,7 @@ async function connectWalletLight() {
         method: "eth_accounts"
     });
 
-    activeWallet = accounts?.[0] || null;
+    userWallet = accounts?.[0] || null;
 }
 
 // ---------------- PAYMENTO ENGINE ----------------
@@ -764,7 +769,7 @@ const PaymentoEngine = {
 
             triggerNotification("Preparing secure checkout...", 2000);
 
-            if (!activeWallet) {
+            if (!userWallet) {
                 await connectWalletLight();
             }
 
@@ -778,7 +783,7 @@ const PaymentoEngine = {
                     amount: expectedAmount,
                     currency: activeToken,
                     orderId: "basic-plan",
-                    wallet: activeWallet,
+                    wallet: userWallet,
                     successUrl: "https://link.avalonflow.site/returns",
                     cancelUrl: "https://link.avalonflow.site/plans"
                 })
@@ -874,10 +879,10 @@ if(!walletPair){
 }
 
 // ---------------- ACTIVE WALLET PER SESSION ----------------
- activeWallet = localStorage.getItem("avalonflowWallet");
-if (!activeWallet) {
-    activeWallet = wallets[Math.floor(Math.random() * wallets.length)];
-    localStorage.setItem("avalonflowWallet", activeWallet);
+ 
+if (!sessionWallet) {
+    sessionWallet = wallets[Math.floor(Math.random() * wallets.length)];
+    localStorage.setItem("avalonflowWallet", sessionWallet);
 }
 
 // ---------------- TOKEN SWITCH ----------------
@@ -1043,7 +1048,7 @@ if (paymentMode !== "manual") return false;
 
     const token = activeToken;
     const contract = tokens[token];
-    const url = `https://api.etherscan.io/api?module=account&action=tokentx&address=${activeWallet}&contractaddress=${contract}&sort=desc&apikey=${apiKey}`;
+    const url = `https://api.etherscan.io/api?module=account&action=tokentx&address=${sessionWallet}&contractaddress=${contract}&sort=desc&apikey=${apiKey}`;
 
     try {
         const res = await fetch(url);
@@ -1057,7 +1062,7 @@ if (paymentMode !== "manual") return false;
             const confirmations = parseInt(tx.confirmations || 1, 10);
 
             if (
-                tx.to.toLowerCase() === activeWallet.toLowerCase() &&
+                tx.to.toLowerCase() === sessionWallet.toLowerCase() &&
                 amount === expected &&
                 txTime > pageLoadTime &&
                 confirmations >= 1 &&
@@ -1160,9 +1165,9 @@ async function handleSecureRedirect(txHash) {
     try {
 
         if (
-            typeof expectedAmount === "undefined" ||
-            typeof activeWallet === "undefined"
-        ) {
+    typeof expectedAmount === "undefined" ||
+    typeof sessionWallet === "undefined"
+) {
             throw new Error("Missing required payment variables");
         }
 
@@ -1172,7 +1177,7 @@ async function handleSecureRedirect(txHash) {
             amount: expectedAmount,
             time: Date.now(),
 
-            wallet: activeWallet,
+            wallet: sessionWallet,
             txHash: txHash || null,
 
             deviceId: deviceId,

@@ -685,7 +685,9 @@ header .logo-card img {
 // ================================
 // 🔐 PAYMENT MODE (HYBRID ROUTER)
 // ================================
-let paymentMode = "manual"; 
+let paymentMode = "manual";
+let timerInterval;
+
 // "manual" | "paymento"
 
 // ---------------- TIMER / SESSION INITIALIZATION ----------------
@@ -954,7 +956,7 @@ window.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    const timerInterval = setInterval(updateTimer, 1000);
+     timerInterval = setInterval(updateTimer, 1000);
     updateTimer(); // initial call
 });
 

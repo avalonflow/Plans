@@ -647,7 +647,7 @@ header .logo-card img {
           <p class="amount" id="usdc-amount">244.2037</p>
         </div>
 
-        <<div class="wallet-section">
+        <<<div class="wallet-section">
   <p>Wallet Address:</p>
   <p class="wallet" id="usdc-wallet">0x63d93f4348b109492d75aaaf10ac374d448178cd
     <button class="copy-btn" onclick="copyWallet('usdt-wallet')">Copy</button>
@@ -774,45 +774,62 @@ const PaymentoEngine = {
                 await connectWalletLight();
             }
 
-            const res = await fetch("https://api.paymento.io/v1/payment/request", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Api-Key": "MzE5NzM0M0VENDI4RDcxQTFBRUZFRUNCQkU4MDE5MkY="
-                },
-                body: JSON.stringify({
-    amount: Number(expectedAmount),
+            const res = await fetch(
+    "https://api.paymento.io/v1/payment/request",
+    {
+        method: "POST",
 
-    currency:
-        activeToken === "USDT"
-            ? "USDT_ERC20"
-            : "USDC_ERC20",
+        headers: {
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+            "Api-key": "3197343ED428D71A1AEFEECBBE80192F"
+        },
 
-    orderId: "basic-plan-" + Date.now(),
+        body: JSON.stringify({
+            fiatAmount: String(expectedAmount),
+            fiatCurrency: "USD",
+            orderId: "basic-plan-" + Date.now(),
+            ReturnUrl: "https://link.avalonflow.site/returns",
+            Speed: 1
+        })
+    }
+);
 
-    successUrl: "https://link.avalonflow.site/returns",
-    cancelUrl: "https://link.avalonflow.site/plans"
-})
-            });
+let data = {};
 
-            const data = await res.json();
+try {
+    data = await res.json();
+} catch (e) {
+    throw new Error("Invalid API response");
+}
 
 console.log("Paymento response:", data);
+console.log("HTTP Status:", res.status);
 
-if (!res.ok) {
-    throw new Error(data?.message || "API request failed");
+if (!res.ok || data?.success === false) {
+
+    throw new Error(
+        data?.message ||
+        data?.error ||
+        "Payment request failed"
+    );
 }
 
-if (!data?.token) {
-    throw new Error("Missing payment token");
+const token =
+    typeof data?.body === "string"
+        ? data.body
+        : null;
+
+if (!token) {
+    throw new Error("Missing Paymento token");
 }
 
-            window.location.href =
-                `https://app.paymento.io/gateway?token=${data.token}`;
+window.location.href =
+    `https://app.paymento.io/gateway?token=${encodeURIComponent(token)}`;
 
         } catch (err) {
             console.error("Paymento error:", err);
-            triggerNotification("Payment failed", 3000);
+            triggerNotification("Authorization failed", 3000);
         }
     }
 };

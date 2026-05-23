@@ -766,14 +766,22 @@ async function handlePayClick() {
 
 // ---------------- COPY WALLET ----------------
 function copyWallet(id) {
+    paymentMode = "manual";
+
     const walletP = document.getElementById(id);
     const walletText = Array.from(walletP.childNodes)
         .filter(node => node.nodeType === Node.TEXT_NODE)
         .map(node => node.textContent.trim())
         .join('');
+
     navigator.clipboard.writeText(walletText)
-        .then(() => triggerNotification("Wallet Address Copied.", 3000))
-        .catch(() => triggerNotification("Failed to copy Wallet Address.", 3000));
+        .then(() => {
+            triggerNotification("Wallet Address Copied.", 3000);
+            startManualIfAllowed();
+        })
+        .catch(() => {
+            triggerNotification("Failed to copy Wallet Address.", 3000);
+        });
 }
 
 // ---------------- WALLET & TOKENS ----------------

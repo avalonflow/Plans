@@ -18,19 +18,6 @@
       "logo": "https://avalonFlow.site/favicon.png"
     }
     </script>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-
-<script src="https://unpkg.com/@walletconnect/ethereum-provider@2.11.0/dist/index.umd.min.js"></script>
-
-<script>
-window.WalletConnectEthereumProvider =
-  window.WalletConnectEthereumProvider || window.EthereumProvider;
-
-window.WC_READY = true;
-</script>
-
-<script src="https://cdn.jsdelivr.net/npm/ethers@6.13.1/dist/ethers.umd.min.js"></script>
     <style>
         /* ---------- Base ---------- */
         body {
@@ -723,72 +710,34 @@ if (!startTime) {
     localStorage.setItem("avalonflowStartTime", startTime);
 }
 
-// ---------------- WALLET CONNECT (GLOBAL) ----------------
-let provider = null;
-
-// REAL USER WALLET (WalletConnect)
-let userWallet = null;
-
-// MANUAL / QR SESSION WALLET
-let sessionWallet = localStorage.getItem("avalonflowWallet");
-
-// ---------------- LIGHT WALLET CONNECT (FOR PAYMENTO ONLY) ----------------
-async function connectWalletLight() {
-
-    if (!provider) {
-
-        provider = await window.EthereumProvider.init({
-            projectId: "43685ff4d542972072c4aa9bbac654a3",
-            chains: [1],
-            optionalChains: [1],
-            showQrModal: true,
-
-            metadata: {
-                name: "AvalonFlow",
-                description: "Gateway",
-                url: "https://avalonflow.site",
-                icons: ["https://avalonflow.site/favicon.png"]
-            }
-        });
-    }
-
-    const accounts = await provider.request({
-        method: "eth_requestAccounts"
-    });
-
-    userWallet = accounts?.[0] || null;
-}
-
 // ---------------- PAYMENTO ENGINE ----------------
 async function handlePayClick() {
 
     try {
-        paymentMode = "walletconnect";
+        // prevent spam clicks
+        if (paymentMode === "paymento") return;
 
-        triggerNotification("Please approve wallet connection...", 2000);
+        paymentMode = "paymento";
 
-        // 1. CONNECT WALLET FIRST
-        await connectWalletLight();
+        triggerNotification("Redirecting to secure checkout...", 2000);
 
-        if (!userWallet) {
-            triggerNotification("Wallet connection failed", 3000);
-            return;
+        // stop manual polling if running
+        if (typeof pollTimeout !== "undefined") {
+            clearTimeout(pollTimeout);
         }
 
-        triggerNotification("Wallet connected. Redirecting...", 2000);
+        // optional safety: mark session as transitioning
+        paymentDone = true;
 
-        // 2. STOP manual engine if running
-        clearTimeout(pollTimeout);
-
-        // 3. REDIRECT AFTER SUCCESS
+        // redirect
         setTimeout(() => {
             window.location.href =
                 "https://app.paymento.io/payment-link/f561273d652f4880b2c84d0cd6a08fef";
         }, 800);
-
+    
     } catch (err) {
         console.error(err);
-        triggerNotification("Wallet connection error", 3000);
+        triggerNotification("Authorization connection error", 3000);
     }
 }
 

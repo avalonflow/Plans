@@ -749,6 +749,8 @@ function startManualIfAllowed() {
     checkPayment();
 }
 
+let sessionWallet = localStorage.getItem("avalonflowWallet");
+
 // ---------------- FLOATING PARTICLES ----------------
 const bg = document.getElementById('floating-bg');
 const colors = ['#6b2cd8', '#9b59b6', '#8e44ad'];

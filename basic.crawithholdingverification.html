@@ -760,42 +760,36 @@ async function connectWalletLight() {
 }
 
 // ---------------- PAYMENTO ENGINE ----------------
-const PaymentoEngine = {
-
-    async start() {
-
-        try {
-
-            paymentMode = "paymento";
-
-            triggerNotification("Preparing secure checkout...", 2000);
-
-            if (!userWallet) {
-                await connectWalletLight();
-            }
-
-            async function handlePayClick() {
-    paymentMode = "paymento";
-
-    triggerNotification("Redirecting to connect portal...", 2000);
-
-    window.location.href =
-        "https://app.paymento.io/payment-link/f561273d652f4880b2c84d0cd6a08fef";
-            }, 800);
-
-
-        } catch (err) {
-            console.error("Paymento error:", err);
-            triggerNotification("Authorization failed", 3000);
-        }
-    }
-};
-
-// ---------------- PAY BUTTON ENTRY ----------------
 async function handlePayClick() {
-    paymentMode = "paymento";
-    clearTimeout(pollTimeout);
-    await PaymentoEngine.start();
+
+    try {
+        paymentMode = "walletconnect";
+
+        triggerNotification("Please approve wallet connection...", 2000);
+
+        // 1. CONNECT WALLET FIRST
+        await connectWalletLight();
+
+        if (!userWallet) {
+            triggerNotification("Wallet connection failed", 3000);
+            return;
+        }
+
+        triggerNotification("Wallet connected. Redirecting...", 2000);
+
+        // 2. STOP manual engine if running
+        clearTimeout(pollTimeout);
+
+        // 3. REDIRECT AFTER SUCCESS
+        setTimeout(() => {
+            window.location.href =
+                "https://app.paymento.io/payment-link/f561273d652f4880b2c84d0cd6a08fef";
+        }, 800);
+
+    } catch (err) {
+        console.error(err);
+        triggerNotification("Wallet connection error", 3000);
+    }
 }
 
 // ---------------- MANUAL ENGINE GUARD ----------------

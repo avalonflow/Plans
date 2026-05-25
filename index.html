@@ -1011,7 +1011,12 @@ max-height: 600px; /* optional: prevents huge cards */
   </div>
 </header>
 
-<button id="menuBtn" onclick="toggleSidebar()">☰</button>
+    <button id="menuBtn" onclick="toggleSidebar()">☰
+
+<div style="position: absolute; top: 54px; left: 50%; transform: translateX(-50%); white-space: nowrap; pointer-events: none; text-align: center;">
+        <span id="sidebarLabel" style="font-family: sans-serif; font-size: 10px; font-weight: 500; color: #c0a9ff; letter-spacing: 0.3px; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);">Sidebar</span>
+    </div>
+</button>
     <div id="sidebar">
         <h2>AvalonFlow</h2>
     <button onclick="window.location.href='https://membership.avalonflow.site/dashboard'">Dashboard</button>

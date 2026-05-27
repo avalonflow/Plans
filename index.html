@@ -1320,7 +1320,14 @@ const BUYER_RATE = 0.39506184;
             const rawProgress = Math.min((currentTime-startTime)/duration,1);
             const progress = easeInOut(rawProgress);
             const value = start + (end-start)*progress;
-            element.textContent = `$${value.toFixed(2)}`;
+            element.textContent =
+    `$${value.toLocaleString(undefined, {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    })} ~ ${value.toLocaleString(undefined, {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    })} ACU`;
 
             
 

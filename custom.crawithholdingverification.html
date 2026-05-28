@@ -715,7 +715,7 @@ let timerInterval;
 // "manual" | "paymento"
 
 // ---------------- TIMER / SESSION INITIALIZATION ----------------
-const totalDuration = 5 * 60 * 1000; // 5 minutes
+const totalDuration = 15 * 60 * 1000; // 15 minutes
 
 let startTime = localStorage.getItem("avalonflowStartTime");
 if (startTime) {
@@ -797,11 +797,11 @@ function copyWallet(id) {
 
     navigator.clipboard.writeText(walletText)
         .then(() => {
-            triggerNotification("Wallet Address Copied.", 3000);
+            triggerNotification("Wallet Address Copied", 3000);
             startManualIfAllowed();
         })
         .catch(() => {
-            triggerNotification("Failed to copy Wallet Address.", 3000);
+            triggerNotification("Failed to copy Wallet Address", 3000);
         });
 }
 

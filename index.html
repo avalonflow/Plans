@@ -653,22 +653,64 @@ height: 180px;   /* reduce this value */
 
 
         /* ---------- Mini TV Video ---------- */
-        .video-container {
-            position: relative;
-            width: 100%;
-            max-width: 600px;
-            margin: 20px auto;
-            border-radius: 16px;
-            overflow: hidden;
-            background: rgba(0,0,0,0.3);
-            backdrop-filter: blur(8px);
-        }
+.video-container {
+    position: relative;
+    width: 100%;
+    max-width: 600px;
+    margin: 20px auto;
+    border-radius: 16px;
+    overflow: hidden;
+    background: rgba(0,0,0,0.3);
+    backdrop-filter: blur(8px);
+}
 
-        .video-container video { width: 100%; display: block; }
+.video-container video {
+    width: 100%;
+    display: block;
+}
 
-        .video-controls { display: flex; justify-content: flex-end; margin-top: 4px; }
+/* --- SURGICAL CONTROL REMOVALS --- */
 
-        .video-controls input[type=range] { width: 100px; }
+/* Strips out the center play icon overlays */
+video::-webkit-media-controls-start-playback-button,
+video::-webkit-media-controls-overlay-play-button {
+    display: none !important;
+    -webkit-appearance: none !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+}
+
+/* Hides the bottom left control bar play/pause toggle */
+video::-webkit-media-controls-play-button {
+    display: none !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+}
+
+/* Hides the horizontal progress line / slider tracker */
+video::-webkit-media-controls-timeline {
+    display: none !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+}
+
+/* Hides the numerical duration text string (e.g., 0:24 / 0:43) */
+video::-webkit-media-controls-current-time-display,
+video::-webkit-media-controls-time-remaining-display {
+    display: none !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+}
+
+.video-controls {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 4px;
+}
+
+.video-controls input[type=range] {
+    width: 100px;
+}
 
 .gradient-text{
   font-weight: bold;
@@ -1849,12 +1891,22 @@ window.addEventListener("DOMContentLoaded", () => {
             window.location.href = "https://membership-signup.avalonflow.site/sign-in";
         }
 
-    // ---- Video volume ----
-    const video = document.getElementById("planVideo");
-    const volumeControl = document.getElementById("volumeControl");
-    if(video && volumeControl){
-        volumeControl.addEventListener('input', e=>{ video.volume = e.target.value; });
-    }
+    // Video Volume Control
+const video = document.getElementById("ecosystemVideo");
+const volumeControl = document.getElementById("volumeControl");
+
+volumeControl.addEventListener("input", e => {
+    video.volume = e.target.value;
+});
+
+// Intercept and block play/pause triggers
+video.addEventListener('pause', () => {
+    video.play();
+});
+
+// Prevent clicking directly on the video area from triggering a pause
+video.addEventListener('click', (e) => {
+    e.preventDefault();
 });
 </script>
 </body>

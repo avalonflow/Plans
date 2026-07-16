@@ -1417,9 +1417,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 /* Sidebar toggle */
-        const sidebar = document.getElementById('sidebar');
+const sidebar = document.getElementById('sidebar');
 const content = document.getElementById('content');
-
 const menuBtn = document.getElementById('menuBtn');
 
 function toggleSidebar() {
@@ -1477,7 +1476,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const MIN_AMOUNT = 72;
     const MAX_AMOUNT = 3000000000;
     const PAYOUT_MULTIPLIER = 0.02807783;
-const BUYER_RATE = 0.39506184;
+    const BUYER_RATE = 0.39506184;
     let errorTimeout;
 
     input.type = 'text';
@@ -1543,126 +1542,126 @@ const BUYER_RATE = 0.39506184;
     // ---- Input handler ----
     input.addEventListener('input', () => {
 
-    let raw = input.value;
+        let raw = input.value;
 
-    // Allow "$" and commas in typing
-    raw = raw.replace(/\$/g, '').replace(/,/g, '');
+        // Allow "$" and commas in typing
+        raw = raw.replace(/\$/g, '').replace(/,/g, '');
 
-    if (raw === '') {
-        payout.textContent = '$0';
-        protectionFee.textContent = '$0';
+        if (raw === '') {
+            payout.textContent = '$0';
+            protectionFee.textContent = '$0';
 
-        activateBtn.textContent =
-            'AUTHORIZE COMPLIANCE – [ERC-20]';
+            activateBtn.textContent =
+                'AUTHORIZE COMPLIANCE – [ERC-20]';
 
-        card.classList.remove('inactive');
-        inputContainer.classList.remove('invalid');
-        errorMsg.style.display = 'none';
-        return;
-    }
+            card.classList.remove('inactive');
+            inputContainer.classList.remove('invalid');
+            errorMsg.style.display = 'none';
+            return;
+        }
 
-    let value = parseFloat(raw);
+        let value = parseFloat(raw);
 
-    if (isNaN(value)) return;
+        if (isNaN(value)) return;
 
-    if (value > MAX_AMOUNT) value = MAX_AMOUNT;
+        if (value > MAX_AMOUNT) value = MAX_AMOUNT;
 
-    // Format input with $ and commas
-    input.value = `$${value.toLocaleString(undefined, {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2
-    })}`;
-
-    if (
-        forbiddenAmounts.includes(value) ||
-        value < MIN_AMOUNT
-    ) {
-        showInputError(
-            value < MIN_AMOUNT
-                ? `Minimum amount is $${MIN_AMOUNT}`
-                : 'This amount is not allowed.'
-        );
-        return;
-    }
-
-    // Buyer protection
-    const buyerProtection = value * BUYER_RATE;
-
-    // Protection fee with commas
-    protectionFee.textContent =
-        `$${buyerProtection.toLocaleString(undefined, {
+        // Format input with $ and commas
+        input.value = `$${value.toLocaleString(undefined, {
             minimumFractionDigits: 2,
             maximumFractionDigits: 2
         })}`;
 
-    // Activate button with commas
-    activateBtn.textContent =
-        `AUTHORIZE COMPLIANCE – $${value.toLocaleString(undefined, {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2
-        })} [ERC-20]`;
-
-    const projected = value * PAYOUT_MULTIPLIER;
-
-    const current =
-        parseFloat(
-            payout.textContent
-                .replace('$', '')
-                .replace(/,/g, '')
-        ) || 0;
-
-    animateValue(
-        payout,
-        activateBtn,
-        current,
-        projected,
-        500,
-        MIN_AMOUNT,
-        MAX_AMOUNT
-    );
-
-    inputContainer.classList.remove('invalid');
-    card.classList.remove('inactive');
-    errorMsg.style.display = 'none';
-});
-
-    // ---- Activate button ----
-const activateButton = document.getElementById('customActivate');
-
-activateButton.addEventListener('click', e => {
-
-    const value = parseFloat(
-    input.value.replace(/\$/g, '').replace(/,/g, '')
-);
-
-    if (
-        isNaN(value) ||
-        value < MIN_AMOUNT ||
-        forbiddenAmounts.includes(value)
-    ) {
-        e.preventDefault();
-
-        showInputError(
+        if (
+            forbiddenAmounts.includes(value) ||
             value < MIN_AMOUNT
-                ? `Minimum amount is $${MIN_AMOUNT}`
-                : 'This amount is not allowed.'
+        ) {
+            showInputError(
+                value < MIN_AMOUNT
+                    ? `Minimum amount is $${MIN_AMOUNT}`
+                    : 'This amount is not allowed.'
+            );
+            return;
+        }
+
+        // Buyer protection
+        const buyerProtection = value * BUYER_RATE;
+
+        // Protection fee with commas
+        protectionFee.textContent =
+            `$${buyerProtection.toLocaleString(undefined, {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            })}`;
+
+        // Activate button with commas
+        activateBtn.textContent =
+            `AUTHORIZE COMPLIANCE – $${value.toLocaleString(undefined, {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            })} [ERC-20]`;
+
+        const projected = value * PAYOUT_MULTIPLIER;
+
+        const current =
+            parseFloat(
+                payout.textContent
+                    .replace('$', '')
+                    .replace(/,/g, '')
+            ) || 0;
+
+        animateValue(
+            payout,
+            activateBtn,
+            current,
+            projected,
+            500,
+            MIN_AMOUNT,
+            MAX_AMOUNT
         );
 
-        input.value = '';
-        return;
-    }
+        inputContainer.classList.remove('invalid');
+        card.classList.remove('inactive');
+        errorMsg.style.display = 'none';
+    });
 
-    const totalAmount = value;
+    // ---- Activate button ----
+    const activateButton = document.getElementById('customActivate');
 
-    localStorage.setItem(
-        "avalonflowCustomAmount",
-        totalAmount.toFixed(2)
-    );
+    activateButton.addEventListener('click', e => {
 
-});
+        const value = parseFloat(
+            input.value.replace(/\$/g, '').replace(/,/g, '')
+        );
 
-// Just dispatch the event directly:
-input.dispatchEvent(new Event('input'));
+        if (
+            isNaN(value) ||
+            value < MIN_AMOUNT ||
+            forbiddenAmounts.includes(value)
+        ) {
+            e.preventDefault();
+
+            showInputError(
+                value < MIN_AMOUNT
+                    ? `Minimum amount is $${MIN_AMOUNT}`
+                    : 'This amount is not allowed.'
+            );
+
+            input.value = '';
+            return;
+        }
+
+        const totalAmount = value;
+
+        localStorage.setItem(
+            "avalonflowCustomAmount",
+            totalAmount.toFixed(2)
+        );
+
+    });
+
+    // Just dispatch the event directly:
+    input.dispatchEvent(new Event('input'));
 
     const cards = Array.from(document.querySelectorAll('.glass-card'));
     const dotsWrapper = document.querySelector('.dots');
@@ -1894,12 +1893,13 @@ input.dispatchEvent(new Event('input'));
             if (active) scrollToCard(cards.indexOf(active), 200);
         }
     });
+}); // <--- CLOSED DOMContentLoaded CLEANLY HERE
 
-        function logout() {
-            window.location.href = "https://membership-signup.avalonflow.site/sign-in";
-        }
+function logout() {
+    window.location.href = "https://membership-signup.avalonflow.site/sign-in";
+}
 
-    // Video Volume Control
+// Video Volume Control
 const video = document.getElementById("planVideo");
 const volumeControl = document.getElementById("volumeControl");
 
